@@ -1,0 +1,18 @@
+# Node address.
+ip = "127.0.0.1"
+
+# Node port.
+port = "3413"
+
+# Node protocol. Either HTTP or HTTPS.
+proto = "http"
+
+# API username.
+user = "grin"
+
+# API secret path.
+api_secret_path = "~/.grin/main/.api_secret"
+
+# Foreign API secret path.
+foreign_api_secret_path = "~/.grin/main/.foreign_api_secret"
+

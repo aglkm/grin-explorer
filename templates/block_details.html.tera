@@ -1,0 +1,128 @@
+{% extends "base" %}
+
+{% block content %}
+
+<code>
+
+  <div class="card">
+    <div class="card-body" align="left">
+      <div class="darkorange-text"><i class="bi bi-box"></i> BLOCK {{ block.height }}</div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Time&nbsp;</div>
+        <div class="value-text text-end">{{ block.time }}</div>
+      </div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Hash&nbsp;</div>
+        <div class="value-text text-break text-end">{{ block.hash }}</div>
+      </div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Fees&nbsp;</div>
+        <div class="value-text text-end">ツ {{ block.fees / 1000000000.0 }}</div>
+      </div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Weight&nbsp;</div>
+        <div class="value-text text-end">{{ block.weight }} %</div>
+      </div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Version&nbsp;</div>
+        <div class="value-text text-end">{{ block.version }}</div>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+  <div class="card">
+    <div class="card-body mb-2" align="left">
+      <div class="darkorange-text"><i class="bi bi-receipt"></i> TRANSACTIONS</div>
+      <br>
+      <div class="value-text" align="center">Kernels ({{ block.ker_len }})</div>
+      {% for i in range(end=block.ker_len) %}
+        <br>
+        <div class="row">
+        <!-- kernels[i][0] - Hash
+             kernels[i][1] - Type
+             kernels[i][2] - Fee -->
+        {% if block.kernels[i][1] == "Coinbase" %}
+          <div class="col-sm value-text" align="left">
+            <span class="badge bg-dark-subtle text-black px-2 py-1">ツ {{ block.kernels[i][2] }}</span> <span class="badge bg-info text-black px-2 py-1">{{ block.kernels[i][1] }}&nbsp;<i class="bi bi-hammer"></i></span>
+          </div>
+        {% else %}
+          <div class="col-sm value-text" align="left">
+            <span class="badge bg-dark-subtle text-black px-2 py-1">ツ {{ block.kernels[i][2] }}</span> <span class="badge bg-dark-subtle text-black px-2 py-1">{{ block.kernels[i][1] }}</span>
+          </div>
+        {% endif %}
+	  <div class="col-sm value-text">{{ block.kernels[i][0] }}</div>
+	  <div class="col-sm value-text"></div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="card-body mb-2" align="center">
+      <div class="d-flex flex-row justify-content-center">
+        <i class="bi bi-asterisk me-4"></i>
+        <i class="bi bi-asterisk me-4"></i>
+        <i class="bi bi-asterisk"></i>
+      </div>
+    </div>
+
+    <div class="card-body mb-1" align="center">
+      <div class="value-text">Inputs ({{ block.in_len }})</div>
+      {% for i in range(end=block.in_len) %}
+        <br>
+        <div class="row">
+          <div class="col-sm"></div>
+	  <div class="col-sm" align="left">{{ block.inputs[i] }}</div>
+	  <div class="col-sm"></div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="card-body mb-1" align="center">
+      <h2><i class="bi bi-arrow-down-circle"></i></h2>
+    </div>
+
+    <div class="card-body" align="center">
+      <div class="value-text">Outputs ({{ block.out_len }})</div>
+      {% for i in range(end=block.out_len) %}
+        <br>
+        <div class="row">
+          <!-- outputs[i][0] - Hash
+               outputs[i][1] - Type -->
+          {% if block.outputs[i][1] == "Coinbase" %}
+            <div class="col-sm value-text" align="left">
+              <span class="badge bg-info text-black px-2 py-1">{{ block.outputs[i][1] }}&nbsp;<i class="bi bi-hammer"></i></span>
+            </div>
+          {% else %}
+	    <div class="col-sm value-text" align="left">
+              <span class="badge bg-dark-subtle text-black px-2 py-1">{{ block.outputs[i][1] }}</span>
+            </div>
+          {% endif %}
+	    <div class="col-sm value-text" align="left">{{ block.outputs[i][0] }}</div>
+	    <div class="col-sm value-text"></div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <br>
+
+  <div class="card">
+    <div class="card-body" align="left">
+      <div class="darkorange-text"><i class="bi bi-layout-text-sidebar-reverse"></i> RAW DATA</div>
+      <br>
+      <div class="value-text">{{ block.raw_data }}</div>
+    </div>
+  </div>
+
+ <br>
+
+</code>
+
+{% endblock %}
+

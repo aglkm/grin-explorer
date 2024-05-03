@@ -1,0 +1,264 @@
+{% extends "base" %}
+
+{% block content %}
+
+<code>
+
+<div class="d-none d-md-block mb-4"> <!-- Show on >= md screens -->
+  <div class="card-group">
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            HEIGHT
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            AGE
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            KERNELS
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            INPUTS
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            OUTPUTS
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            FEES
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            WEIGHT
+          </div>
+	</div>
+      </div>
+  </div>
+
+
+    {% for i in range(end=10) %}
+    <div class="card-group rounded-0">
+        <div class="card rounded-0 mt-1">
+          <div class="card-body">
+            {% if route == "block_list_by_height" %}
+              <div class="value-text">
+                <a class="text-decoration-none" href="/block/{{ blocks[i].height }}">
+                  {{ blocks[i].height }}
+                </a>
+              </div>
+            {% else %}
+	      <div class="value-text" hx-get="/rpc/block/link" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+            {% endif %}
+	  </div>
+	</div>
+        <div class="card rounded-0 mt-1">
+          <div class="card-body">
+            {% if route == "block_list_by_height" %}
+              <div class="value-text">{{ blocks[i].time }}</div>
+            {% else %}
+              <div class="value-text" hx-get="/rpc/block/time" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+            {% endif %}
+	  </div>
+	</div>
+        <div class="card rounded-0 mt-1">
+          <div class="card-body">
+            {% if route == "block_list_by_height" %}
+              <div class="value-text">{{ blocks[i].ker_len }}</div>
+            {% else %}
+              <div class="value-text" hx-get="/rpc/block/kernels" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+            {% endif %}
+          </div>
+	</div>
+        <div class="card rounded-0 mt-1">
+          <div class="card-body">
+            {% if route == "block_list_by_height" %}
+              <div class="value-text">{{ blocks[i].in_len }}</div>
+            {% else %}
+              <div class="value-text" hx-get="/rpc/block/inputs" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+            {% endif %}
+	  </div>
+	</div>
+        <div class="card rounded-0 mt-1">
+          <div class="card-body">
+            {% if route == "block_list_by_height" %}
+              <div class="value-text">{{ blocks[i].out_len }}</div>
+            {% else %}
+              <div class="value-text" hx-get="/rpc/block/outputs" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+            {% endif %}
+          </div>
+	</div>
+        <div class="card rounded-0 mt-1">
+          <div class="card-body">
+            {% if route == "block_list_by_height" %}
+              <div class="value-text">ツ {{ blocks[i].fees / 1000000000.0 }}</div>
+            {% else %}
+              <div class="value-text" hx-get="/rpc/block/fees" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+            {% endif %}
+          </div>
+	</div>
+        <div class="card rounded-0 mt-1">
+          <div class="card-body">
+            {% if route == "block_list_by_height" %}
+              <div class="value-text">{{ blocks[i].weight }} %</div>
+            {% else %}
+              <div class="value-text" hx-get="/rpc/block/weight" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+            {% endif %}
+          </div>
+	</div>
+    </div>
+    {% endfor %}
+
+</div>
+
+
+<div class="d-md-none mb-4"> <!-- Show on < md screens-->
+    {% for i in range(end=10) %}
+        <div class="card mb-3">
+          <div class="card-body" align="left">
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Block</div>
+                {% if route == "block_list_by_height" %}
+                  <div class="value-text">
+                    <a class="text-decoration-none darkorange-text" href="/block/{{ blocks[i].height }}">
+                      {{ blocks[i].height }}
+                    </a>
+                  </div>
+                {% else %}
+		<div class="value-text text-end" hx-get="/rpc/block/link_color" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+                {% endif %}
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Age</div>
+                {% if route == "block_list_by_height" %}
+                  <div class="value-text">{{ blocks[i].time }}</div>
+                {% else %}
+		  <div class="value-text text-end" hx-get="/rpc/block/time" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+                {% endif %}
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Kernels</div>
+                {% if route == "block_list_by_height" %}
+                  <div class="value-text">{{ blocks[i].ker_len }}</div>
+                {% else %}
+		  <div class="value-text text-end" hx-get="/rpc/block/kernels" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+                {% endif %}
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Inputs</div>
+                {% if route == "block_list_by_height" %}
+                  <div class="value-text">{{ blocks[i].in_len }}</div>
+                {% else %}
+		  <div class="value-text text-end" hx-get="/rpc/block/inputs" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+                {% endif %}
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Outputs</div>
+                {% if route == "block_list_by_height" %}
+                  <div class="value-text">{{ blocks[i].out_len }}</div>
+                {% else %}
+		  <div class="value-text text-end" hx-get="/rpc/block/outputs" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+                {% endif %}
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Fees</div>
+                {% if route == "block_list_by_height" %}
+                  <div class="value-text">ツ {{ blocks[i].fees / 1000000000.0 }}</div>
+                {% else %}
+		  <div class="value-text text-end" hx-get="/rpc/block/fees" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+                {% endif %}
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Weight</div>
+                {% if route == "block_list_by_height" %}
+                  <div class="value-text">{{ blocks[i].weight }} %</div>
+                {% else %}
+		  <div class="value-text text-end" hx-get="/rpc/block/weight" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+                {% endif %}
+              </div>
+          </div>
+	</div>
+    {% endfor %}
+</div>
+
+
+{% if route == "block_list_by_height" %}
+
+  <div class="d-flex justify-content-center sticky-bottom mb-3">
+    <div class="me-5">
+      {% if height >= (index + 10) %}
+        <a class="text-decoration-none" href="/block_list/{{ index + 10 }}">
+      {% elif height >= (index) and height < (index + 10) %}
+        <a class="text-decoration-none" href="/block_list/{{ height }}">
+      {% endif %}
+        <h2><i class="bi bi-arrow-left-square"></i></h2>
+      </a>
+    </div>
+    <div class="me-5">
+      <a class="text-decoration-none" href="/block_list">
+        <h2><i class="bi bi-house"></i></h2>
+      </a>
+    </div>
+    <div>
+      {% if index >= 20 %}
+        <a class="text-decoration-none" href="/block_list/{{ index - 10 }}">
+      {% elif index >= 10 and index < 20 %}
+        <a class="text-decoration-none" href="/block_list/{{ 9 }}">
+      {% else %}
+        <a class="text-decoration-none disabled" href="">
+      {% endif %}
+        <h2><i class="bi bi-arrow-right-square"></i></h2>
+      </a>
+    </div>
+  </div>
+
+{% else %}
+
+  <div class="d-flex justify-content-center sticky-bottom mb-3">
+    <div class="me-5">
+      <a class="text-decoration-none disabled" href="">
+        <h2><i class="bi bi-arrow-left-square"></i></h2>
+      </a>
+    </div>
+    <div class="me-5">
+      <a class="text-decoration-none" href="/block_list">
+        <h2><i class="bi bi-house"></i></h2>
+      </a>
+    </div>
+    <div>
+      <div hx-get="/rpc/block_list/index" hx-trigger="load, every 10s"></div>
+    </div>
+  </div>
+
+{% endif %}
+
+</code>
+
+{% endblock %}

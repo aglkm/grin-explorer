@@ -1,0 +1,228 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Grin Blockchain Explorer</title>
+    <meta property="og:site_name" content="Grincoin.org (GRIN) Blockchain Explorer" />
+    <meta property="og:url" content="https://grincoin.org" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Grin Blockchain Explorer" />
+    <meta property="og:description" content="Grincoin.org website allows you to explore Grin blockchain." />
+    <meta name="description" content="Grincoin.org website allows you to explore Grin blockchain." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type= "text/css" href="/static/styles/style.css" />
+    <link rel= "stylesheet" type= "text/css" href= "/static/styles/bootstrap.css" />
+    <link rel= "stylesheet" type= "text/css" href= "/static/styles/bootstrap-icons.css" />
+    <link rel="shortcut icon" type="image/png" href="/static/icon/grin-logo.png" />
+    <script src="/static/scripts/darkmode.js"></script>
+    <script src="/static/scripts/darkmode_toggle.js"></script>
+    <script src="/static/scripts/bootstrap.bundle.js"></script>
+    <script src="/static/scripts/htmx.min.js"></script>
+  </head>
+
+  <body class="d-flex flex-column min-vh-100 dark-mode">
+
+    <nav class="navbar bg-style navbar-expand-lg shadow-sm py-0"> 
+      <div class="container-fluid">
+        <code><a class="navbar-brand fs-2" href="/"><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 191 191" height="35" width="35" style="enable-background:new 0 0 191 191;" xml:space="preserve"><style type="text/css">.st0{fill:#f2a900;}</style><circle cx="95.5" cy="95.5" r="95.5"/><circle class="st0" cx="95.3" cy="95.5" r="85.3"/><path d="M135.7,63.5c-2-4.6-3.9-13.6-9.1-15.6c-6.7-2.6-10.9,14.3-11.9,18.6h-1c-1.7-7.3-4-17.7-12-20c-3.7,15.6,3.9,32.5,11,46
+	c7.6-3.6,11.3-15,12-23h1l8,24c6.4-1.8,8.7-8.2,11-14c5-12.4,9.2-27.7,6-41C141.1,41.2,138.2,55,135.7,63.5 M39.7,95.5
+	c8.6-4.1,12.7-17.1,14-26h1c1,4.3,3.7,15.4,9.1,16.1c6.8,0.9,10.4-14.3,10.9-19.1h1c2.2,7.5,4.5,17.3,12,21
+	c2.8-11.7-0.5-24.1-4.8-35c-1.1-2.8-3.3-10.4-7.2-10.4c-6.3,0-9.9,16.7-11,21.4h-1l-8-24C41.6,46.2,34,82,39.7,95.5 M24.7,107.5
+	c10.4,45.6,58.6,71.4,102,52.1c15.8-7,28.3-19.5,35.5-35.1c1.9-4,5.5-11.4,3.4-16.7c-2.1-5.3-22.8,3.4-27.9,5.6
+	c-0.7,0.3-1.2,1-1.4,1.8c-0.3,2.2,1.2,4.3,3.4,4.6c0.1,0,0.2,0,0.3,0l8.7,0.7c-15.7,30.4-58.1,43.8-88,19.5
+	C54,134.6,48,128.2,44,120.5c-1.9-3.7-3.7-8.4-7-11C33.8,107.1,29,106.3,24.7,107.5L24.7,107.5z"/></svg></a></code>
+        <button class="navbar-toggler my-3" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav me-auto">
+	    {% if route == "index" %}
+              <li class="nav-item">
+	      <a class="nav-link" href="/"><div class="darkorange-text"><i class="bi bi-speedometer"></i> Dashboard</div></a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/block_list"><i class="bi bi-box"></i> Blocks</a>
+              </li>
+	    {% elif route == "block_list" or route == "block_list_by_height" %}
+              <li class="nav-item">
+                <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/block_list"><div class="darkorange-text"><i class="bi bi-box"></i> Blocks</div></a>
+              </li>
+	    {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/block_list"><i class="bi bi-box"></i> Blocks</a>
+              </li>
+	    {% endif %}
+          </ul>
+
+	  <div class="row">
+	    <div class="col-12">
+              <form class="input-group my-3" role="search" action="/search" method="POST" autocomplete="off">
+                <input class="form-control ms-0 me-2" type="search" placeholder="Explore Grin Network" aria-label="Search" name="search" required>
+                <button class="btn btn-outline-secondary btn-search" type="submit">
+                  <i class="bi bi-search"></i>
+                </button>
+              </form>
+	    </div>
+	  </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <br>
+      {% block content %}{% endblock content %}
+    </div>
+
+    <footer class="shadow">
+      <code>
+        <br>
+        <div class="container-fluid">
+          <div class="card-group">
+            <div class="card border-0">
+              <div class="card-body" align="left">
+	        <div class="darkorange-text">Community</div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://grin.mw/">Grin.MW</a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://forum.grin.mw/">Forum</a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://www.grincc.mw/">Council</a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://keybase.io/team/grincoin">Keybase</a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+                  <div class="me-3">
+                    <a class="text-decoration-none" href="https://t.me/grinprivacy">
+                      <h2><i class="bi bi-telegram"></i></h2>
+                    </a>
+                  </div>
+                  <div class="me-3">
+                    <a class="text-decoration-none" href="https://discord.gg/5p4vCQY9km">
+                      <h2><i class="bi bi-discord"></i></h2>
+                    </a>
+                  </div>
+                  <div class="me-3">
+                    <a class="text-decoration-none" href="https://www.reddit.com/r/grincoin/">
+                      <h2><i class="bi bi-reddit"></i></h2>
+                    </a>
+                  </div>
+                </div>
+              </div>
+	    </div>
+
+            <div class="card border-0">
+              <div class="card-body" align="left">
+                <div class="darkorange-text">Resources</div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://docs.grin.mw/about-grin/story/">
+                      About Grin
+                    </a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://phyro.github.io/what-is-grin">
+                      What Is Grin
+                    </a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://phyro.github.io/grinvestigation/why_grin.html">Why Grin</a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://grinnode.live/">Grinnode</a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://grinflation.com/">Grinflation</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card border-0">
+              <div class="card-body" align="left">
+                <div class="darkorange-text">Build</div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://github.com/mimblewimble/grin">
+                      Github
+                    </a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://docs.grin.mw/">Documentation</a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://github.com/mimblewimble/docs/wiki/A-Brief-History-of-MimbleWimble-White-Paper">Whitepaper</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <br>
+
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+              <span class="custom-control custom-switch custom-control-inline ms-0">
+                <button class="btn-sm btn-outline-secondary" onclick="darkModeFunc()">
+                  <h3><i class="bi bi-brightness-low"></i></h3>
+                </button>
+              </span>
+            </div>
+            </div>
+            <div class="row">
+              <div class="col d-flex justify-content-center" style="color:grey">
+	        Powered by CoinGecko
+	      </div>
+            </div>
+          </div>
+        </div>
+        <br>
+      </code>
+    </footer>
+
+    <script>
+      checkDarkMode()
+    </script>
+
+   </body>
+</html>

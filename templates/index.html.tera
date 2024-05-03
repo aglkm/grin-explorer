@@ -1,0 +1,427 @@
+{% extends "base" %}
+
+{% block content %}
+
+<code>
+
+<div class="d-none d-md-block"> <!-- Show on >= md screens -->
+      <div class="card-group mb-2">
+        <div class="card me-2">
+          <div class="card-body" align="left">
+	      <div class="darkorange-text"><i class="bi bi-cash-coin"></i> PRICE</div>
+              <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">GRIN_BTC&nbsp;</div><div class="value-text text-end" hx-get="/rpc/price/btc" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">GRIN_USD&nbsp;</div><div class="value-text text-end" hx-get="/rpc/price/usd" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">24H Volume (USD)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/volume_usd" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">24H Volume (BTC)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/volume_btc" hx-trigger="load, every 10s"></div>
+              </div>
+          </div>
+	</div>
+
+        <div class="card">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-bank"></i> MARKET</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Yearly Inflation Rate&nbsp;</div><div class="value-text text-end" hx-get="/rpc/inflation/rate" hx-trigger="load, every 10s"> %</div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Coin Supply&nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/supply" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Soft Total Supply
+                <!-- Button trigger soft supply explanation modal -->
+                <button class="btn-sm shadow-none" data-bs-toggle="modal" data-bs-target="#soft_sup">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/soft_supply" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Market Cap (USD)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/cap_usd" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Market Cap (BTC)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/cap_btc" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="card-group mb-2">
+        <div class="card me-2">
+          <div class="card-body" align="left">
+              <div class="d-flex justify-content-between">
+	        <div class="darkorange-text"><i class="bi bi-grid"></i> BLOCKCHAIN</div>
+              </div>
+              <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Size&nbsp;</div><div class="value-text text-end" hx-get="/rpc/disk/usage" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Block Height&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/latest" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Time Since Last Block&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/time_since_last" hx-trigger="load, every 10s"></div>
+              </div>
+          </div>
+        </div>
+        <div class="card me-2">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-hammer"></i> MINING</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Hashrate (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/hashrate" hx-trigger="load, every 10s"> KG/s</div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Difficulty&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/difficulty" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Block Reward&nbsp;</div><div class="value-text text-end">ツ 60</div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Estimated Mining Cost
+                <!-- Button trigger mining cost explanation modal -->
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#mining_cost">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/mining/production_cost" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Reward/Cost Ratio
+                <!-- Button trigger ratio explanation modal -->
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#ratio">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/mining/reward_ratio" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">1H Period (60 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">24H Period (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="card-group mb-4">
+        <div class="card me-2">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-receipt"></i> MEMPOOL</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Transactions&nbsp;</div><div class="value-text text-end" hx-get="/rpc/mempool/txns" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Stem&nbsp;</div><div class="value-text text-end" hx-get="/rpc/mempool/stem" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card me-2">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-diagram-3"></i> CONNECTIONS</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Inbound&nbsp;</div><div class="value-text text-end" hx-get="/rpc/peers/inbound" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Outbound&nbsp;</div><div class="value-text text-end" hx-get="/rpc/peers/outbound" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-pc-display-horizontal"></i> NODE</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Version&nbsp;</div><div class="value-text text-end">{{ node_ver }}</div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text me-1">Protocol&nbsp;</div><div class="value-text text-end">{{ proto_ver }}</div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text me-1">Sync Status&nbsp;</div><div class="value-text text-end" hx-get="/rpc/sync/status" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>
+
+<div class="d-md-none"> <!-- Show on < md screens-->
+
+        <div class="card mb-3">
+          <div class="card-body" align="left">
+	      <div class="darkorange-text"><i class="bi bi-cash-coin"></i> PRICE</div>
+              <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">GRIN_BTC&nbsp;</div><div class="value-text text-end" hx-get="/rpc/price/btc" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">GRIN_USD&nbsp;</div><div class="value-text text-end" hx-get="/rpc/price/usd" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">24H Volume (USD)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/volume_usd" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">24H Volume (BTC)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/volume_btc" hx-trigger="load, every 10s"></div>
+              </div>
+          </div>
+	</div>
+
+        <div class="card mb-3">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-bank"></i> MARKET</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Yearly Inflation Rate&nbsp;</div><div class="value-text text-end" hx-get="/rpc/inflation/rate" hx-trigger="load, every 10s"> %</div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Coin Supply&nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/supply" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Soft Total Supply
+                <!-- Button trigger soft supply explanation modal -->
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#soft_sup">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/soft_supply" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Market Cap (USD)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/cap_usd" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Market Cap (BTC)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/cap_btc" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="card mb-3">
+          <div class="card-body" align="left">
+              <div class="d-flex justify-content-between">
+	        <div class="darkorange-text"><i class="bi bi-grid"></i> BLOCKCHAIN</div>
+              </div>
+              <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Size&nbsp;</div><div class="value-text text-end" hx-get="/rpc/disk/usage" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Block Height&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/latest" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Time Since Last Block&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/time_since_last" hx-trigger="load, every 10s"></div>
+              </div>
+          </div>
+        </div>
+        <div class="card mb-3">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-hammer"></i> MINING</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Hashrate (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/hashrate" hx-trigger="load, every 10s"> KG/s</div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Difficulty&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/difficulty" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Block Reward&nbsp;</div><div class="value-text text-end">ツ 60</div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Estimated Mining Cost
+                <!-- Button trigger mining cost explanation modal -->
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#mining_cost">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/mining/production_cost" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Reward/Cost Ratio
+                <!-- Button trigger ratio explanation modal -->
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#ratio">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/mining/reward_ratio" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card mb-3">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">1H Period (60 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">24H Period (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="card mb-3">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-receipt"></i> MEMPOOL</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Transactions&nbsp;</div><div class="value-text text-end" hx-get="/rpc/mempool/txns" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Stem&nbsp;</div><div class="value-text text-end" hx-get="/rpc/mempool/stem" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card mb-3">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-diagram-3"></i> CONNECTIONS</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Inbound&nbsp;</div><div class="value-text text-end" hx-get="/rpc/peers/inbound" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">Outbound&nbsp;</div><div class="value-text text-end" hx-get="/rpc/peers/outbound" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card mb-4">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-pc-display-horizontal"></i> NODE</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Version&nbsp;</div><div class="value-text text-end">{{ node_ver }}</div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text me-1">Protocol&nbsp;</div><div class="value-text text-end">{{ proto_ver }}</div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text me-1">Sync Status&nbsp;</div><div class="value-text text-end" hx-get="/rpc/sync/status" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+
+</div>
+
+
+<!-- Modals. Explanations of several dashboard stats. -->
+<div class="card border-0">
+
+<div class="modal fade" id="soft_sup" tabindex="-1" aria-labelledby="soft_sup_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="soft_sup_label">Soft Total Supply</h1>
+        <div data-bs-theme="light">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        Percentage of issued coins from the soft total supply (3150M) when inflation will reach <1%.
+        <br>
+        <br>
+        <a class="text-decoration-none" href="https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153">https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="mining_cost" tabindex="-1" aria-labelledby="mining_cost_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="mining_cost_label">Estimated Mining Cost</h1>
+        <div data-bs-theme="light">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        Mining cost to produce 1 grin coin.<br>
+        Assuming that:<br>
+        Miner is G1-mini ASIC.<br>
+        Electricity cost is $0.07 per kW/h.<br>
+        <br>
+        <a class="text-decoration-none" href="https://ipollo.com/products/ipollo-g1-mini">https://ipollo.com/products/ipollo-g1-mini</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="ratio" tabindex="-1" aria-labelledby="ratio_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="ratio_label">Reward/Cost Ratio</h1>
+        <div data-bs-theme="light">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        Shows the result of the following formula:<br>
+        Price of 1 Grin (USD) / Mining Cost of 1 Grin (USD).<br>
+        <br>
+        <i class="bi bi-hand-thumbs-down"></i> - <= 1<br>
+        <i class="bi bi-hand-thumbs-up"></i> - from 1 to 2<br>
+        <i class="bi bi-emoji-sunglasses"></i> - from 2 to 3<br>
+        <i class='bi bi-rocket-takeoff'></i> - >= 3
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+</code>
+
+{% endblock content%}
+

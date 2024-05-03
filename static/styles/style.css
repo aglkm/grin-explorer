@@ -1,0 +1,266 @@
+.darkgray-text {
+  color: #636c72;
+}
+
+.darkorange-text {
+  color: #FF7518 !important;
+}
+
+.grey_background {
+  background-color: red !important;
+}
+
+a, a:link, a:visited {
+  color: black;
+}
+
+a:hover, a:active {
+  color: silver;
+}
+
+.disabled {
+  pointer-events: none;
+  color: #636c72 !important;
+}
+
+.btn-search {
+  border-color: silver !important;
+}
+
+button {
+  color: black !important;
+  background-color: white !important;
+  border-color: white !important;
+  border: 0;
+} 
+
+button:hover, 
+button:active {
+  color: darkgrey !important;
+}
+
+h4, h5, h6, code {
+  color: black;
+}
+
+div.card {
+  color: black;
+  border-color: #f8f9fa;
+}
+
+.value-text {
+  color: black;
+}
+
+div.rp,
+span.rp {
+  color: red;
+}
+
+div.bluechblk,
+span.bluechblk {
+  color: blue;
+}
+
+div.toast-header,
+div.toast-body {
+  background-color: #f2a900;
+  color: #14151a;
+  border-color: #14151a;
+}
+
+.nav-item,
+.nav-link {
+  color: #71797E !important;
+  border-style: none;
+}
+
+footer {
+  background-color: white;
+}
+
+.dark-mode .navbar-brand {
+  color: silver !important;
+}
+
+.dark-mode .darkorange-text {
+  color: #f2a900 !important;
+}
+
+.dark-mode .darkgray-text {
+  color: #636c72;
+}
+
+.dark-mode .navbar-toggler {
+  background-color: #f2a900 !important;
+}
+
+.dark-mode input,
+.dark-mode input:focus {
+  color: silver !important;
+  border-color: #1f2029 !important;
+  background-color: #1f2029 !important;
+}
+
+.dark-mode input::placeholder {
+  color: grey !important;
+}
+
+.dark-mode a {
+  border-color: #14151a !important;
+  background-color: #14151a !important;
+}
+
+.dark-mode button {
+  color: grey !important;
+  background-color: #14151a !important;
+  border-color: #14151a !important;
+  border: 0;
+} 
+
+.dark-mode .btn-search {
+  background-color: #1f2029 !important;
+  border-color: #1f2029 !important;
+}
+
+.dark-mode .btn-close {
+  background-color: silver !important;
+}
+
+.dark-mode button:focus { outline:0; }
+
+.dark-mode button:hover, 
+.dark-mode button:active {
+  color: silver !important;
+}
+
+.dark-mode .value-text {
+  color: silver !important;
+}
+
+.dark-mode span .badge {
+  badge-color: red;
+}
+
+.dark-mode {
+  background-color: #1f2029 !important;
+  color: silver !important;
+}
+
+.dark-mode div.card,
+.dark-mode a.card {
+  background-color: #14151a;
+  color: silver;
+  border-color: #1f2029;
+}
+
+.dark-mode div.toast-header,
+.dark-mode div.toast-body {
+  background-color: black;
+  color: silver;
+  border-color: #14151a;
+}
+
+.dark-mode div.bluechblk,
+.dark-mode span.bluechblk {
+  color: royalblue;
+}
+
+.dark-mode div.rp,
+.dark-mode span.rp {
+  color: lightcoral;
+}
+
+.dark-mode .bg-style {
+  background-color: #14151a !important;
+}
+
+.dark-mode a,
+.dark-mode a:link,
+.dark-mode a:visited,
+.dark-mode a:active {
+  color: silver;
+}
+
+.dark-mode a:hover {
+  color: white;
+}
+
+.dark-mode .nav-tabs {
+  border-color: #14151a;
+}
+
+.dark-mode .nav-tabs
+.dark-mode .nav-item {
+  border-color: #14151a;
+}
+
+.dark-mode .nav-tabs,
+.dark-mode .nav-item,
+.dark-mode .nav-link {
+  color: #636c72 !important;
+  border-style: none;
+}
+
+.dark-mode .nav-link.active {
+  background-color: #14151a;
+  color: #636c72 !important;
+  border-style: none;
+}
+
+.dark-mode .modal-header {
+  background-color: #14151a;
+  border-style: none;
+}
+
+.dark-mode .modal-body {
+  background-color: #1f2029;
+  border-style: none;
+}
+
+.dark-mode .modal-content {
+  border-style: none;
+}
+
+.dark-mode .pagination .page-item .page-link {
+  background-color: #14151a;
+  border-color: silver;
+}
+
+.dark-mode .navbar-nav > li > .dropdown-menu,
+.dark-mode .navbar-nav > li > .dropdown-menu a,
+.dark-mode .navbar-nav > li > .dropdown-menu a:link,
+.dark-mode .navbar-nav > li > .dropdown-menu a:hover {
+  color: silver;
+  background-color: #1f2029;
+}
+
+.dark-mode .dropdown-menu {
+  background-color: #1f2029;
+}
+
+.dark-mode .dropdown-menu .dropdown-item {
+  color: silver;
+  background-color: #343a40;
+}
+
+.dark-mode .close {
+  color: silver;
+}
+
+.dark-mode hr {
+  border-color: #1f2029;
+}
+
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6,
+.dark-mode p,
+.dark-mode code,
+.dark-mode pre {
+  color: silver;
+}
+
+.dark-mode footer {
+  background-color: #14151a;
+}
