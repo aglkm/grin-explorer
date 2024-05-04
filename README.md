@@ -16,18 +16,21 @@ Grin is the very first, simple and fair MimbleWimble blockchain implementation.
 
 ## Installation
 
-1. Clone repository: git clone https://github.com/aglkm/grin-explorer.git
-2. Build explorer: cargo build --release
-3. Run executable: ./target/release/grin-explorer
+1. Clone repository: `git clone https://github.com/aglkm/grin-explorer.git`
+2. Build explorer:
+   ```
+   cd grin-explorer
+   cargo build --release
+   ```
+4. Run executable: `./target/release/grin-explorer`
 
    You will see the following output:
 
-   `[ INFO    ] Starting up Explorer.`
+   ```
+   [ INFO    ] Starting up Explorer.
+   [ INFO    ] Starting up Rocket engine.
+   🚀 Rocket has launched from http://127.0.0.1:8000
+   [ OK      ] Explorer Ready.
+   ```
 
-   `[ INFO    ] Starting up Rocket engine.`
-
-   `🚀 Rocket has launched from http://127.0.0.1:8000`
-
-   `[ OK      ] Explorer Ready.`
-
-4. Open explorer in your browser: http://127.0.0.1:8000
+5. Open explorer in your browser: http://127.0.0.1:8000
