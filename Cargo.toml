@@ -20,10 +20,6 @@ lazy_static = "1.4.0"
 shellexpand = "3.1.0"
 either      = "1.11.0"
 
-[dependencies.rusqlite]
-version  = "0.30.0"
-features = ["bundled"]
-
 [dependencies.reqwest]
 version  = "0.11.23"
 features = ["json", "blocking"]
