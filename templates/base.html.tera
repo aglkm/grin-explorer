@@ -209,9 +209,16 @@
               </span>
             </div>
             </div>
+            <div class="row mb-2">
+              <div class="col d-flex justify-content-center">
+                <a class="text-decoration-none" href="https://github.com/aglkm/grin-explorer">
+                  <span style="color:grey">v.0.1.0 <i class="bi bi-github"></i></span>
+		</a>
+	      </div>
+            </div>
             <div class="row">
               <div class="col d-flex justify-content-center" style="color:grey">
-	        Powered by CoinGecko
+		Powered by CoinGecko
 	      </div>
             </div>
           </div>
