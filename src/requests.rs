@@ -232,7 +232,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Er
 
             data.reward_ratio    = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
                                                     / data.production_cost.parse::<f64>().unwrap());
-            data.break_even_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+            data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
                                    / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
         }
     }
