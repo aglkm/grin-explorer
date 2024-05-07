@@ -387,18 +387,20 @@ pub async fn get_kernel(kernel: &str, height: &mut String)
 pub async fn get_block_kernels(height: &String, blocks: &mut Vec<Block>)
              -> Result<(), Error> {
     if height.is_empty() == false {
-        let params   = &format!("[{}, {}, 1440, false]", height.parse::<u64>().unwrap() - 1440,
-                                height)[..];
-        let resp     = call("get_blocks", params, "foreign").await.unwrap();
+        let params = &format!("[{}, {}, 720, false]", height.parse::<u64>().unwrap() - 720,
+                              height)[..];
+        let resp   = call("get_blocks", params, "foreign").await.unwrap();
 
         for resp_block in resp["result"]["Ok"]["blocks"].as_array().unwrap() {
+            let mut block = Block::new();
+            
             for kernel in resp_block["kernels"].as_array().unwrap() {
-                let mut block = Block::new();
                 block.kernels.push((kernel["excess"].to_string(),
                                     kernel["features"].as_str().unwrap().to_string(),
                                     kernel["fee"].to_string()));
-                blocks.push(block);
             }
+            
+            blocks.push(block);
         }
     }
 
@@ -413,7 +415,11 @@ pub async fn get_txn_stats(dashboard: Arc<Mutex<Dashboard>>,
     let height     = get_current_height(dashboard.clone());
 
     if height.is_empty() == false {
-        // Collecting kernels for 1440 blocks
+        // get_blocks grin rpc has limit of maximum of 1000 blocks request
+        // https://github.com/mimblewimble/grin/blob/master/api/src/handlers/blocks_api.rs#L27
+        // So, collecting kernels 2 times by 720 blocks to get a day of blocks
+        let _ = get_block_kernels(&((height.parse::<u64>().unwrap() - 720).to_string()), &mut blocks)
+                                 .await;
         let _ = get_block_kernels(&height, &mut blocks).await;
 
         if blocks.is_empty() == false {
@@ -424,7 +430,8 @@ pub async fn get_txn_stats(dashboard: Arc<Mutex<Dashboard>>,
             let mut index         = 0;
 
             for block in blocks {
-                if index < 60 {
+                // Latest 60 blocks
+                if index >= 1380 {
                     for kernel in block.kernels.clone() {
                         if kernel.1 != "Coinbase" {
                             ker_count_1h = ker_count_1h + 1;
