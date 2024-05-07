@@ -31,6 +31,7 @@ pub struct Dashboard {
     // mining
     pub production_cost: String,
     pub reward_ratio:    String,
+    pub break_even_cost: String,
     // mempool
     pub txns:            String,
     pub stem:            String,
@@ -60,6 +61,7 @@ impl Dashboard {
             difficulty:      String::new(),
             production_cost: String::new(),
             reward_ratio:    String::new(),
+            break_even_cost: String::new(),
             txns:            String::new(),
             stem:            String::new(),
         }

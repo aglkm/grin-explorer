@@ -227,10 +227,13 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Er
             let coins_per_hour = 1.2 / hashrate * 60.0 * 60.0;
 
             // Calculating production cost of 1 grin
-            // Assuming $0,07 per kW/h
+            // Assuming $0.07 per kW/h
             data.production_cost = format!("{:.3}", 120.0 / 1000.0 * 0.07 * (1.0 / coins_per_hour));
+
             data.reward_ratio    = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
                                                     / data.production_cost.parse::<f64>().unwrap());
+            data.break_even_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                                   / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
         }
     }
 
