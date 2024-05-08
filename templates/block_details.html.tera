@@ -45,7 +45,7 @@
       {% for i in range(end=block.ker_len) %}
         <br>
         <div class="row">
-        <!-- kernels[i][0] - Hash
+        <!-- kernels[i][0] - Kernel
              kernels[i][1] - Type
              kernels[i][2] - Fee -->
         {% if block.kernels[i][1] == "Coinbase" %}
@@ -92,7 +92,7 @@
       {% for i in range(end=block.out_len) %}
         <br>
         <div class="row">
-          <!-- outputs[i][0] - Hash
+          <!-- outputs[i][0] - Output
                outputs[i][1] - Type -->
           {% if block.outputs[i][1] == "Coinbase" %}
             <div class="col-sm value-text" align="left">
