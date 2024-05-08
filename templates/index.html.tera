@@ -85,11 +85,11 @@
               <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
               <br>
               <div class="d-flex justify-content-between">
-	        <div class="value-text">1H Period (60 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
+	        <div class="value-text">1H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
               </div>
 	      <br>
               <div class="d-flex justify-content-between">
-	        <div class="value-text">24H Period (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
+	        <div class="value-text">24H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
               </div>
             </div>
           </div>
@@ -100,7 +100,7 @@
             <div class="darkorange-text"><i class="bi bi-hammer"></i> MINING</div>
             <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">Hashrate (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/hashrate" hx-trigger="load, every 10s"> KG/s</div>
+	      <div class="value-text">Hashrate&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/hashrate" hx-trigger="load, every 10s"> KG/s</div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
@@ -269,7 +269,7 @@
             <div class="darkorange-text"><i class="bi bi-hammer"></i> MINING</div>
             <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">Hashrate (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/hashrate" hx-trigger="load, every 10s"> KG/s</div>
+	      <div class="value-text">Hashrate&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/hashrate" hx-trigger="load, every 10s"> KG/s</div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
@@ -299,7 +299,7 @@
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">Breakeven Electricity Cost
+	      <div class="value-text">Breakeven Elec. Cost
                 <!-- Button trigger breakeven explanation modal -->
                 <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#breakeven">
                   <i class="bi bi-question-circle"></i>
@@ -313,11 +313,11 @@
             <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
             <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">1H Period (60 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
+	      <div class="value-text">1H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">24H Period (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
+	      <div class="value-text">24H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
