@@ -195,7 +195,7 @@ pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 }
 
 
-// Collecting: hashrate, difficulty, production cost.
+// Collecting: hashrate, difficulty, production cost, breakeven cost.
 pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
     let difficulty_window = 1440;
     let height            = get_current_height(dashboard.clone());
