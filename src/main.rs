@@ -344,7 +344,7 @@ fn reward_ratio(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 fn breakeven_cost(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    format!("$ {}", data.breakeven_cost)
+    format!("$ {} (kW/h)", data.breakeven_cost)
 }
 
 
