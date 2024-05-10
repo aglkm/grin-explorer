@@ -138,6 +138,7 @@ pub struct ExplorerConfig {
     pub user:                    String,
     pub api_secret_path:         String,
     pub foreign_api_secret_path: String,
+    pub grin_dir:                String,
     pub api_secret:              String,
     pub foreign_api_secret:      String,
 }
@@ -151,6 +152,7 @@ impl ExplorerConfig {
             user:                    String::new(),
             api_secret_path:         String::new(),
             foreign_api_secret_path: String::new(),
+            grin_dir:                String::new(),
             api_secret:              String::new(),
             foreign_api_secret:      String::new(),
         }

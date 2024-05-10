@@ -16,3 +16,6 @@ api_secret_path = "~/.grin/main/.api_secret"
 # Foreign API secret path.
 foreign_api_secret_path = "~/.grin/main/.foreign_api_secret"
 
+# Path to Grin directory
+grin_dir = "~/.grin"
+
