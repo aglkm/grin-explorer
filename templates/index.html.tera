@@ -63,7 +63,7 @@
 
       <div class="card-group mb-2">
         <div class="card card-background me-2">
-          <div class="card mb-2">
+          <div class="card rounded-end-0 mb-2">
             <div class="card-body" align="left">
 	      <div class="darkorange-text"><i class="bi bi-grid"></i> BLOCKCHAIN</div>
               <br>
@@ -80,7 +80,7 @@
               </div>
             </div>
           </div>
-          <div class="card">
+          <div class="card rounded-end-0">
             <div class="card-body" align="left">
               <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
               <br>
