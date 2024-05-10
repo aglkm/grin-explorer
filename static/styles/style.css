@@ -6,8 +6,8 @@
   color: #FF7518 !important;
 }
 
-.grey_background {
-  background-color: red !important;
+.card-background {
+  background-color: #FBFBFB !important;
 }
 
 a, a:link, a:visited {
@@ -50,23 +50,6 @@ div.card {
 
 .value-text {
   color: black;
-}
-
-div.rp,
-span.rp {
-  color: red;
-}
-
-div.bluechblk,
-span.bluechblk {
-  color: blue;
-}
-
-div.toast-header,
-div.toast-body {
-  background-color: #f2a900;
-  color: #14151a;
-  border-color: #14151a;
 }
 
 .nav-item,
@@ -154,25 +137,12 @@ footer {
   border-color: #1f2029;
 }
 
-.dark-mode div.toast-header,
-.dark-mode div.toast-body {
-  background-color: black;
-  color: silver;
-  border-color: #14151a;
-}
-
-.dark-mode div.bluechblk,
-.dark-mode span.bluechblk {
-  color: royalblue;
-}
-
-.dark-mode div.rp,
-.dark-mode span.rp {
-  color: lightcoral;
-}
-
 .dark-mode .bg-style {
   background-color: #14151a !important;
+}
+
+.dark-mode .card-background {
+  background-color: #1f2029 !important;
 }
 
 .dark-mode a,
@@ -220,28 +190,6 @@ footer {
 
 .dark-mode .modal-content {
   border-style: none;
-}
-
-.dark-mode .pagination .page-item .page-link {
-  background-color: #14151a;
-  border-color: silver;
-}
-
-.dark-mode .navbar-nav > li > .dropdown-menu,
-.dark-mode .navbar-nav > li > .dropdown-menu a,
-.dark-mode .navbar-nav > li > .dropdown-menu a:link,
-.dark-mode .navbar-nav > li > .dropdown-menu a:hover {
-  color: silver;
-  background-color: #1f2029;
-}
-
-.dark-mode .dropdown-menu {
-  background-color: #1f2029;
-}
-
-.dark-mode .dropdown-menu .dropdown-item {
-  color: silver;
-  background-color: #343a40;
 }
 
 .dark-mode .close {

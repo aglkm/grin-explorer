@@ -31,6 +31,7 @@ pub struct Dashboard {
     // mining
     pub production_cost: String,
     pub reward_ratio:    String,
+    pub breakeven_cost:  String,
     // mempool
     pub txns:            String,
     pub stem:            String,
@@ -60,6 +61,7 @@ impl Dashboard {
             difficulty:      String::new(),
             production_cost: String::new(),
             reward_ratio:    String::new(),
+            breakeven_cost:  String::new(),
             txns:            String::new(),
             stem:            String::new(),
         }
@@ -136,6 +138,7 @@ pub struct ExplorerConfig {
     pub user:                    String,
     pub api_secret_path:         String,
     pub foreign_api_secret_path: String,
+    pub grin_dir:                String,
     pub api_secret:              String,
     pub foreign_api_secret:      String,
 }
@@ -149,6 +152,7 @@ impl ExplorerConfig {
             user:                    String::new(),
             api_secret_path:         String::new(),
             foreign_api_secret_path: String::new(),
+            grin_dir:                String::new(),
             api_secret:              String::new(),
             foreign_api_secret:      String::new(),
         }

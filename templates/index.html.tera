@@ -46,7 +46,7 @@
                 <button class="btn-sm shadow-none" data-bs-toggle="modal" data-bs-target="#soft_sup">
                   <i class="bi bi-question-circle"></i>
                 </button>
-                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/soft_supply" hx-trigger="load, every 10s"></div>
+                </div><div class="value-text text-end" hx-get="/rpc/market/soft_supply" hx-trigger="load, every 10s"></div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
@@ -62,11 +62,10 @@
 
 
       <div class="card-group mb-2">
-        <div class="card me-2">
-          <div class="card-body" align="left">
-              <div class="d-flex justify-content-between">
-	        <div class="darkorange-text"><i class="bi bi-grid"></i> BLOCKCHAIN</div>
-              </div>
+        <div class="card card-background me-2">
+          <div class="card rounded-end-0 mb-2">
+            <div class="card-body" align="left">
+	      <div class="darkorange-text"><i class="bi bi-grid"></i> BLOCKCHAIN</div>
               <br>
               <div class="d-flex justify-content-between">
 	        <div class="value-text">Size&nbsp;</div><div class="value-text text-end" hx-get="/rpc/disk/usage" hx-trigger="load, every 10s"></div>
@@ -79,14 +78,29 @@
               <div class="d-flex justify-content-between">
 	        <div class="value-text">Time Since Last Block&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/time_since_last" hx-trigger="load, every 10s"></div>
               </div>
+            </div>
+          </div>
+          <div class="card rounded-end-0">
+            <div class="card-body" align="left">
+              <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
+              <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">1H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">24H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="card me-2">
+
+        <div class="card">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-hammer"></i> MINING</div>
             <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">Hashrate (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/hashrate" hx-trigger="load, every 10s"> KG/s</div>
+	      <div class="value-text">Hashrate&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/hashrate" hx-trigger="load, every 10s"> KG/s</div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
@@ -103,7 +117,7 @@
                 <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#mining_cost">
                   <i class="bi bi-question-circle"></i>
                 </button>
-                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/mining/production_cost" hx-trigger="load, every 10s"></div>
+                </div><div class="value-text text-end" hx-get="/rpc/mining/production_cost" hx-trigger="load, every 10s"></div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
@@ -112,25 +126,20 @@
                 <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#ratio">
                   <i class="bi bi-question-circle"></i>
                 </button>
-                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/mining/reward_ratio" hx-trigger="load, every 10s"></div>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body" align="left">
-            <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
-            <br>
-            <div class="d-flex justify-content-between">
-	      <div class="value-text">1H Period (60 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
+                </div><div class="value-text text-end" hx-get="/rpc/mining/reward_ratio" hx-trigger="load, every 10s"></div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">24H Period (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
+              <div class="value-text">Breakeven Electricity Cost
+                <!-- Button trigger breakeven explanation modal -->
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#breakeven">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+                </div><div class="value-text text-end" hx-get="/rpc/mining/breakeven_cost" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
       </div>
-
 
 
       <div class="card-group mb-4">
@@ -222,7 +231,7 @@
                 <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#soft_sup">
                   <i class="bi bi-question-circle"></i>
                 </button>
-                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/market/soft_supply" hx-trigger="load, every 10s"></div>
+                </div><div class="value-text text-end" hx-get="/rpc/market/soft_supply" hx-trigger="load, every 10s"></div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
@@ -260,7 +269,7 @@
             <div class="darkorange-text"><i class="bi bi-hammer"></i> MINING</div>
             <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">Hashrate (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/hashrate" hx-trigger="load, every 10s"> KG/s</div>
+	      <div class="value-text">Hashrate&nbsp;</div><div class="value-text text-end" hx-get="/rpc/network/hashrate" hx-trigger="load, every 10s"> KG/s</div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
@@ -277,7 +286,7 @@
                 <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#mining_cost">
                   <i class="bi bi-question-circle"></i>
                 </button>
-                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/mining/production_cost" hx-trigger="load, every 10s"></div>
+                </div><div class="value-text text-end" hx-get="/rpc/mining/production_cost" hx-trigger="load, every 10s"></div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
@@ -286,7 +295,16 @@
                 <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#ratio">
                   <i class="bi bi-question-circle"></i>
                 </button>
-                &nbsp;</div><div class="value-text text-end" hx-get="/rpc/mining/reward_ratio" hx-trigger="load, every 10s"></div>
+                </div><div class="value-text text-end" hx-get="/rpc/mining/reward_ratio" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Breakeven Elec. Cost
+                <!-- Button trigger breakeven explanation modal -->
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#breakeven">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+              </div><div class="value-text text-end" hx-get="/rpc/mining/breakeven_cost" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
@@ -295,11 +313,11 @@
             <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
             <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">1H Period (60 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
+	      <div class="value-text">1H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">24H Period (1440 Blocks)&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
+	      <div class="value-text">24H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
@@ -414,6 +432,23 @@
         <i class="bi bi-hand-thumbs-up"></i> - from 1 to 2<br>
         <i class="bi bi-emoji-sunglasses"></i> - from 2 to 3<br>
         <i class='bi bi-rocket-takeoff'></i> - >= 3
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="breakeven" tabindex="-1" aria-labelledby="breakeven_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="breakeven_label">Breakeven Electricity Cost</h1>
+        <div data-bs-theme="light">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        Electricity threshold cost below which mining is profitable.<br>
+        Assuming G1-mini ASIC as a miner device.
       </div>
     </div>
   </div>

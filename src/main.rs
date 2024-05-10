@@ -340,6 +340,14 @@ fn reward_ratio(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 }
 
 
+#[get("/rpc/mining/breakeven_cost")]
+fn breakeven_cost(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
+    let data = dashboard.lock().unwrap();
+
+    format!("$ {} (kW/h)", data.breakeven_cost)
+}
+
+
 #[get("/rpc/network/difficulty")]
 fn network_difficulty(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
@@ -543,8 +551,8 @@ async fn main() {
                                 txns_count_24h, block_list, block_link, block_link_color,
                                 block_time, block_txns, block_inputs, block_outputs, block_fees,
                                 block_weight, block_details_by_height, block_header_by_hash,
-                                soft_supply, production_cost, reward_ratio, last_block_age,
-                                block_list_by_height, block_list_index, search, kernel])
+                                soft_supply, production_cost, reward_ratio, breakeven_cost,
+                                last_block_age, block_list_by_height, block_list_index, search, kernel])
             .mount("/static", FileServer::from("static"))
             .attach(Template::fairing())
             .launch()

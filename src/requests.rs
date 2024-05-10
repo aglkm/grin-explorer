@@ -35,6 +35,7 @@ lazy_static! {
                 "user"                    => cfg.user                    = value,
                 "api_secret_path"         => cfg.api_secret_path         = value,
                 "foreign_api_secret_path" => cfg.foreign_api_secret_path = value,
+                "grin_dir"                => cfg.grin_dir                = value,
                 _ => println!("{} Unknown config setting '{}'.", "[ ERROR   ]".red(), name),
             }
         }
@@ -43,7 +44,8 @@ lazy_static! {
                                      shellexpand::tilde(&cfg.api_secret_path))).unwrap();
         cfg.foreign_api_secret = fs::read_to_string(format!("{}",
                                      shellexpand::tilde(&cfg.foreign_api_secret_path))).unwrap();
-
+        cfg.grin_dir           = format!("{}", shellexpand::tilde(&cfg.grin_dir));
+        
         cfg
     };
 }
@@ -187,17 +189,19 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 // Collecting: disk_usage.
 pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> { 
     let mut data = dashboard.lock().unwrap();
-    let grin_dir = format!("{}/.grin", std::env::var("HOME").unwrap());
 
-    data.disk_usage = format!("{:.2}", (get_size(grin_dir).unwrap() as f64) / 1000.0 / 1000.0 / 1000.0);
+    let chain_data = format!("{}/main/chain_data", CONFIG.grin_dir);
+
+    data.disk_usage = format!("{:.2}", (get_size(chain_data).unwrap() as f64)
+                                       / 1000.0 / 1000.0 / 1000.0);
 
     Ok(())
 }
 
 
-// Collecting: hashrate, difficulty, production cost.
+// Collecting: hashrate, difficulty, production cost, breakeven cost.
 pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
-    let difficulty_window = 60;
+    let difficulty_window = 1440;
     let height            = get_current_height(dashboard.clone());
 
     if height.is_empty() == false {
@@ -227,10 +231,13 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Er
             let coins_per_hour = 1.2 / hashrate * 60.0 * 60.0;
 
             // Calculating production cost of 1 grin
-            // Assuming $0,07 per kW/h
+            // Assuming $0.07 per kW/h
             data.production_cost = format!("{:.3}", 120.0 / 1000.0 * 0.07 * (1.0 / coins_per_hour));
+
             data.reward_ratio    = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
                                                     / data.production_cost.parse::<f64>().unwrap());
+            data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                                   / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
         }
     }
 
