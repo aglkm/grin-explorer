@@ -25,9 +25,10 @@ fn index(dashboard: &State<Arc<Mutex<Dashboard>>>) -> Template {
     let data = dashboard.lock().unwrap();
 
     Template::render("index", context! {
-        route: "index",
-        node_ver: &data.node_ver,
+        route:     "index",
+        node_ver:  &data.node_ver,
         proto_ver: &data.proto_ver,
+        cg_api:    &data.cg_api,
     })
 }
 
@@ -211,7 +212,13 @@ fn soft_supply(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
     if data.supply.is_empty() == false {
-        return format!("{} % ({}M/3150M)", data.soft_supply, &data.supply[..3]);
+        // 9 digits plus 2 commas, e.g. 168,038,400
+        if data.supply.len() == 11 {
+            return format!("{} % ({}M/3150M)", data.soft_supply, &data.supply[..3]);
+        // 10 digits plus 2 commas
+        } else if data.supply.len() == 12 {
+            return format!("{} % ({}M/3150M)", data.soft_supply, &data.supply[..4]);
+        }
     }
     
     "3150M".to_string()
@@ -491,7 +498,7 @@ fn block_weight(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String 
 fn block_list_index(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    if data.height.is_empty() == false {
+    if data.height.is_empty() == false && data.height.parse::<u64>().unwrap() > 10 {
         return format!("<a class='text-decoration-none' href='/block_list/{}'>
                         <div class='col-sm'><h2><i class='bi bi-arrow-right-square'></i></h2></div>
                         </a>", data.height.parse::<u64>().unwrap() - 10);

@@ -35,6 +35,8 @@ pub struct Dashboard {
     // mempool
     pub txns:            String,
     pub stem:            String,
+    // coingecko api
+    pub cg_api:          String,
 }
 
 impl Dashboard {
@@ -64,6 +66,7 @@ impl Dashboard {
             breakeven_cost:  String::new(),
             txns:            String::new(),
             stem:            String::new(),
+            cg_api:          String::new(),
         }
     }
 }
@@ -141,6 +144,7 @@ pub struct ExplorerConfig {
     pub grin_dir:                String,
     pub api_secret:              String,
     pub foreign_api_secret:      String,
+    pub coingecko_api:           String,
 }
 
 impl ExplorerConfig {
@@ -155,6 +159,7 @@ impl ExplorerConfig {
             grin_dir:                String::new(),
             api_secret:              String::new(),
             foreign_api_secret:      String::new(),
+            coingecko_api:           String::new(),
         }
     }
 }

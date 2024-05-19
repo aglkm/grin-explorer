@@ -36,6 +36,7 @@ lazy_static! {
                 "api_secret_path"         => cfg.api_secret_path         = value,
                 "foreign_api_secret_path" => cfg.foreign_api_secret_path = value,
                 "grin_dir"                => cfg.grin_dir                = value,
+                "coingecko_api"           => cfg.coingecko_api           = value,
                 _ => println!("{} Unknown config setting '{}'.", "[ ERROR   ]".red(), name),
             }
         }
@@ -140,15 +141,21 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>) -> Result<(),
 
 // Collecting: supply, inflation, price_usd, price_btc, volume_usd, volume_btc, cap_usd, cap_btc.
 pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
-    let client = reqwest::Client::new();
-    let result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true")
-                       .send()
-                       .await?;
+    let client;
+    let result;
+    let mut val = Value::Null;
 
-    let val: Value = serde_json::from_str(&result.text().await.unwrap()).unwrap();
-    
+    if CONFIG.coingecko_api == "on" {
+        client = reqwest::Client::new();
+        result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true").send().await?;
+        val    = serde_json::from_str(&result.text().await.unwrap()).unwrap();
+    }
+
     let mut data = dashboard.lock().unwrap();
-   
+  
+    // Save the setting into Dashboard structure for later use
+    data.cg_api = CONFIG.coingecko_api.clone();
+    
     if data.height.is_empty() == false {
         // Calculating coin supply
         // Adding +1 as block index starts with 0
@@ -157,28 +164,32 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
         // 31536000 seconds in a year
         let inflation = (31536000.0 / (supply as f64)) * 100.0;
 
-        data.inflation   = format!("{:.2}", inflation);
-        data.supply      = supply.to_formatted_string(&Locale::en);
+        data.inflation = format!("{:.2}", inflation);
+        data.supply    = supply.to_formatted_string(&Locale::en);
 
         // https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153
         data.soft_supply = format!("{:.2}",
-                           supply.to_string().parse::<f64>().unwrap() / 3150000000.0 * 100.0);
+                                   supply.to_string().parse::<f64>().unwrap() / 3150000000.0 * 100.0);
     
-        // Check if CoingGecko API returned error
-        if let Some(status) = val.get("status") {
-            println!("{} {}.", "[ WARNING ]".yellow(),
-                     status["error_message"].as_str().unwrap().to_string());
-        } else {
-            data.price_usd  = format!("{:.3}", val["grin"]["usd"].to_string().parse::<f64>().unwrap());
-            data.price_btc  = format!("{:.8}", val["grin"]["btc"].to_string().parse::<f64>().unwrap());
-            data.volume_usd = (val["grin"]["usd_24h_vol"].to_string().parse::<f64>().unwrap() as u64)
-                              .to_formatted_string(&Locale::en);
-            data.volume_btc = format!("{:.2}", val["grin"]["btc_24h_vol"].to_string().parse::<f64>()
-                              .unwrap());
-            data.cap_usd    = (((supply as f64) * data.price_usd.parse::<f64>().unwrap()) as u64)
-                              .to_formatted_string(&Locale::en);
-            data.cap_btc    = (((supply as f64) * data.price_btc.parse::<f64>().unwrap()) as u64)
-                              .to_formatted_string(&Locale::en);
+        if CONFIG.coingecko_api == "on" && val != Value::Null {
+            // Check if CoingGecko API returned error
+            if let Some(status) = val.get("status") {
+                println!("{} {}.", "[ WARNING ]".yellow(),
+                         status["error_message"].as_str().unwrap().to_string());
+            } else {
+                data.price_usd  = format!("{:.3}", val["grin"]["usd"].to_string().parse::<f64>()
+                                  .unwrap());
+                data.price_btc  = format!("{:.8}", val["grin"]["btc"].to_string().parse::<f64>()
+                                  .unwrap());
+                data.volume_usd = (val["grin"]["usd_24h_vol"].to_string().parse::<f64>().unwrap() as u64)
+                                  .to_formatted_string(&Locale::en);
+                data.volume_btc = format!("{:.2}", val["grin"]["btc_24h_vol"].to_string().parse::<f64>()
+                                  .unwrap());
+                data.cap_usd    = (((supply as f64) * data.price_usd.parse::<f64>().unwrap()) as u64)
+                                  .to_formatted_string(&Locale::en);
+                data.cap_btc    = (((supply as f64) * data.price_btc.parse::<f64>().unwrap()) as u64)
+                                  .to_formatted_string(&Locale::en);
+            }
         }
     }
 
@@ -189,8 +200,13 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 // Collecting: disk_usage.
 pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> { 
     let mut data = dashboard.lock().unwrap();
+    let chain_data;
 
-    let chain_data = format!("{}/main/chain_data", CONFIG.grin_dir);
+    if CONFIG.coingecko_api == "on" {
+        chain_data = format!("{}/main/chain_data", CONFIG.grin_dir);
+    } else {
+        chain_data = format!("{}/test/chain_data", CONFIG.grin_dir);
+    }
 
     data.disk_usage = format!("{:.2}", (get_size(chain_data).unwrap() as f64)
                                        / 1000.0 / 1000.0 / 1000.0);
@@ -204,7 +220,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Er
     let difficulty_window = 1440;
     let height            = get_current_height(dashboard.clone());
 
-    if height.is_empty() == false {
+    if height.is_empty() == false && height.parse::<u64>().unwrap() > 1440 {
         let params1 = &format!("[{}, null, null]", height)[..];
         let params2 = &format!("[{}, null, null]", height.parse::<u64>().unwrap()
                                - difficulty_window)[..];
@@ -227,17 +243,19 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Er
             data.hashrate   = format!("{:.2}", hashrate / 1000.0);
             data.difficulty = net_diff.to_string();
 
-            // Calculating G1-mini production per hour
-            let coins_per_hour = 1.2 / hashrate * 60.0 * 60.0;
+            if CONFIG.coingecko_api == "on" {
+                // Calculating G1-mini production per hour
+                let coins_per_hour = 1.2 / hashrate * 60.0 * 60.0;
 
-            // Calculating production cost of 1 grin
-            // Assuming $0.07 per kW/h
-            data.production_cost = format!("{:.3}", 120.0 / 1000.0 * 0.07 * (1.0 / coins_per_hour));
+                // Calculating production cost of 1 grin
+                // Assuming $0.07 per kW/h
+                data.production_cost = format!("{:.3}", 120.0 / 1000.0 * 0.07 * (1.0 / coins_per_hour));
 
-            data.reward_ratio    = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
-                                                    / data.production_cost.parse::<f64>().unwrap());
-            data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
-                                   / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
+                data.reward_ratio    = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                                                        / data.production_cost.parse::<f64>().unwrap());
+                data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                                       / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
+            }
         }
     }
 
@@ -421,7 +439,7 @@ pub async fn get_txn_stats(dashboard: Arc<Mutex<Dashboard>>,
     let mut blocks = Vec::<Block>::new();
     let height     = get_current_height(dashboard.clone());
 
-    if height.is_empty() == false {
+    if height.is_empty() == false && height.parse::<u64>().unwrap() > 1440 {
         // get_blocks grin rpc has limit of maximum of 1000 blocks request
         // https://github.com/mimblewimble/grin/blob/master/api/src/handlers/blocks_api.rs#L27
         // So, collecting kernels 2 times by 720 blocks to get a day of blocks
@@ -484,7 +502,7 @@ pub async fn get_recent_blocks(dashboard: Arc<Mutex<Dashboard>>,
     let mut i      = 0;
     let height_str = get_current_height(dashboard.clone());
 
-    if height_str.is_empty() == false {
+    if height_str.is_empty() == false && height_str.parse::<u64>().unwrap() > 0 {
         let height         = height_str.parse::<u64>().unwrap();
         let mut blocks_vec = Vec::<Block>::new();
 

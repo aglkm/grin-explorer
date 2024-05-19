@@ -16,6 +16,20 @@ api_secret_path = "~/.grin/main/.api_secret"
 # Foreign API secret path.
 foreign_api_secret_path = "~/.grin/main/.foreign_api_secret"
 
-# Path to Grin directory
+# Path to Grin directory.
 grin_dir = "~/.grin"
+
+# CoinGecko API on/off switch.
+coingecko_api = "on"
+
+
+# Testnet config
+# ip = "127.0.0.1"
+# port = "13413"
+# proto = "http"
+# user = "grin"
+# api_secret_path = "~/.grin/test/.api_secret"
+# foreign_api_secret_path = "~/.grin/test/.foreign_api_secret"
+# grin_dir = "~/.grin"
+# coingecko_api = "off"
 
