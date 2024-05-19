@@ -93,6 +93,9 @@ pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
         data.proto_ver = resp["result"]["Ok"]["protocol_version"].to_string();
     }
 
+    // Also set cg_api value
+    data.cg_api = CONFIG.coingecko_api.clone();
+
     Ok(())
 }
 
@@ -153,9 +156,6 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 
     let mut data = dashboard.lock().unwrap();
   
-    // Save the setting into Dashboard structure for later use
-    data.cg_api = CONFIG.coingecko_api.clone();
-    
     if data.height.is_empty() == false {
         // Calculating coin supply
         // Adding +1 as block index starts with 0

@@ -155,7 +155,7 @@ fn search(input: &str) -> Either<Template, Redirect> {
             } else if input.len() == 64 {
                 return Either::Right(Redirect::to(uri!(block_header_by_hash(input))));
             
-            // Kernel hash
+            // Kernel
             } else if input.len() == 66 {
                 return Either::Right(Redirect::to(uri!(kernel(input))));
             }

@@ -7,11 +7,7 @@
   <div class="card">
     <div class="card-body">
       <h4>No results found.</h4><br>
-      Explorer supports requests by block number, block hash or kernel.<br><br>
-      Examples:<br>
-      Block number - <a class="text-decoration-none" href="/block/2765726">2765726</a><br>
-      Block hash - <a class="text-decoration-none" href="/hash/0000fc4d93e5717579b955ab840165d96603f009804a228be22da76f6f906a3c">0000fc4d93e5717579b955ab840165d96603f009804a228be22da76f6f906a3c</a><br>
-      Kernel - <a class="text-decoration-none" href="/kernel/084caeb931b7e8cb73d6419ea74ea157a3cef19f6e9307108a8a808df58437a4ef">084caeb931b7e8cb73d6419ea74ea157a3cef19f6e9307108a8a808df58437a4ef</a>
+      Explorer supports requests by block number, block hash or kernel.<br>
     </div>
   </div>
 
