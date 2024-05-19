@@ -138,11 +138,12 @@ async fn kernel(kernel: &str) -> Either<Template, Redirect> {
 // Handling search request.
 #[post("/search", data="<input>")]
 fn search(input: &str) -> Either<Template, Redirect> {
-    // Trim 'search=' from the request data
-    let input = &input[7..].to_lowercase();
-    
-    //Check if input is valid
-    if input.is_empty() == false {
+    //Check input length
+    if input.len() > "search=".len() {
+        // Trim 'search=' from the request data
+        let input = &input[7..].to_lowercase();
+
+        // Check for valid chars
         if input.chars().all(|x| (x >= 'a' && x <= 'f') || (x >= '0' && x <= '9')) == true {
 
             // Block number
