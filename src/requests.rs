@@ -240,8 +240,16 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
 
             // https://forum.grin.mw/t/on-dual-pow-graph-rates-gps-and-difficulty/2144/52
             // https://forum.grin.mw/t/difference-c31-and-c32-c33/7018/7
-            let hashrate    = (net_diff as f64) * 42.0 / 60.0 / 16384.0;
-            data.hashrate   = format!("{:.2}", hashrate / 1000.0);
+            let hashrate = (net_diff as f64) * 42.0 / 60.0 / 16384.0;
+
+            // KG/s
+            if hashrate > 1000.0 {
+                data.hashrate   = format!("{:.2} KG/s", hashrate / 1000.0);
+            // G/s
+            } else {
+                data.hashrate   = format!("{:.2} G/s", hashrate);
+            }
+            
             data.difficulty = net_diff.to_string();
 
             if CONFIG.coingecko_api == "on" {

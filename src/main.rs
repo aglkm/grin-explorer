@@ -314,7 +314,7 @@ fn disk_usage(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 fn network_hashrate(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    format!("{} KG/s", data.hashrate)
+    data.hashrate.clone()
 }
 
 
