@@ -184,7 +184,6 @@ async fn api_owner(data: &str) -> String {
         _ => return "{\"error\":\"bad syntax\"}".to_string(),
     };
 
-    println!("{}", method);
     // Whitelisted methods: get_connected_peer, get_peers, get_status.
     if method == "get_connected_peers" || method == "get_peers" || method == "get_status" {
         let resp = requests::call(method, v["params"].to_string().as_str(), "owner").await;
@@ -217,7 +216,6 @@ async fn api_foreign(data: &str) -> String {
         _ => return "{\"error\":\"bad syntax\"}".to_string(),
     };
 
-    println!("{}", method);
     let resp = requests::call(method, v["params"].to_string().as_str(), "foreign").await;
 
     let result = match resp {
