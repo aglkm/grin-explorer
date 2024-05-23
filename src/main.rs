@@ -9,6 +9,7 @@ use colored::Colorize;
 use rocket::tokio;
 use rocket::response::Redirect;
 use either::Either;
+use serde_json::Value;
 
 mod worker;
 mod requests;
@@ -165,6 +166,64 @@ fn search(input: &str) -> Either<Template, Redirect> {
     Either::Left(Template::render("error", context! {
         route: "error",
     }))
+}
+
+
+// Owner API.
+#[post("/api/v2/owner", data="<data>")]
+async fn api_owner(data: &str) -> String {
+    let result = serde_json::from_str(data);
+
+    let v: Value = match result {
+        Ok(value) => value,
+        Err(_err) => return "{\"error\":\"bad syntax\"}".to_string(),
+    };
+
+    let method = match v["method"].as_str() {
+        Some(value) => value,
+        _ => return "{\"error\":\"bad syntax\"}".to_string(),
+    };
+
+    // Whitelisted methods: get_connected_peer, get_peers, get_status.
+    if method == "get_connected_peers" || method == "get_peers" || method == "get_status" {
+        let resp = requests::call(method, v["params"].to_string().as_str(), "owner").await;
+
+        let result = match resp {
+            Ok(value) => value,
+            Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
+        };
+
+        return result.to_string();
+    }
+
+    "{\"error\":\"not allowed\"}".to_string()
+}
+
+
+// Foreign API.
+// All methods are whitelisted.
+#[post("/api/v2/foreign", data="<data>")]
+async fn api_foreign(data: &str) -> String {
+    let result = serde_json::from_str(data);
+
+    let v: Value = match result {
+        Ok(value) => value,
+        Err(_err) => return "{\"error\":\"bad syntax\"}".to_string(),
+    };
+
+    let method = match v["method"].as_str() {
+        Some(value) => value,
+        _ => return "{\"error\":\"bad syntax\"}".to_string(),
+    };
+
+    let resp = requests::call(method, v["params"].to_string().as_str(), "foreign").await;
+
+    let result = match resp {
+        Ok(value) => value,
+        Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
+    };
+
+    result.to_string()
 }
 
 
@@ -560,7 +619,8 @@ async fn main() {
                                 block_time, block_txns, block_inputs, block_outputs, block_fees,
                                 block_weight, block_details_by_height, block_header_by_hash,
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
-                                last_block_age, block_list_by_height, block_list_index, search, kernel])
+                                last_block_age, block_list_by_height, block_list_index, search, kernel,
+                                api_owner, api_foreign])
             .mount("/static", FileServer::from("static"))
             .attach(Template::fairing())
             .launch()

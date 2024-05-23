@@ -53,7 +53,7 @@ lazy_static! {
 
 
 // RPC requests to grin node.
-async fn call(method: &str, params: &str, rpc_type: &str) -> Result<Value, anyhow::Error> {
+pub async fn call(method: &str, params: &str, rpc_type: &str) -> Result<Value, anyhow::Error> {
     let rpc_url;
     let secret;
 
