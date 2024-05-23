@@ -170,7 +170,7 @@ fn search(input: &str) -> Either<Template, Redirect> {
 
 
 // Owner API.
-#[post("/api/v2/owner", data="<data>")]
+#[post("/v2/owner", data="<data>")]
 async fn api_owner(data: &str) -> String {
     let result = serde_json::from_str(data);
 
@@ -184,6 +184,7 @@ async fn api_owner(data: &str) -> String {
         _ => return "{\"error\":\"bad syntax\"}".to_string(),
     };
 
+    println!("{}", method);
     // Whitelisted methods: get_connected_peer, get_peers, get_status.
     if method == "get_connected_peers" || method == "get_peers" || method == "get_status" {
         let resp = requests::call(method, v["params"].to_string().as_str(), "owner").await;
@@ -202,7 +203,7 @@ async fn api_owner(data: &str) -> String {
 
 // Foreign API.
 // All methods are whitelisted.
-#[post("/api/v2/foreign", data="<data>")]
+#[post("/v2/foreign", data="<data>")]
 async fn api_foreign(data: &str) -> String {
     let result = serde_json::from_str(data);
 
@@ -216,6 +217,7 @@ async fn api_foreign(data: &str) -> String {
         _ => return "{\"error\":\"bad syntax\"}".to_string(),
     };
 
+    println!("{}", method);
     let resp = requests::call(method, v["params"].to_string().as_str(), "foreign").await;
 
     let result = match resp {
