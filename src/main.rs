@@ -140,28 +140,30 @@ async fn kernel(excess: &str) -> Template {
 
 
 // Handling search request.
-#[post("/search", data="<input>")]
-fn search(input: &str) -> Either<Template, Redirect> {
-    //Check input length
-    if input.len() > "search=".len() {
-        // Trim 'search=' from the request data
-        let input = &input[7..].to_lowercase();
+// Using Option<&str> to match '/search' query without input params.
+// https://github.com/rwf2/Rocket/issues/608
+#[get("/search?<input>")]
+fn search(input: Option<&str>) -> Either<Template, Redirect> {
+    // Unwrap Option and forward to Search page if no parameters
+    let input = match input {
+        Some(value) => value,
+        None => return Either::Left(Template::render("search", context! { route: "search", })),
+    };
 
-        // Check for valid chars
-        if input.chars().all(|x| (x >= 'a' && x <= 'f') || (x >= '0' && x <= '9')) == true {
+    // Check for valid chars
+    if input.chars().all(|x| (x >= 'a' && x <= 'f') || (x >= '0' && x <= '9')) == true {
 
-            // Block number
-            if input.chars().all(char::is_numeric) == true {
-                return Either::Right(Redirect::to(uri!(block_details_by_height(input))));
+        // Block number
+        if input.chars().all(char::is_numeric) == true {
+            return Either::Right(Redirect::to(uri!(block_details_by_height(input))));
 
-            // Block hash
-            } else if input.len() == 64 {
-                return Either::Right(Redirect::to(uri!(block_header_by_hash(input))));
+        // Block hash
+        } else if input.len() == 64 {
+            return Either::Right(Redirect::to(uri!(block_header_by_hash(input))));
             
-            // Kernel
-            } else if input.len() == 66 {
-                return Either::Right(Redirect::to(uri!(kernel(input))));
-            }
+        // Kernel
+        } else if input.len() == 66 {
+            return Either::Right(Redirect::to(uri!(kernel(input))));
         }
     }
     
@@ -255,9 +257,9 @@ fn sync_status(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     if data.sync == "no_sync" {
         "Synced".to_string()
     } else {
-        format!("Syncing ({})
+        format!("Syncing
                  <div class='spinner-grow spinner-grow-sm' role='status'>
-                 <span class='visually-hidden'>Syncing...</span></div>", data.sync)
+                 <span class='visually-hidden'>Syncing...</span></div>")
     }
 }
 

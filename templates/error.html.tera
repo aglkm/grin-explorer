@@ -7,7 +7,10 @@
   <div class="card">
     <div class="card-body">
       <h4>No results found.</h4><br>
-      Explorer supports requests by block number, block hash or kernel.<br>
+      <div class="value-text mb-2">Supported search inputs:</div>
+      <div class="value-text"><i class="bi bi-dot"></i> block number</div>
+      <div class="value-text"><i class="bi bi-dot"></i> block hash</div>
+      <div class="value-text"><i class="bi bi-dot"></i> kernel</div>
     </div>
   </div>
 
