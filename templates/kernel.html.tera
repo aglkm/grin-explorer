@@ -1,0 +1,52 @@
+{% extends "base" %}
+
+{% block content %}
+
+<code>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="darkorange-text"><i class="bi bi-card-text"></i> KERNEL</div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Excess&nbsp;</div>
+        <div class="value-text text-break text-end">{{ kernel.excess }}</div>
+      </div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Block Height&nbsp;</div>
+        <div class="value-text text-end">
+          <a class="text-decoration-none" href="/block/{{ kernel.height }}">
+            {{ kernel.height }} <i class="bi bi-box-arrow-up-right"></i>
+          </a>
+        </div>
+      </div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Type&nbsp;</div>
+        <div class="value-text text-end">{{ kernel.ker_type }}</div>
+      </div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Fee&nbsp;</div>
+        <div class="value-text text-end">{{ kernel.fee }}</div>
+      </div>
+    </div>
+  </div>
+
+  <br>
+
+  <div class="card">
+    <div class="card-body" align="left">
+      <div class="darkorange-text"><i class="bi bi-layout-text-sidebar-reverse"></i> RAW DATA</div>
+      <br>
+      <div class="value-text">{{ kernel.raw_data }}</div>
+    </div>
+  </div>
+
+  <br>
+
+</code>
+
+{% endblock %}
+

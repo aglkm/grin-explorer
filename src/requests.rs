@@ -16,6 +16,7 @@ use crate::data::Dashboard;
 use crate::data::Block;
 use crate::data::Transactions;
 use crate::data::ExplorerConfig;
+use crate::Kernel;
 
 
 // Static explorer config structure
@@ -36,6 +37,7 @@ lazy_static! {
                 "api_secret_path"         => cfg.api_secret_path         = value,
                 "foreign_api_secret_path" => cfg.foreign_api_secret_path = value,
                 "grin_dir"                => cfg.grin_dir                = value,
+                "coingecko_api"           => cfg.coingecko_api           = value,
                 _ => println!("{} Unknown config setting '{}'.", "[ ERROR   ]".red(), name),
             }
         }
@@ -52,7 +54,7 @@ lazy_static! {
 
 
 // RPC requests to grin node.
-async fn call(method: &str, params: &str, rpc_type: &str) -> Result<Value, Error> {
+pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Result<Value, anyhow::Error> {
     let rpc_url;
     let secret;
 
@@ -67,21 +69,21 @@ async fn call(method: &str, params: &str, rpc_type: &str) -> Result<Value, Error
 
     let client = reqwest::Client::new();
     let result = client.post(rpc_url)
-                       .body(format!("{{\"method\": \"{}\", \"params\": {}, \"id\":1}}", method, params))
+                       .body(format!("{{\"method\": \"{}\", \"params\": {}, \"id\": {}}}", method, params, id))
                        .basic_auth(CONFIG.user.clone(), Some(secret))
                        .header("content-type", "plain/text")
                        .send()
                        .await?;
 
-    let val: Value = serde_json::from_str(&result.text().await.unwrap()).unwrap();
+    let val: Value = serde_json::from_str(&result.text().await.unwrap())?;
 
     Ok(val)
 }
 
 
 // Collecting: height, sync, node_ver, proto_ver.
-pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
-    let resp = call("get_status", "[]", "owner").await?;
+pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::Error> {
+    let resp = call("get_status", "[]", "1", "owner").await?;
 
     let mut data = dashboard.lock().unwrap();
 
@@ -92,14 +94,17 @@ pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
         data.proto_ver = resp["result"]["Ok"]["protocol_version"].to_string();
     }
 
+    // Also set cg_api value
+    data.cg_api = CONFIG.coingecko_api.clone();
+
     Ok(())
 }
 
 
 // Collecting: txns, stem.
-pub async fn get_mempool(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
-    let resp1 = call("get_pool_size", "[]", "foreign").await?;
-    let resp2 = call("get_stempool_size", "[]", "foreign").await?;
+pub async fn get_mempool(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::Error> {
+    let resp1 = call("get_pool_size", "[]", "1", "foreign").await?;
+    let resp2 = call("get_stempool_size", "[]", "1", "foreign").await?;
     
     let mut data = dashboard.lock().unwrap();
 
@@ -113,8 +118,9 @@ pub async fn get_mempool(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> 
 
 
 // Collecting: inbound, outbound.
-pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
-    let resp = call("get_connected_peers", "[]", "owner").await?;
+pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>)
+             -> Result<(), anyhow::Error> {
+    let resp = call("get_connected_peers", "[]", "1", "owner").await?;
 
     let mut data = dashboard.lock().unwrap();
     
@@ -140,15 +146,18 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>) -> Result<(),
 
 // Collecting: supply, inflation, price_usd, price_btc, volume_usd, volume_btc, cap_usd, cap_btc.
 pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
-    let client = reqwest::Client::new();
-    let result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true")
-                       .send()
-                       .await?;
+    let client;
+    let result;
+    let mut val = Value::Null;
 
-    let val: Value = serde_json::from_str(&result.text().await.unwrap()).unwrap();
-    
+    if CONFIG.coingecko_api == "on" {
+        client = reqwest::Client::new();
+        result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true").send().await?;
+        val    = serde_json::from_str(&result.text().await.unwrap()).unwrap();
+    }
+
     let mut data = dashboard.lock().unwrap();
-   
+  
     if data.height.is_empty() == false {
         // Calculating coin supply
         // Adding +1 as block index starts with 0
@@ -157,28 +166,32 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
         // 31536000 seconds in a year
         let inflation = (31536000.0 / (supply as f64)) * 100.0;
 
-        data.inflation   = format!("{:.2}", inflation);
-        data.supply      = supply.to_formatted_string(&Locale::en);
+        data.inflation = format!("{:.2}", inflation);
+        data.supply    = supply.to_formatted_string(&Locale::en);
 
         // https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153
         data.soft_supply = format!("{:.2}",
-                           supply.to_string().parse::<f64>().unwrap() / 3150000000.0 * 100.0);
+                                   supply.to_string().parse::<f64>().unwrap() / 3150000000.0 * 100.0);
     
-        // Check if CoingGecko API returned error
-        if let Some(status) = val.get("status") {
-            println!("{} {}.", "[ WARNING ]".yellow(),
-                     status["error_message"].as_str().unwrap().to_string());
-        } else {
-            data.price_usd  = format!("{:.3}", val["grin"]["usd"].to_string().parse::<f64>().unwrap());
-            data.price_btc  = format!("{:.8}", val["grin"]["btc"].to_string().parse::<f64>().unwrap());
-            data.volume_usd = (val["grin"]["usd_24h_vol"].to_string().parse::<f64>().unwrap() as u64)
-                              .to_formatted_string(&Locale::en);
-            data.volume_btc = format!("{:.2}", val["grin"]["btc_24h_vol"].to_string().parse::<f64>()
-                              .unwrap());
-            data.cap_usd    = (((supply as f64) * data.price_usd.parse::<f64>().unwrap()) as u64)
-                              .to_formatted_string(&Locale::en);
-            data.cap_btc    = (((supply as f64) * data.price_btc.parse::<f64>().unwrap()) as u64)
-                              .to_formatted_string(&Locale::en);
+        if CONFIG.coingecko_api == "on" && val != Value::Null {
+            // Check if CoingGecko API returned error
+            if let Some(status) = val.get("status") {
+                println!("{} {}.", "[ WARNING ]".yellow(),
+                         status["error_message"].as_str().unwrap().to_string());
+            } else {
+                data.price_usd  = format!("{:.3}", val["grin"]["usd"].to_string().parse::<f64>()
+                                  .unwrap());
+                data.price_btc  = format!("{:.8}", val["grin"]["btc"].to_string().parse::<f64>()
+                                  .unwrap());
+                data.volume_usd = (val["grin"]["usd_24h_vol"].to_string().parse::<f64>().unwrap() as u64)
+                                  .to_formatted_string(&Locale::en);
+                data.volume_btc = format!("{:.2}", val["grin"]["btc_24h_vol"].to_string().parse::<f64>()
+                                  .unwrap());
+                data.cap_usd    = (((supply as f64) * data.price_usd.parse::<f64>().unwrap()) as u64)
+                                  .to_formatted_string(&Locale::en);
+                data.cap_btc    = (((supply as f64) * data.price_btc.parse::<f64>().unwrap()) as u64)
+                                  .to_formatted_string(&Locale::en);
+            }
         }
     }
 
@@ -189,8 +202,13 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 // Collecting: disk_usage.
 pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> { 
     let mut data = dashboard.lock().unwrap();
+    let chain_data;
 
-    let chain_data = format!("{}/main/chain_data", CONFIG.grin_dir);
+    if CONFIG.coingecko_api == "on" {
+        chain_data = format!("{}/main/chain_data", CONFIG.grin_dir);
+    } else {
+        chain_data = format!("{}/test/chain_data", CONFIG.grin_dir);
+    }
 
     data.disk_usage = format!("{:.2}", (get_size(chain_data).unwrap() as f64)
                                        / 1000.0 / 1000.0 / 1000.0);
@@ -200,16 +218,16 @@ pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 
 
 // Collecting: hashrate, difficulty, production cost, breakeven cost.
-pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
+pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::Error> {
     let difficulty_window = 1440;
     let height            = get_current_height(dashboard.clone());
 
-    if height.is_empty() == false {
+    if height.is_empty() == false && height.parse::<u64>().unwrap() > 1440 {
         let params1 = &format!("[{}, null, null]", height)[..];
         let params2 = &format!("[{}, null, null]", height.parse::<u64>().unwrap()
                                - difficulty_window)[..];
-        let resp1   = call("get_block", params1, "foreign").await?;
-        let resp2   = call("get_block", params2, "foreign").await?;
+        let resp1   = call("get_block", params1, "1", "foreign").await?;
+        let resp2   = call("get_block", params2, "1", "foreign").await?;
     
         let mut data = dashboard.lock().unwrap();
 
@@ -223,21 +241,31 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Er
 
             // https://forum.grin.mw/t/on-dual-pow-graph-rates-gps-and-difficulty/2144/52
             // https://forum.grin.mw/t/difference-c31-and-c32-c33/7018/7
-            let hashrate    = (net_diff as f64) * 42.0 / 60.0 / 16384.0;
-            data.hashrate   = format!("{:.2}", hashrate / 1000.0);
+            let hashrate = (net_diff as f64) * 42.0 / 60.0 / 16384.0;
+
+            // KG/s
+            if hashrate > 1000.0 {
+                data.hashrate   = format!("{:.2} KG/s", hashrate / 1000.0);
+            // G/s
+            } else {
+                data.hashrate   = format!("{:.2} G/s", hashrate);
+            }
+            
             data.difficulty = net_diff.to_string();
 
-            // Calculating G1-mini production per hour
-            let coins_per_hour = 1.2 / hashrate * 60.0 * 60.0;
+            if CONFIG.coingecko_api == "on" {
+                // Calculating G1-mini production per hour
+                let coins_per_hour = 1.2 / hashrate * 60.0 * 60.0;
 
-            // Calculating production cost of 1 grin
-            // Assuming $0.07 per kW/h
-            data.production_cost = format!("{:.3}", 120.0 / 1000.0 * 0.07 * (1.0 / coins_per_hour));
+                // Calculating production cost of 1 grin
+                // Assuming $0.07 per kW/h
+                data.production_cost = format!("{:.3}", 120.0 / 1000.0 * 0.07 * (1.0 / coins_per_hour));
 
-            data.reward_ratio    = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
-                                                    / data.production_cost.parse::<f64>().unwrap());
-            data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
-                                   / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
+                data.reward_ratio    = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                                                        / data.production_cost.parse::<f64>().unwrap());
+                data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                                       / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
+            }
         }
     }
 
@@ -247,7 +275,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Er
 
 // Collecting block data for recent blocks (block_list page).
 pub async fn get_block_list_data(height: &String, block: &mut Block)
-                                  -> Result<(), Error> {
+                                  -> Result<(), anyhow::Error> {
     // Max block weight is 40000
     // One unit of weight is 32 bytes
     let kernel_weight = 3.0;
@@ -255,11 +283,11 @@ pub async fn get_block_list_data(height: &String, block: &mut Block)
     let output_weight = 21.0;
 
     if height.is_empty() == false {
-        let params   = &format!("[{}, null, null]", height)[..];
-        let resp     = call("get_block", params, "foreign").await.unwrap();
+        let params = &format!("[{}, null, null]", height)[..];
+        let resp   = call("get_block", params, "1", "foreign").await?;
 
         if resp["result"]["Ok"].is_null() == false {
-            block.height  = resp["result"]["Ok"]["header"]["height"].to_string();
+            block.height = resp["result"]["Ok"]["header"]["height"].to_string();
 
             let dt: DateTime<Utc> = resp["result"]["Ok"]["header"]["timestamp"]
                                     .as_str().unwrap().to_string().parse().unwrap();
@@ -306,7 +334,7 @@ pub async fn get_block_list_data(height: &String, block: &mut Block)
 
 // Collecting block data.
 pub async fn get_block_data(height: &str, block: &mut Block)
-             -> Result<(), Error> {
+             -> Result<(), anyhow::Error> {
     // Max block weight is 40000
     // One unit of weight is 32 bytes
     let kernel_weight = 3.0;
@@ -316,7 +344,7 @@ pub async fn get_block_data(height: &str, block: &mut Block)
     if height.is_empty() == false {
         let params = &format!("[{}, null, null]", height)[..];
 
-        let resp = call("get_block", params, "foreign").await?;
+        let resp = call("get_block", params, "1", "foreign").await?;
 
         if resp["result"]["Ok"].is_null() == false {
             block.hash    = resp["result"]["Ok"]["header"]["hash"].as_str().unwrap().to_string();
@@ -362,10 +390,10 @@ pub async fn get_block_data(height: &str, block: &mut Block)
 
 // Get block height by hash.
 pub async fn get_block_header(hash: &str, height: &mut String)
-             -> Result<(), Error> {
+             -> Result<(), anyhow::Error> {
     let params = &format!("[null, \"{}\", null]", hash)[..];
 
-    let resp = call("get_header", params, "foreign").await.unwrap();
+    let resp = call("get_header", params, "1", "foreign").await?;
     
     if resp["result"]["Ok"].is_null() == false {
         *height = resp["result"]["Ok"]["height"].to_string();
@@ -376,14 +404,26 @@ pub async fn get_block_header(hash: &str, height: &mut String)
 
 
 // Get kernel.
-pub async fn get_kernel(kernel: &str, height: &mut String)
-             -> Result<(), Error> {
-    let params = &format!("[\"{}\", null, null]", kernel)[..];
+pub async fn get_kernel(excess: &str, kernel: &mut Kernel)
+             -> Result<(), anyhow::Error> {
+    let params = &format!("[\"{}\", null, null]", excess)[..];
 
-    let resp = call("get_kernel", params, "foreign").await.unwrap();
+    let resp = call("get_kernel", params, "1", "foreign").await?;
     
     if resp["result"]["Ok"].is_null() == false {
-        *height = resp["result"]["Ok"]["height"].to_string();
+        kernel.height  = resp["result"]["Ok"]["height"].to_string();
+        kernel.excess  = resp["result"]["Ok"]["tx_kernel"]["excess"].as_str().unwrap().to_string();
+        if resp["result"]["Ok"]["tx_kernel"]["features"]["Plain"].is_null() == false {
+            kernel.ker_type = "Plain".to_string();
+            kernel.fee      = format!("ツ {}",
+                                      resp["result"]["Ok"]["tx_kernel"]["features"]["Plain"]["fee"]
+                                      .to_string().parse::<f64>().unwrap() / 1000000000.0);
+        } else {
+            kernel.ker_type = resp["result"]["Ok"]["tx_kernel"]["features"].as_str().unwrap().to_string();
+            kernel.fee      = "ツ 0".to_string();
+        }
+
+        kernel.raw_data = serde_json::to_string_pretty(&resp).unwrap()
     }
 
     Ok(())
@@ -392,11 +432,11 @@ pub async fn get_kernel(kernel: &str, height: &mut String)
 
 // Collecting block kernels for transactions stats.
 pub async fn get_block_kernels(height: &String, blocks: &mut Vec<Block>)
-             -> Result<(), Error> {
+             -> Result<(), anyhow::Error> {
     if height.is_empty() == false {
         let params = &format!("[{}, {}, 720, false]", height.parse::<u64>().unwrap() - 720,
                               height)[..];
-        let resp   = call("get_blocks", params, "foreign").await.unwrap();
+        let resp   = call("get_blocks", params, "1", "foreign").await?;
 
         for resp_block in resp["result"]["Ok"]["blocks"].as_array().unwrap() {
             let mut block = Block::new();
@@ -421,7 +461,7 @@ pub async fn get_txn_stats(dashboard: Arc<Mutex<Dashboard>>,
     let mut blocks = Vec::<Block>::new();
     let height     = get_current_height(dashboard.clone());
 
-    if height.is_empty() == false {
+    if height.is_empty() == false && height.parse::<u64>().unwrap() > 1440 {
         // get_blocks grin rpc has limit of maximum of 1000 blocks request
         // https://github.com/mimblewimble/grin/blob/master/api/src/handlers/blocks_api.rs#L27
         // So, collecting kernels 2 times by 720 blocks to get a day of blocks
@@ -484,7 +524,7 @@ pub async fn get_recent_blocks(dashboard: Arc<Mutex<Dashboard>>,
     let mut i      = 0;
     let height_str = get_current_height(dashboard.clone());
 
-    if height_str.is_empty() == false {
+    if height_str.is_empty() == false && height_str.parse::<u64>().unwrap() > 0 {
         let height         = height_str.parse::<u64>().unwrap();
         let mut blocks_vec = Vec::<Block>::new();
 
@@ -510,11 +550,11 @@ pub async fn get_recent_blocks(dashboard: Arc<Mutex<Dashboard>>,
 
 // Collecting a specified list of blocks.
 pub async fn get_block_list_by_height(height: &str, blocks: &mut Vec<Block>,
-                                      latest_height: &mut u64) -> Result<(), Error> {
+                                      latest_height: &mut u64) -> Result<(), anyhow::Error> {
     let mut i      = 0;
     let height = height.to_string();
 
-    let resp = call("get_status", "[]", "owner").await.unwrap();
+    let resp = call("get_status", "[]", "1", "owner").await?;
 
     if resp != Value::Null {
         *latest_height = resp["result"]["Ok"]["tip"]["height"].to_string().parse::<u64>().unwrap();

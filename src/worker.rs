@@ -1,5 +1,4 @@
 use std::sync::{Arc, Mutex};
-use reqwest::Error;
 
 use crate::data::Dashboard;
 use crate::data::Block;
@@ -10,7 +9,7 @@ use crate::requests;
 // Tokio Runtime Worker.
 // Collecting all the data.
 pub async fn run(dash: Arc<Mutex<Dashboard>>, blocks: Arc<Mutex<Vec<Block>>>,
-                 txns: Arc<Mutex<Transactions>>) -> Result<(), Error> {
+                 txns: Arc<Mutex<Transactions>>) -> Result<(), anyhow::Error> {
     let _ = requests::get_status(dash.clone()).await?;
     let _ = requests::get_mempool(dash.clone()).await?;
     let _ = requests::get_connected_peers(dash.clone()).await?;

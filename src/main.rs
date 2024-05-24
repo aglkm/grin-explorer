@@ -9,6 +9,7 @@ use colored::Colorize;
 use rocket::tokio;
 use rocket::response::Redirect;
 use either::Either;
+use serde_json::Value;
 
 mod worker;
 mod requests;
@@ -17,6 +18,7 @@ mod data;
 use crate::data::Dashboard;
 use crate::data::Block;
 use crate::data::Transactions;
+use crate::data::Kernel;
 
 
 // Rendering main (Dashboard) page.
@@ -25,9 +27,10 @@ fn index(dashboard: &State<Arc<Mutex<Dashboard>>>) -> Template {
     let data = dashboard.lock().unwrap();
 
     Template::render("index", context! {
-        route: "index",
-        node_ver: &data.node_ver,
+        route:     "index",
+        node_ver:  &data.node_ver,
         proto_ver: &data.proto_ver,
+        cg_api:    &data.cg_api,
     })
 }
 
@@ -117,32 +120,34 @@ async fn block_header_by_hash(hash: &str) -> Either<Template, Redirect> {
 
 
 // Rendering page for a specified kernel.
-#[get("/kernel/<kernel>")]
-async fn kernel(kernel: &str) -> Either<Template, Redirect> {
-    let mut height = String::new();
+#[get("/kernel/<excess>")]
+async fn kernel(excess: &str) -> Template {
+    let mut kernel = Kernel::new();
 
-    let _ = requests::get_kernel(&kernel, &mut height).await;
+    let _ = requests::get_kernel(&excess, &mut kernel).await;
 
-    if kernel.is_empty() == false {
-        if height.is_empty() == false {
-            return Either::Right(Redirect::to(uri!(block_details_by_height(height.as_str()))));
-        }
+    if kernel.height.is_empty() == false {
+        return Template::render("kernel", context! {
+            route: "kernel",
+            kernel,
+        })
     }
 
-    return Either::Left(Template::render("error", context! {
+    return Template::render("error", context! {
         route: "error",
-    }))
+    })
 }
 
 
 // Handling search request.
 #[post("/search", data="<input>")]
 fn search(input: &str) -> Either<Template, Redirect> {
-    // Trim 'search=' from the request data
-    let input = &input[7..].to_lowercase();
-    
-    //Check if input is valid
-    if input.is_empty() == false {
+    //Check input length
+    if input.len() > "search=".len() {
+        // Trim 'search=' from the request data
+        let input = &input[7..].to_lowercase();
+
+        // Check for valid chars
         if input.chars().all(|x| (x >= 'a' && x <= 'f') || (x >= '0' && x <= '9')) == true {
 
             // Block number
@@ -153,7 +158,7 @@ fn search(input: &str) -> Either<Template, Redirect> {
             } else if input.len() == 64 {
                 return Either::Right(Redirect::to(uri!(block_header_by_hash(input))));
             
-            // Kernel hash
+            // Kernel
             } else if input.len() == 66 {
                 return Either::Right(Redirect::to(uri!(kernel(input))));
             }
@@ -163,6 +168,66 @@ fn search(input: &str) -> Either<Template, Redirect> {
     Either::Left(Template::render("error", context! {
         route: "error",
     }))
+}
+
+
+// Owner API.
+#[post("/v2/owner", data="<data>")]
+async fn api_owner(data: &str) -> String {
+    let result = serde_json::from_str(data);
+
+    let v: Value = match result {
+        Ok(value) => value,
+        Err(_err) => return "{\"error\":\"bad syntax\"}".to_string(),
+    };
+
+    let method = match v["method"].as_str() {
+        Some(value) => value,
+        _ => return "{\"error\":\"bad syntax\"}".to_string(),
+    };
+    
+    // Whitelisted methods: get_connected_peer, get_peers, get_status.
+    if method == "get_connected_peers" || method == "get_peers" || method == "get_status" {
+        let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "owner").await;
+
+        let result = match resp {
+            Ok(value) => value,
+            Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
+        };
+
+        return result.to_string();
+    }
+
+    "{\"error\":\"not allowed\"}".to_string()
+}
+
+
+// Foreign API.
+// All methods are whitelisted.
+#[post("/v2/foreign", data="<data>")]
+async fn api_foreign(data: &str) -> String {
+    let result = serde_json::from_str(data);
+
+    let v: Value = match result {
+        Ok(value) => value,
+        Err(_err) => return "{\"error\":\"bad syntax\"}".to_string(),
+    };
+
+    let method = match v["method"].as_str() {
+        Some(value) => value,
+        _ => return "{\"error\":\"bad syntax\"}".to_string(),
+    };
+
+    println!("{}", method);
+    println!("{}", data);
+    let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "foreign").await;
+
+    let result = match resp {
+        Ok(value) => value,
+        Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
+    };
+
+    result.to_string()
 }
 
 
@@ -210,7 +275,13 @@ fn soft_supply(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
     if data.supply.is_empty() == false {
-        return format!("{} % ({}M/3150M)", data.soft_supply, &data.supply[..3]);
+        // 9 digits plus 2 commas, e.g. 168,038,400
+        if data.supply.len() == 11 {
+            return format!("{} % ({}M/3150M)", data.soft_supply, &data.supply[..3]);
+        // 10 digits plus 2 commas
+        } else if data.supply.len() == 12 {
+            return format!("{} % ({}M/3150M)", data.soft_supply, &data.supply[..4]);
+        }
     }
     
     "3150M".to_string()
@@ -306,7 +377,7 @@ fn disk_usage(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 fn network_hashrate(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    format!("{} KG/s", data.hashrate)
+    data.hashrate.clone()
 }
 
 
@@ -490,7 +561,7 @@ fn block_weight(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String 
 fn block_list_index(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    if data.height.is_empty() == false {
+    if data.height.is_empty() == false && data.height.parse::<u64>().unwrap() > 10 {
         return format!("<a class='text-decoration-none' href='/block_list/{}'>
                         <div class='col-sm'><h2><i class='bi bi-arrow-right-square'></i></h2></div>
                         </a>", data.height.parse::<u64>().unwrap() - 10);
@@ -552,7 +623,8 @@ async fn main() {
                                 block_time, block_txns, block_inputs, block_outputs, block_fees,
                                 block_weight, block_details_by_height, block_header_by_hash,
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
-                                last_block_age, block_list_by_height, block_list_index, search, kernel])
+                                last_block_age, block_list_by_height, block_list_index, search, kernel,
+                                api_owner, api_foreign])
             .mount("/static", FileServer::from("static"))
             .attach(Template::fairing())
             .launch()
