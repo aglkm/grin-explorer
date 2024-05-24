@@ -26,11 +26,13 @@
         <div class="value-text">Type&nbsp;</div>
         <div class="value-text text-end">{{ kernel.ker_type }}</div>
       </div>
-      <br>
-      <div class="d-flex justify-content-between">
-        <div class="value-text">Fee&nbsp;</div>
-        <div class="value-text text-end">{{ kernel.fee }}</div>
-      </div>
+      {% if kernel.ker_type == "Plain" %}
+        <br>
+        <div class="d-flex justify-content-between">
+          <div class="value-text">Fee&nbsp;</div>
+          <div class="value-text text-end">{{ kernel.fee }}</div>
+        </div>
+      {% endif %}
     </div>
   </div>
 

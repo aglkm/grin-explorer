@@ -411,8 +411,8 @@ pub async fn get_kernel(excess: &str, kernel: &mut Kernel)
     let resp = call("get_kernel", params, "1", "foreign").await?;
     
     if resp["result"]["Ok"].is_null() == false {
-        kernel.height  = resp["result"]["Ok"]["height"].to_string();
-        kernel.excess  = resp["result"]["Ok"]["tx_kernel"]["excess"].as_str().unwrap().to_string();
+        kernel.height = resp["result"]["Ok"]["height"].to_string();
+        kernel.excess = resp["result"]["Ok"]["tx_kernel"]["excess"].as_str().unwrap().to_string();
         if resp["result"]["Ok"]["tx_kernel"]["features"]["Plain"].is_null() == false {
             kernel.ker_type = "Plain".to_string();
             kernel.fee      = format!("ツ {}",
@@ -420,7 +420,6 @@ pub async fn get_kernel(excess: &str, kernel: &mut Kernel)
                                       .to_string().parse::<f64>().unwrap() / 1000000000.0);
         } else {
             kernel.ker_type = resp["result"]["Ok"]["tx_kernel"]["features"].as_str().unwrap().to_string();
-            kernel.fee      = "ツ 0".to_string();
         }
 
         kernel.raw_data = serde_json::to_string_pretty(&resp).unwrap()
