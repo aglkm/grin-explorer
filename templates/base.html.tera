@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+ <html lang="en" class="h-100">
   <head>
     <title>Grin Blockchain Explorer</title>
     <meta property="og:site_name" content="Grincoin.org (GRIN) Blockchain Explorer" />
@@ -78,7 +78,7 @@
       {% block content %}{% endblock content %}
     </div>
 
-    <footer class="shadow">
+    <footer class="shadow mt-auto">
       <code>
         <br>
         <div class="container-fluid">

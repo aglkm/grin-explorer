@@ -18,6 +18,7 @@ mod data;
 use crate::data::Dashboard;
 use crate::data::Block;
 use crate::data::Transactions;
+use crate::data::Kernel;
 
 
 // Rendering main (Dashboard) page.
@@ -119,21 +120,22 @@ async fn block_header_by_hash(hash: &str) -> Either<Template, Redirect> {
 
 
 // Rendering page for a specified kernel.
-#[get("/kernel/<kernel>")]
-async fn kernel(kernel: &str) -> Either<Template, Redirect> {
-    let mut height = String::new();
+#[get("/kernel/<excess>")]
+async fn kernel(excess: &str) -> Template {
+    let mut kernel = Kernel::new();
 
-    let _ = requests::get_kernel(&kernel, &mut height).await;
+    let _ = requests::get_kernel(&excess, &mut kernel).await;
 
-    if kernel.is_empty() == false {
-        if height.is_empty() == false {
-            return Either::Right(Redirect::to(uri!(block_details_by_height(height.as_str()))));
-        }
+    if kernel.height.is_empty() == false {
+        return Template::render("kernel", context! {
+            route: "kernel",
+            kernel,
+        })
     }
 
-    return Either::Left(Template::render("error", context! {
+    return Template::render("error", context! {
         route: "error",
-    }))
+    })
 }
 
 
@@ -183,10 +185,10 @@ async fn api_owner(data: &str) -> String {
         Some(value) => value,
         _ => return "{\"error\":\"bad syntax\"}".to_string(),
     };
-
+    
     // Whitelisted methods: get_connected_peer, get_peers, get_status.
     if method == "get_connected_peers" || method == "get_peers" || method == "get_status" {
-        let resp = requests::call(method, v["params"].to_string().as_str(), "owner").await;
+        let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "owner").await;
 
         let result = match resp {
             Ok(value) => value,
@@ -216,7 +218,9 @@ async fn api_foreign(data: &str) -> String {
         _ => return "{\"error\":\"bad syntax\"}".to_string(),
     };
 
-    let resp = requests::call(method, v["params"].to_string().as_str(), "foreign").await;
+    println!("{}", method);
+    println!("{}", data);
+    let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "foreign").await;
 
     let result = match resp {
         Ok(value) => value,

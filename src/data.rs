@@ -111,6 +111,29 @@ impl Block {
 }
 
 
+// Kernel data
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Kernel {
+    pub height:   String,
+    pub excess:   String,
+    pub ker_type: String,
+    pub fee:      String,
+    pub raw_data: String,
+}
+
+impl Kernel {
+    pub fn new() -> Kernel {
+        Kernel {
+            height:   String::new(),
+            excess:   String::new(),
+            ker_type: String::new(),
+            fee:      String::new(),
+            raw_data: String::new(),
+        }
+    }
+}
+
+
 // Transactions data
 #[derive(Debug)]
 pub struct Transactions {

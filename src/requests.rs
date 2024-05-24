@@ -16,6 +16,7 @@ use crate::data::Dashboard;
 use crate::data::Block;
 use crate::data::Transactions;
 use crate::data::ExplorerConfig;
+use crate::Kernel;
 
 
 // Static explorer config structure
@@ -53,7 +54,7 @@ lazy_static! {
 
 
 // RPC requests to grin node.
-pub async fn call(method: &str, params: &str, rpc_type: &str) -> Result<Value, anyhow::Error> {
+pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Result<Value, anyhow::Error> {
     let rpc_url;
     let secret;
 
@@ -68,7 +69,7 @@ pub async fn call(method: &str, params: &str, rpc_type: &str) -> Result<Value, a
 
     let client = reqwest::Client::new();
     let result = client.post(rpc_url)
-                       .body(format!("{{\"method\": \"{}\", \"params\": {}, \"id\":1}}", method, params))
+                       .body(format!("{{\"method\": \"{}\", \"params\": {}, \"id\": {}}}", method, params, id))
                        .basic_auth(CONFIG.user.clone(), Some(secret))
                        .header("content-type", "plain/text")
                        .send()
@@ -82,7 +83,7 @@ pub async fn call(method: &str, params: &str, rpc_type: &str) -> Result<Value, a
 
 // Collecting: height, sync, node_ver, proto_ver.
 pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::Error> {
-    let resp = call("get_status", "[]", "owner").await?;
+    let resp = call("get_status", "[]", "1", "owner").await?;
 
     let mut data = dashboard.lock().unwrap();
 
@@ -102,8 +103,8 @@ pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
 
 // Collecting: txns, stem.
 pub async fn get_mempool(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::Error> {
-    let resp1 = call("get_pool_size", "[]", "foreign").await?;
-    let resp2 = call("get_stempool_size", "[]", "foreign").await?;
+    let resp1 = call("get_pool_size", "[]", "1", "foreign").await?;
+    let resp2 = call("get_stempool_size", "[]", "1", "foreign").await?;
     
     let mut data = dashboard.lock().unwrap();
 
@@ -119,7 +120,7 @@ pub async fn get_mempool(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow:
 // Collecting: inbound, outbound.
 pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>)
              -> Result<(), anyhow::Error> {
-    let resp = call("get_connected_peers", "[]", "owner").await?;
+    let resp = call("get_connected_peers", "[]", "1", "owner").await?;
 
     let mut data = dashboard.lock().unwrap();
     
@@ -225,8 +226,8 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
         let params1 = &format!("[{}, null, null]", height)[..];
         let params2 = &format!("[{}, null, null]", height.parse::<u64>().unwrap()
                                - difficulty_window)[..];
-        let resp1   = call("get_block", params1, "foreign").await?;
-        let resp2   = call("get_block", params2, "foreign").await?;
+        let resp1   = call("get_block", params1, "1", "foreign").await?;
+        let resp2   = call("get_block", params2, "1", "foreign").await?;
     
         let mut data = dashboard.lock().unwrap();
 
@@ -283,7 +284,7 @@ pub async fn get_block_list_data(height: &String, block: &mut Block)
 
     if height.is_empty() == false {
         let params = &format!("[{}, null, null]", height)[..];
-        let resp   = call("get_block", params, "foreign").await?;
+        let resp   = call("get_block", params, "1", "foreign").await?;
 
         if resp["result"]["Ok"].is_null() == false {
             block.height = resp["result"]["Ok"]["header"]["height"].to_string();
@@ -343,7 +344,7 @@ pub async fn get_block_data(height: &str, block: &mut Block)
     if height.is_empty() == false {
         let params = &format!("[{}, null, null]", height)[..];
 
-        let resp = call("get_block", params, "foreign").await?;
+        let resp = call("get_block", params, "1", "foreign").await?;
 
         if resp["result"]["Ok"].is_null() == false {
             block.hash    = resp["result"]["Ok"]["header"]["hash"].as_str().unwrap().to_string();
@@ -392,7 +393,7 @@ pub async fn get_block_header(hash: &str, height: &mut String)
              -> Result<(), anyhow::Error> {
     let params = &format!("[null, \"{}\", null]", hash)[..];
 
-    let resp = call("get_header", params, "foreign").await?;
+    let resp = call("get_header", params, "1", "foreign").await?;
     
     if resp["result"]["Ok"].is_null() == false {
         *height = resp["result"]["Ok"]["height"].to_string();
@@ -403,14 +404,26 @@ pub async fn get_block_header(hash: &str, height: &mut String)
 
 
 // Get kernel.
-pub async fn get_kernel(kernel: &str, height: &mut String)
+pub async fn get_kernel(excess: &str, kernel: &mut Kernel)
              -> Result<(), anyhow::Error> {
-    let params = &format!("[\"{}\", null, null]", kernel)[..];
+    let params = &format!("[\"{}\", null, null]", excess)[..];
 
-    let resp = call("get_kernel", params, "foreign").await?;
+    let resp = call("get_kernel", params, "1", "foreign").await?;
     
     if resp["result"]["Ok"].is_null() == false {
-        *height = resp["result"]["Ok"]["height"].to_string();
+        kernel.height  = resp["result"]["Ok"]["height"].to_string();
+        kernel.excess  = resp["result"]["Ok"]["tx_kernel"]["excess"].as_str().unwrap().to_string();
+        if resp["result"]["Ok"]["tx_kernel"]["features"]["Plain"].is_null() == false {
+            kernel.ker_type = "Plain".to_string();
+            kernel.fee      = format!("ツ {}",
+                                      resp["result"]["Ok"]["tx_kernel"]["features"]["Plain"]["fee"]
+                                      .to_string().parse::<f64>().unwrap() / 1000000000.0);
+        } else {
+            kernel.ker_type = resp["result"]["Ok"]["tx_kernel"]["features"].as_str().unwrap().to_string();
+            kernel.fee      = "ツ 0".to_string();
+        }
+
+        kernel.raw_data = serde_json::to_string_pretty(&resp).unwrap()
     }
 
     Ok(())
@@ -423,7 +436,7 @@ pub async fn get_block_kernels(height: &String, blocks: &mut Vec<Block>)
     if height.is_empty() == false {
         let params = &format!("[{}, {}, 720, false]", height.parse::<u64>().unwrap() - 720,
                               height)[..];
-        let resp   = call("get_blocks", params, "foreign").await?;
+        let resp   = call("get_blocks", params, "1", "foreign").await?;
 
         for resp_block in resp["result"]["Ok"]["blocks"].as_array().unwrap() {
             let mut block = Block::new();
@@ -541,7 +554,7 @@ pub async fn get_block_list_by_height(height: &str, blocks: &mut Vec<Block>,
     let mut i      = 0;
     let height = height.to_string();
 
-    let resp = call("get_status", "[]", "owner").await?;
+    let resp = call("get_status", "[]", "1", "owner").await?;
 
     if resp != Value::Null {
         *latest_height = resp["result"]["Ok"]["tip"]["height"].to_string().parse::<u64>().unwrap();
