@@ -220,8 +220,6 @@ async fn api_foreign(data: &str) -> String {
         _ => return "{\"error\":\"bad syntax\"}".to_string(),
     };
 
-    println!("{}", method);
-    println!("{}", data);
     let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "foreign").await;
 
     let result = match resp {
