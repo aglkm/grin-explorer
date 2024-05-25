@@ -118,6 +118,7 @@ pub struct Kernel {
     pub excess:   String,
     pub ker_type: String,
     pub fee:      String,
+    pub status:   String,
     pub raw_data: String,
 }
 
@@ -128,6 +129,7 @@ impl Kernel {
             excess:   String::new(),
             ker_type: String::new(),
             fee:      String::new(),
+            status:   String::new(),
             raw_data: String::new(),
         }
     }
