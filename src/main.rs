@@ -126,7 +126,7 @@ async fn kernel(excess: &str) -> Template {
 
     let _ = requests::get_kernel(&excess, &mut kernel).await;
 
-    if kernel.height.is_empty() == false {
+    if kernel.excess.is_empty() == false {
         return Template::render("kernel", context! {
             route: "kernel",
             kernel,

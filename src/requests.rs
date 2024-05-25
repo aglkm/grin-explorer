@@ -404,11 +404,31 @@ pub async fn get_block_header(hash: &str, height: &mut String)
 
 
 // Get kernel.
-pub async fn get_kernel(excess: &str, kernel: &mut Kernel)
-             -> Result<(), anyhow::Error> {
+pub async fn get_kernel(excess: &str, kernel: &mut Kernel) -> Result<(), anyhow::Error> {
+    // First check whether kernel is broadcasted but not confirmed yet (in mempool)
+    let mut resp = call("get_unconfirmed_transactions", "[]", "1", "foreign").await?;
+    
+    if resp["result"]["Ok"].is_null() == false {
+        for tx in resp["result"]["Ok"].as_array().unwrap() {
+            for ker in tx["tx"]["body"]["kernels"].as_array().unwrap() {
+                if ker["excess"].as_str().unwrap() == excess {
+                    // Only Plain kernels in the mempool
+                    kernel.ker_type = "Plain".to_string();
+                    kernel.excess   = ker["excess"].as_str().unwrap().to_string();
+                    kernel.status   = "Unconfirmed".to_string();
+                    kernel.fee      = format!("ツ {}",
+                                      ker["features"]["Plain"]["fee"]
+                                      .to_string().parse::<f64>().unwrap() / 1000000000.0);
+                    // Found it, no need to continue
+                    return Ok(());
+                }
+            }
+        }
+    }
+    
     let params = &format!("[\"{}\", null, null]", excess)[..];
 
-    let resp = call("get_kernel", params, "1", "foreign").await?;
+    resp = call("get_kernel", params, "1", "foreign").await?;
     
     if resp["result"]["Ok"].is_null() == false {
         kernel.height = resp["result"]["Ok"]["height"].to_string();

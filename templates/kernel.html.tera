@@ -6,12 +6,18 @@
 
   <div class="card">
     <div class="card-body">
-      <div class="darkorange-text"><i class="bi bi-card-text"></i> KERNEL</div>
+      <div class="d-flex justify-content-between">
+        <div class="darkorange-text"><i class="bi bi-card-text"></i> KERNEL</div>
+        {% if kernel.status == "Unconfirmed" %}
+          <span class="badge text-bg-warning px-2 py-2">UNCONFIRMED</span>
+        {% endif %}
+      </div>
       <br>
       <div class="d-flex justify-content-between">
         <div class="value-text">Excess&nbsp;</div>
         <div class="value-text text-break text-end">{{ kernel.excess }}</div>
       </div>
+      {% if kernel.status != "Unconfirmed" %}
       <br>
       <div class="d-flex justify-content-between">
         <div class="value-text">Block Height&nbsp;</div>
@@ -21,6 +27,7 @@
           </a>
         </div>
       </div>
+      {% endif %}
       <br>
       <div class="d-flex justify-content-between">
         <div class="value-text">Type&nbsp;</div>
@@ -36,15 +43,16 @@
     </div>
   </div>
 
-  <br>
-
-  <div class="card">
-    <div class="card-body" align="left">
-      <div class="darkorange-text"><i class="bi bi-layout-text-sidebar-reverse"></i> RAW DATA</div>
-      <br>
-      <div class="value-text">{{ kernel.raw_data }}</div>
+  {% if kernel.status != "Unconfirmed" %}
+    <br>
+    <div class="card">
+      <div class="card-body" align="left">
+        <div class="darkorange-text"><i class="bi bi-layout-text-sidebar-reverse"></i> RAW DATA</div>
+        <br>
+        <div class="value-text">{{ kernel.raw_data }}</div>
+      </div>
     </div>
-  </div>
+  {% endif %}
 
   <br>
 
