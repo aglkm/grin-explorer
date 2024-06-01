@@ -38,6 +38,7 @@ lazy_static! {
                 "foreign_api_secret_path" => cfg.foreign_api_secret_path = value,
                 "grin_dir"                => cfg.grin_dir                = value,
                 "coingecko_api"           => cfg.coingecko_api           = value,
+                "public_api"              => cfg.public_api              = value,
                 _ => println!("{} Unknown config setting '{}'.", "[ ERROR   ]".red(), name),
             }
         }
@@ -147,7 +148,7 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
     let result;
     let mut val = Value::Null;
 
-    if CONFIG.coingecko_api == "on" {
+    if CONFIG.coingecko_api == "enabled" {
         client = reqwest::Client::new();
         result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true").send().await?;
         val    = serde_json::from_str(&result.text().await.unwrap()).unwrap();
@@ -170,7 +171,7 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
         data.soft_supply = format!("{:.2}",
                                    supply.to_string().parse::<f64>().unwrap() / 3150000000.0 * 100.0);
     
-        if CONFIG.coingecko_api == "on" && val != Value::Null {
+        if CONFIG.coingecko_api == "enabled" && val != Value::Null {
             // Check if CoingGecko API returned error
             if let Some(status) = val.get("status") {
                 println!("{} {}.", "[ WARNING ]".yellow(),
@@ -201,7 +202,7 @@ pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
     let mut data = dashboard.lock().unwrap();
     let chain_data;
 
-    if CONFIG.coingecko_api == "on" {
+    if CONFIG.coingecko_api == "enabled" {
         chain_data = format!("{}/main/chain_data", CONFIG.grin_dir);
     } else {
         chain_data = format!("{}/test/chain_data", CONFIG.grin_dir);
@@ -250,7 +251,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
             
             data.difficulty = net_diff.to_string();
 
-            if CONFIG.coingecko_api == "on" {
+            if CONFIG.coingecko_api == "enabled" {
                 // Calculating G1-mini production per hour
                 let coins_per_hour = 1.2 / hashrate * 60.0 * 60.0;
 

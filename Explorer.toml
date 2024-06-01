@@ -19,8 +19,11 @@ foreign_api_secret_path = "~/.grin/main/.foreign_api_secret"
 # Path to Grin directory.
 grin_dir = "~/.grin"
 
-# CoinGecko API on/off switch.
-coingecko_api = "on"
+# Enable or disable CoinGecko API.
+coingecko_api = "enabled"
+
+# Enable or disable node POST API public access.
+public_api = "enabled"
 
 
 # Testnet config
@@ -31,5 +34,6 @@ coingecko_api = "on"
 # api_secret_path = "~/.grin/test/.api_secret"
 # foreign_api_secret_path = "~/.grin/test/.foreign_api_secret"
 # grin_dir = "~/.grin"
-# coingecko_api = "off"
+# coingecko_api = "disabled"
+# public_api = "enabled"
 

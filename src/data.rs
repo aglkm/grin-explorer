@@ -167,6 +167,7 @@ pub struct ExplorerConfig {
     pub api_secret:              String,
     pub foreign_api_secret:      String,
     pub coingecko_api:           String,
+    pub public_api:              String,
 }
 
 impl ExplorerConfig {
@@ -182,6 +183,7 @@ impl ExplorerConfig {
             api_secret:              String::new(),
             foreign_api_secret:      String::new(),
             coingecko_api:           String::new(),
+            public_api:              String::new(),
         }
     }
 }

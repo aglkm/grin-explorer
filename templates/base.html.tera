@@ -219,7 +219,7 @@
 		</a>
 	      </div>
             </div>
-	    {% if cg_api == "on" %}
+	    {% if cg_api == "enabled" %}
             <div class="row">
               <div class="col d-flex justify-content-center" style="color:grey">
 		Powered by CoinGecko

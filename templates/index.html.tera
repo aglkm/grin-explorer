@@ -6,7 +6,7 @@
 
 {# We have different UI to display if CoinGecko API is disabled by user #}
 
-{% if cg_api == "on" %}
+{% if cg_api == "enabled" %}
 {# CoinGecko API is enabled #}
 
 <div class="d-none d-md-block"> <!-- Show on >= md screens -->
