@@ -215,15 +215,17 @@
                   <span style="color:grey"><i class="bi bi-github me-1"></i>v.0.1.5</span>
 		</a>
                 <a class="text-decoration-none" href="/search">
-                  <span style="color:grey"><i class="bi bi-search me-1"></i>search</span>
+                  <span style="color:grey"><i class="bi bi-search me-1"></i>Search</span>
 		</a>
 	      </div>
             </div>
+	    {% if cg_api == "on" %}
             <div class="row">
               <div class="col d-flex justify-content-center" style="color:grey">
 		Powered by CoinGecko
 	      </div>
             </div>
+	    {% endif %}
           </div>
         </div>
         <br>

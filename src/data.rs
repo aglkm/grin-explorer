@@ -35,8 +35,6 @@ pub struct Dashboard {
     // mempool
     pub txns:            String,
     pub stem:            String,
-    // coingecko api
-    pub cg_api:          String,
 }
 
 impl Dashboard {
@@ -66,7 +64,6 @@ impl Dashboard {
             breakeven_cost:  String::new(),
             txns:            String::new(),
             stem:            String::new(),
-            cg_api:          String::new(),
         }
     }
 }

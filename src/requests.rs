@@ -21,7 +21,7 @@ use crate::Kernel;
 
 // Static explorer config structure
 lazy_static! {
-    static ref CONFIG: ExplorerConfig = {
+    pub static ref CONFIG: ExplorerConfig = {
         let mut cfg  = ExplorerConfig::new();
         let settings = Config::builder().add_source(config::File::with_name("Explorer"))
                                         .build().unwrap();
@@ -93,9 +93,6 @@ pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
         data.node_ver  = resp["result"]["Ok"]["user_agent"].as_str().unwrap().to_string();
         data.proto_ver = resp["result"]["Ok"]["protocol_version"].to_string();
     }
-
-    // Also set cg_api value
-    data.cg_api = CONFIG.coingecko_api.clone();
 
     Ok(())
 }
