@@ -7,8 +7,8 @@
   <div class="card">
     <div class="card-body mx-2 mt-2 mb-3">
       <div class="d-flex justify-content-start mb-1">
-        <i class="bi bi-box me-2"></i>
-        <div class="value-text text-end" hx-get="/rpc/block/latest" hx-trigger="load, every 10s"></div>
+        <i class="bi bi-box darkorange-text"></i>&nbsp;        
+        <div class="darkorange-text text-end" hx-get="/rpc/block/latest" hx-trigger="load, every 10s"></div>
       </div>
       <form class="input-group" role="search" action="/search" method="GET" autocomplete="off">
         <input class="form-control text-center ms-0 me-2" type="search" placeholder="Explore Grin Network" aria-label="Search" name="input" required>
@@ -23,8 +23,6 @@
       <div class="value-text"><i class="bi bi-dot"></i> kernel</div>
     </div>
   </div>
-
-  <br>
 
 </code>
 

@@ -4,7 +4,7 @@
 
 <code>
 
-  <div class="card">
+  <div class="card rounded-0">
     <div class="card-body">
       <div class="d-flex justify-content-between">
         <div class="darkorange-text"><i class="bi bi-card-text"></i> KERNEL</div>
@@ -44,8 +44,7 @@
   </div>
 
   {% if kernel.status != "Unconfirmed" %}
-    <br>
-    <div class="card">
+    <div class="card border-top-0 rounded-0">
       <div class="card-body" align="left">
         <div class="darkorange-text"><i class="bi bi-layout-text-sidebar-reverse"></i> RAW DATA</div>
         <br>
@@ -53,8 +52,6 @@
       </div>
     </div>
   {% endif %}
-
-  <br>
 
 </code>
 
