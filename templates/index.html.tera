@@ -465,8 +465,8 @@
 {# CoinGecko API is disabled #}
 
 <div class="d-none d-md-block"> <!-- Show on >= md screens -->
-      <div class="card-group mb-2">
-        <div class="card me-2">
+      <div class="card-group">
+        <div class="card border-bottom-0 rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-bank"></i> MARKET</div>
             <br>
@@ -489,7 +489,7 @@
           </div>
         </div>
 
-        <div class="card">
+        <div class="card border-bottom-0 rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-hammer"></i> MINING</div>
             <br>
@@ -509,8 +509,8 @@
       </div>
 
 
-      <div class="card-group mb-2">
-          <div class="card me-2">
+      <div class="card-group">
+          <div class="card border-bottom-0 rounded-0">
             <div class="card-body" align="left">
 	      <div class="darkorange-text"><i class="bi bi-grid"></i> BLOCKCHAIN</div>
               <br>
@@ -527,7 +527,7 @@
               </div>
             </div>
           </div>
-          <div class="card">
+          <div class="card border-bottom-0 rounded-0">
             <div class="card-body" align="left">
               <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
               <br>
@@ -543,8 +543,8 @@
       </div>
 
 
-      <div class="card-group mb-4">
-        <div class="card me-2">
+      <div class="card-group">
+        <div class="card rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-receipt"></i> MEMPOOL</div>
             <br>
@@ -557,7 +557,7 @@
             </div>
           </div>
         </div>
-        <div class="card me-2">
+        <div class="card rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-diagram-3"></i> CONNECTIONS</div>
             <br>
@@ -570,7 +570,7 @@
             </div>
           </div>
         </div>
-        <div class="card">
+        <div class="card rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-pc-display-horizontal"></i> NODE</div>
             <br>
@@ -593,7 +593,7 @@
 
 <div class="d-md-none"> <!-- Show on < md screens-->
 
-        <div class="card mb-3">
+        <div class="card border-bottom-0 rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-bank"></i> MARKET</div>
             <br>
@@ -617,7 +617,7 @@
         </div>
 
 
-        <div class="card mb-3">
+        <div class="card border-bottom-0 rounded-0">
           <div class="card-body" align="left">
               <div class="d-flex justify-content-between">
 	        <div class="darkorange-text"><i class="bi bi-grid"></i> BLOCKCHAIN</div>
@@ -636,7 +636,7 @@
               </div>
           </div>
         </div>
-        <div class="card mb-3">
+        <div class="card border-bottom-0 rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-hammer"></i> MINING</div>
             <br>
@@ -653,7 +653,7 @@
             </div>
           </div>
         </div>
-        <div class="card mb-3">
+        <div class="card border-bottom-0 rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
             <br>
@@ -669,7 +669,7 @@
 
 
 
-        <div class="card mb-3">
+        <div class="card border-bottom-0 rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-receipt"></i> MEMPOOL</div>
             <br>
@@ -682,7 +682,7 @@
             </div>
           </div>
         </div>
-        <div class="card mb-3">
+        <div class="card border-bottom-0 rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-diagram-3"></i> CONNECTIONS</div>
             <br>
@@ -695,7 +695,7 @@
             </div>
           </div>
         </div>
-        <div class="card mb-4">
+        <div class="card rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-pc-display-horizontal"></i> NODE</div>
             <br>
