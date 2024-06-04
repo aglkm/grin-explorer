@@ -4,7 +4,7 @@
 
 <code>
 
-  <div class="card rounded-0">
+  <div class="card border-start-0 border-end-0 rounded-0">
     <div class="card-body" align="left">
       <div class="darkorange-text"><i class="bi bi-box"></i> BLOCK {{ block.height }}</div>
       <br>
@@ -35,7 +35,7 @@
     </div>
   </div>
 
-  <div class="card border-top-0 rounded-0">
+  <div class="card border-top-0 border-start-0 border-end-0 rounded-0">
     <div class="card-body mb-2" align="left">
       <div class="darkorange-text"><i class="bi bi-receipt"></i> TRANSACTIONS</div>
       <br>
@@ -108,7 +108,7 @@
     </div>
   </div>
 
-  <div class="card border-top-0 rounded-0">
+  <div class="card border-top-0 border-start-0 border-end-0 rounded-0">
     <div class="card-body" align="left">
       <div class="darkorange-text"><i class="bi bi-layout-text-sidebar-reverse"></i> RAW DATA</div>
       <br>

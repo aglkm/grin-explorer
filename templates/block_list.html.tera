@@ -6,7 +6,7 @@
 
 <div class="d-none d-md-block"> <!-- Show on >= md screens -->
   <div class="card-group">
-      <div class="card border-bottom-0 rounded-0">
+      <div class="card border-bottom-0 border-start-0 rounded-0">
         <div class="card-body">
           <div class="darkorange-text">
             HEIGHT
@@ -48,7 +48,7 @@
           </div>
 	</div>
       </div>
-      <div class="card border-bottom-0 rounded-0">
+      <div class="card border-bottom-0 border-end-0 rounded-0">
         <div class="card-body">
           <div class="darkorange-text">
             WEIGHT
@@ -60,7 +60,7 @@
 
     {% for i in range(end=10) %}
     <div class="card-group rounded-0">
-        <div class="card border-bottom-0 rounded-0">
+        <div class="card border-bottom-0 border-start-0 rounded-0">
           <div class="card-body">
             {% if route == "block_list_by_height" %}
               <div class="value-text">
@@ -118,7 +118,7 @@
             {% endif %}
           </div>
 	</div>
-        <div class="card border-bottom-0 rounded-0">
+        <div class="card border-bottom-0 border-end-0 rounded-0">
           <div class="card-body">
             {% if route == "block_list_by_height" %}
               <div class="value-text">{{ blocks[i].weight }} %</div>
@@ -135,7 +135,7 @@
 
 <div class="d-md-none"> <!-- Show on < md screens-->
     {% for i in range(end=10) %}
-        <div class="card border-bottom-0 rounded-0">
+        <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
           <div class="card-body" align="left">
               <div class="d-flex justify-content-start">
 	        <i class="bi bi-box darkorange-text"></i>&nbsp;
@@ -211,7 +211,7 @@
 
 {% if route == "block_list_by_height" %}
 
-  <div class="card rounded-0 sticky-bottom">
+  <div class="card rounded-0 border-start-0 border-end-0 sticky-bottom">
     <div class="mt-2 d-flex justify-content-center">
       <div class="me-5">
         {% if height >= (index + 10) %}
@@ -243,7 +243,7 @@
 
 {% else %}
 
-  <div class="card rounded-0 sticky-bottom">
+  <div class="card rounded-0 border-start-0 border-end-0 sticky-bottom">
     <div class="mt-2 d-flex justify-content-center">
       <div class="me-5">
         <a class="text-decoration-none disabled" href="">

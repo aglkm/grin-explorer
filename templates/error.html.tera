@@ -4,7 +4,7 @@
 
 <code>
 
-  <div class="card">
+  <div class="card border-start-0 border-end-0 rounded-0">
     <div class="card-body">
       <h4>No results found.</h4><br>
       <div class="value-text mb-2">Supported search inputs:</div>
