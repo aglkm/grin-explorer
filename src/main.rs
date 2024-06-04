@@ -19,6 +19,7 @@ use crate::data::Dashboard;
 use crate::data::Block;
 use crate::data::Transactions;
 use crate::data::Kernel;
+use crate::data::Output;
 use crate::requests::CONFIG;
 
 
@@ -149,11 +150,33 @@ async fn kernel(excess: &str) -> Template {
 }
 
 
+// Rendering page for a specified output.
+#[get("/output/<commit>")]
+async fn output(commit: &str) -> Template {
+    let mut output = Output::new();
+
+    let _ = requests::get_output(&commit, &mut output).await;
+
+    if output.commit.is_empty() == false {
+        return Template::render("output", context! {
+            route:  "output",
+            cg_api: CONFIG.coingecko_api.clone(),
+            output,
+        })
+    }
+
+    return Template::render("error", context! {
+        route:  "error",
+        cg_api: CONFIG.coingecko_api.clone(),
+    })
+}
+
+
 // Handling search request.
 // Using Option<&str> to match '/search' query without input params.
 // https://github.com/rwf2/Rocket/issues/608
 #[get("/search?<input>")]
-fn search(input: Option<&str>) -> Either<Template, Redirect> {
+pub async fn search(input: Option<&str>) -> Either<Template, Redirect> {
     // Unwrap Option and forward to Search page if no parameters
     let input = match input {
         Some(value) => value,
@@ -174,9 +197,23 @@ fn search(input: Option<&str>) -> Either<Template, Redirect> {
         } else if input.len() == 64 {
             return Either::Right(Redirect::to(uri!(block_header_by_hash(input))));
             
-        // Kernel
+        // Kernel or Output
         } else if input.len() == 66 {
-            return Either::Right(Redirect::to(uri!(kernel(input))));
+            // First search for Kernel
+            let mut kernel = Kernel::new();
+
+            let _ = requests::get_kernel(&input, &mut kernel).await;
+
+            if kernel.excess.is_empty() == false {
+                return Either::Left(Template::render("kernel", context! {
+                    route:  "kernel",
+                    cg_api: CONFIG.coingecko_api.clone(),
+                    kernel,
+                }));
+            } else {
+                // If Kernel not found, then search for Output
+                return Either::Right(Redirect::to(uri!(output(input))));
+            }
         }
     }
     
@@ -188,6 +225,7 @@ fn search(input: Option<&str>) -> Either<Template, Redirect> {
 
 
 // Owner API.
+// Whitelisted methods: get_connected_peers, get_peers, get_status.
 #[post("/v2/owner", data="<data>")]
 async fn api_owner(data: &str) -> String {
     if CONFIG.public_api == "enabled" {
@@ -203,7 +241,6 @@ async fn api_owner(data: &str) -> String {
             _ => return "{\"error\":\"bad syntax\"}".to_string(),
         };
     
-        // Whitelisted methods: get_connected_peer, get_peers, get_status.
         if method == "get_connected_peers" || method == "get_peers" || method == "get_status" {
             let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "owner").await;
 
@@ -646,7 +683,7 @@ async fn main() {
                                 block_weight, block_details_by_height, block_header_by_hash,
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
-                                api_owner, api_foreign])
+                                output, api_owner, api_foreign])
             .mount("/static", FileServer::from("static"))
             .attach(Template::fairing())
             .launch()

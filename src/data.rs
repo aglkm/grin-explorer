@@ -133,6 +133,29 @@ impl Kernel {
 }
 
 
+// Output data
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Output {
+    pub height:   String,
+    pub commit:   String,
+    pub out_type: String,
+    pub status:   String,
+    pub raw_data: String,
+}
+
+impl Output {
+    pub fn new() -> Output {
+        Output {
+            height:   String::new(),
+            commit:   String::new(),
+            out_type: String::new(),
+            status:   String::new(),
+            raw_data: String::new(),
+        }
+    }
+}
+
+
 // Transactions data
 #[derive(Debug)]
 pub struct Transactions {
