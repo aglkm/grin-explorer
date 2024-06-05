@@ -223,7 +223,8 @@ async fn api_owner(data: &str) -> String {
 
 
 // Foreign API.
-// All methods are whitelisted.
+// All methods are whitelisted, except get_outputs.
+// get_outputs consumes CPU and blocks certain other rpc calls.
 #[post("/v2/foreign", data="<data>")]
 async fn api_foreign(data: &str) -> String {
     if CONFIG.public_api == "enabled" {
@@ -239,14 +240,18 @@ async fn api_foreign(data: &str) -> String {
             _ => return "{\"error\":\"bad syntax\"}".to_string(),
         };
 
-        let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "foreign").await;
+        if method != "get_outputs" {
+            let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "foreign").await;
 
-        let result = match resp {
-            Ok(value) => value,
-            Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
-        };
+            let result = match resp {
+                Ok(value) => value,
+                Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
+            };
 
-        result.to_string()
+            return result.to_string();
+        }
+
+        "{\"error\":\"not allowed\"}".to_string()
     } else {
         "{\"error\":\"not allowed\"}".to_string()
     }
