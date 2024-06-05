@@ -21,7 +21,6 @@
       <div class="value-text"><i class="bi bi-dot"></i> Block Number</div>
       <div class="value-text"><i class="bi bi-dot"></i> Block Hash</div>
       <div class="value-text"><i class="bi bi-dot"></i> Kernel</div>
-      <div class="value-text"><i class="bi bi-dot"></i> Unspent Output</div>
     </div>
   </div>
 

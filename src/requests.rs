@@ -17,7 +17,6 @@ use crate::data::Block;
 use crate::data::Transactions;
 use crate::data::ExplorerConfig;
 use crate::data::Kernel;
-use crate::data::Output;
 
 
 // Static explorer config structure
@@ -442,41 +441,6 @@ pub async fn get_kernel(excess: &str, kernel: &mut Kernel) -> Result<(), anyhow:
         }
 
         kernel.raw_data = serde_json::to_string_pretty(&resp).unwrap()
-    }
-
-    Ok(())
-}
-
-
-// Get output.
-pub async fn get_output(commit: &str, output: &mut Output) -> Result<(), anyhow::Error> {
-    // First check whether output is broadcasted but not confirmed yet (in mempool)
-    let mut resp = call("get_unconfirmed_transactions", "[]", "1", "foreign").await?;
-    
-    if resp["result"]["Ok"].is_null() == false {
-        for tx in resp["result"]["Ok"].as_array().unwrap() {
-            for out in tx["tx"]["body"]["outputs"].as_array().unwrap() {
-                if out["commit"].as_str().unwrap() == commit {
-                    // Only Plain outputs in the mempool
-                    output.out_type = "Plain".to_string();
-                    output.commit   = out["commit"].as_str().unwrap().to_string();
-                    output.status   = "Unconfirmed".to_string();
-                    // Found it, no need to continue
-                    return Ok(());
-                }
-            }
-        }
-    }
-    
-    let params = &format!("[[\"{}\"], null, null, true, true]", commit)[..];
-
-    resp = call("get_outputs", params, "1", "foreign").await?;
-    
-    if resp["result"]["Ok"][0].is_null() == false {
-        output.height   = resp["result"]["Ok"][0]["block_height"].to_string();
-        output.commit   = resp["result"]["Ok"][0]["commit"].as_str().unwrap().to_string();
-        output.out_type = resp["result"]["Ok"][0]["output_type"].as_str().unwrap().to_string();
-        output.raw_data = serde_json::to_string_pretty(&resp).unwrap()
     }
 
     Ok(())
