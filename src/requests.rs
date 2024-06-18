@@ -168,23 +168,18 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
         data.supply    = supply.to_formatted_string(&Locale::en);
 
         // https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153
-        data.soft_supply = format!("{:.2}",
-                                   supply.to_string().parse::<f64>().unwrap() / 3150000000.0 * 100.0);
+        data.soft_supply = format!("{:.2}", supply.to_string().parse::<f64>().unwrap() / 3150000000.0 * 100.0);
     
         if CONFIG.coingecko_api == "enabled" && val != Value::Null {
             // Check if CoingGecko API returned error
             if let Some(status) = val.get("status") {
-                println!("{} {}.", "[ WARNING ]".yellow(),
-                         status["error_message"].as_str().unwrap().to_string());
+                println!("{} {}.", "[ WARNING ]".yellow(), status["error_message"].as_str().unwrap().to_string());
             } else {
-                data.price_usd  = format!("{:.3}", val["grin"]["usd"].to_string().parse::<f64>()
-                                  .unwrap());
-                data.price_btc  = format!("{:.8}", val["grin"]["btc"].to_string().parse::<f64>()
-                                  .unwrap());
+                data.price_usd  = format!("{:.3}", val["grin"]["usd"].to_string().parse::<f64>().unwrap());
+                data.price_btc  = format!("{:.8}", val["grin"]["btc"].to_string().parse::<f64>().unwrap());
                 data.volume_usd = (val["grin"]["usd_24h_vol"].to_string().parse::<f64>().unwrap() as u64)
                                   .to_formatted_string(&Locale::en);
-                data.volume_btc = format!("{:.2}", val["grin"]["btc_24h_vol"].to_string().parse::<f64>()
-                                  .unwrap());
+                data.volume_btc = format!("{:.2}", val["grin"]["btc_24h_vol"].to_string().parse::<f64>().unwrap());
                 data.cap_usd    = (((supply as f64) * data.price_usd.parse::<f64>().unwrap()) as u64)
                                   .to_formatted_string(&Locale::en);
                 data.cap_btc    = (((supply as f64) * data.price_btc.parse::<f64>().unwrap()) as u64)
@@ -200,16 +195,18 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 // Collecting: disk_usage.
 pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> { 
     let mut data = dashboard.lock().unwrap();
-    let chain_data;
+    let chain_dir;
 
     if CONFIG.coingecko_api == "enabled" {
-        chain_data = format!("{}/main/chain_data", CONFIG.grin_dir);
+        chain_dir = format!("{}/main/chain_data", CONFIG.grin_dir);
     } else {
-        chain_data = format!("{}/test/chain_data", CONFIG.grin_dir);
+        chain_dir = format!("{}/test/chain_data", CONFIG.grin_dir);
     }
 
-    data.disk_usage = format!("{:.2}", (get_size(chain_data).unwrap() as f64)
-                                       / 1000.0 / 1000.0 / 1000.0);
+    match get_size(chain_dir.clone()) {
+        Ok(chain_size) => data.disk_usage = format!("{:.2}", (chain_size as f64) / 1000.0 / 1000.0 / 1000.0),
+        Err(e)         => println!("{} {}: \"{}\".", "[ ERROR   ]".red(), e, chain_dir),
+    }
 
     Ok(())
 }
@@ -222,8 +219,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
 
     if height.is_empty() == false && height.parse::<u64>().unwrap() > 1440 {
         let params1 = &format!("[{}, null, null]", height)[..];
-        let params2 = &format!("[{}, null, null]", height.parse::<u64>().unwrap()
-                               - difficulty_window)[..];
+        let params2 = &format!("[{}, null, null]", height.parse::<u64>().unwrap() - difficulty_window)[..];
         let resp1   = call("get_block", params1, "1", "foreign").await?;
         let resp2   = call("get_block", params2, "1", "foreign").await?;
     
@@ -243,7 +239,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
 
             // KG/s
             if hashrate > 1000.0 {
-                data.hashrate   = format!("{:.2} KG/s", hashrate / 1000.0);
+                data.hashrate   = format!("{:.2} kG/s", hashrate / 1000.0);
             // G/s
             } else {
                 data.hashrate   = format!("{:.2} G/s", hashrate);
