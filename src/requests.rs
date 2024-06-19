@@ -43,11 +43,17 @@ lazy_static! {
             }
         }
 
-        cfg.api_secret         = fs::read_to_string(format!("{}",
-                                     shellexpand::tilde(&cfg.api_secret_path))).unwrap();
-        cfg.foreign_api_secret = fs::read_to_string(format!("{}",
-                                     shellexpand::tilde(&cfg.foreign_api_secret_path))).unwrap();
-        cfg.grin_dir           = format!("{}", shellexpand::tilde(&cfg.grin_dir));
+        if cfg.api_secret_path.is_empty() == false {
+            cfg.api_secret = fs::read_to_string(format!("{}", shellexpand::tilde(&cfg.api_secret_path))).unwrap();
+        }
+
+        if cfg.foreign_api_secret_path.is_empty() == false {
+            cfg.foreign_api_secret = fs::read_to_string(format!("{}", shellexpand::tilde(&cfg.foreign_api_secret_path))).unwrap();
+        }
+
+        if cfg.grin_dir.is_empty() == false {
+            cfg.grin_dir = format!("{}", shellexpand::tilde(&cfg.grin_dir));
+        }
         
         cfg
     };
@@ -59,13 +65,16 @@ pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Resul
     let rpc_url;
     let secret;
 
-    if rpc_type == "owner" {
-        rpc_url = format!("{}://{}:{}/v2/owner", CONFIG.proto, CONFIG.ip, CONFIG.port);
-        secret  = CONFIG.api_secret.clone();
+    if CONFIG.port.is_empty() == false {
+        rpc_url = format!("{}://{}:{}/v2/{}", CONFIG.proto, CONFIG.ip, CONFIG.port, rpc_type);
+    } else {
+        rpc_url = format!("{}://{}/v2/{}", CONFIG.proto, CONFIG.ip, rpc_type);
     }
-    else {
-        rpc_url = format!("{}://{}:{}/v2/foreign", CONFIG.proto, CONFIG.ip, CONFIG.port);
-        secret  = CONFIG.foreign_api_secret.clone();
+
+    if rpc_type == "owner" {
+        secret = CONFIG.api_secret.clone();
+    } else {
+        secret = CONFIG.foreign_api_secret.clone();
     }
 
     let client = reqwest::Client::new();
@@ -75,6 +84,11 @@ pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Resul
                        .header("content-type", "plain/text")
                        .send()
                        .await?;
+
+    match result.error_for_status_ref() {
+        Ok(_res) => (),
+        Err(err) => { error!("rpc failed, status code: {:?}", err.status().unwrap()); },
+    }
 
     let val: Value = serde_json::from_str(&result.text().await.unwrap())?;
 
@@ -173,7 +187,7 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
         if CONFIG.coingecko_api == "enabled" && val != Value::Null {
             // Check if CoingGecko API returned error
             if let Some(status) = val.get("status") {
-                println!("{} {}.", "[ WARNING ]".yellow(), status["error_message"].as_str().unwrap().to_string());
+                warn!("{}", status["error_message"].as_str().unwrap().to_string());
             } else {
                 data.price_usd  = format!("{:.3}", val["grin"]["usd"].to_string().parse::<f64>().unwrap());
                 data.price_btc  = format!("{:.8}", val["grin"]["btc"].to_string().parse::<f64>().unwrap());
@@ -205,7 +219,13 @@ pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 
     match get_size(chain_dir.clone()) {
         Ok(chain_size) => data.disk_usage = format!("{:.2}", (chain_size as f64) / 1000.0 / 1000.0 / 1000.0),
-        Err(e)         => println!("{} {}: \"{}\".", "[ ERROR   ]".red(), e, chain_dir),
+        Err(e)         => {
+            if CONFIG.ip == "127.0.0.1" || CONFIG.ip == "0.0.0.0" {
+                error!("{}: \"{}\"", e, chain_dir);
+            } else {
+                // Ignore error for external node connection
+            }
+        },
     }
 
     Ok(())
@@ -237,7 +257,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
             // https://forum.grin.mw/t/difference-c31-and-c32-c33/7018/7
             let hashrate = (net_diff as f64) * 42.0 / 60.0 / 16384.0;
 
-            // KG/s
+            // kG/s
             if hashrate > 1000.0 {
                 data.hashrate   = format!("{:.2} kG/s", hashrate / 1000.0);
             // G/s
@@ -255,10 +275,12 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
                 // Assuming $0.07 per kW/h
                 data.production_cost = format!("{:.3}", 120.0 / 1000.0 * 0.07 * (1.0 / coins_per_hour));
 
-                data.reward_ratio    = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                if data.price_usd.is_empty() == false {
+                    data.reward_ratio   = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
                                                         / data.production_cost.parse::<f64>().unwrap());
-                data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
-                                       / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
+                    data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                                                        / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
+                }
             }
         }
     }

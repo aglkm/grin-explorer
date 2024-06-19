@@ -1,6 +1,5 @@
 [default]
 address   = "127.0.0.1"
-log_level = "critical"
 
 # Uncomment and change default port number (8000) if another instance of the explorer is needed to run.
 # E.g. Mainnet (8000) and Testnet (8001) instances.

@@ -5,7 +5,6 @@ use rocket::fs::FileServer;
 use rocket::State;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use colored::Colorize;
 use rocket::tokio;
 use rocket::response::Redirect;
 use either::Either;
@@ -396,7 +395,11 @@ fn last_block_age(blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
 fn disk_usage(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    format!("{} GB", data.disk_usage)
+    if data.disk_usage.is_empty() == false {
+        return format!("{} GB", data.disk_usage);
+    } else {
+        return format!("<i class=\"bi bi-x-lg\"></i>");
+    }
 }
 
 
@@ -602,7 +605,9 @@ fn block_list_index(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 // Main
 #[rocket::main]
 async fn main() {
-    println!("{} Starting up Explorer.", "[ INFO    ]".cyan());
+    env_logger::init();
+
+    info!("starting up.");
     
     let dash         = Arc::new(Mutex::new(Dashboard::new()));
     let dash_clone   = dash.clone();
@@ -622,12 +627,12 @@ async fn main() {
                 Ok(_v)  => {
                     if ready == false {
                         ready = true;
-                        println!("{} Explorer Ready.", "[ OK      ]".green());
+                        info!("ready.");
                     }
                 },
                 Err(e) => {
                     ready = false;
-                    println!("{} {}.", "[ ERROR   ]".red(), e);
+                    error!("{}", e);
                 },
             }
             
@@ -635,8 +640,6 @@ async fn main() {
         }
     });
     
-    println!("{} Starting up Rocket engine.", "[ INFO    ]".cyan());
-
     // Starting Rocket engine.
     let _ = rocket::build()
             .manage(dash)

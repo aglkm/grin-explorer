@@ -7,13 +7,13 @@ port = "3413"
 # Node protocol. Either HTTP or HTTPS.
 proto = "http"
 
-# API username.
+# API username. Comment out if user is not required.
 user = "grin"
 
-# API secret path.
+# API secret path. Comment out if secret is not required.
 api_secret_path = "~/.grin/main/.api_secret"
 
-# Foreign API secret path.
+# Foreign API secret path. Comment out if secret is not required.
 foreign_api_secret_path = "~/.grin/main/.foreign_api_secret"
 
 # Path to Grin directory.
@@ -24,6 +24,21 @@ coingecko_api = "enabled"
 
 # Enable or disable node POST API public access.
 public_api = "enabled"
+
+
+# Grinnode config
+# ip = "grinnode.live"
+# port = "3413"
+# proto = "https"
+# coingecko_api = "enabled"
+# public_api = "enabled"
+
+
+# Grincoin config
+# ip = "grincoin.org"
+# proto = "https"
+# coingecko_api = "enabled"
+# public_api = "enabled"
 
 
 # Testnet config
