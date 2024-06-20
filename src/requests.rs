@@ -16,12 +16,13 @@ use crate::data::Dashboard;
 use crate::data::Block;
 use crate::data::Transactions;
 use crate::data::ExplorerConfig;
-use crate::Kernel;
+use crate::data::Kernel;
+use crate::data::Output;
 
 
 // Static explorer config structure
 lazy_static! {
-    static ref CONFIG: ExplorerConfig = {
+    pub static ref CONFIG: ExplorerConfig = {
         let mut cfg  = ExplorerConfig::new();
         let settings = Config::builder().add_source(config::File::with_name("Explorer"))
                                         .build().unwrap();
@@ -38,15 +39,22 @@ lazy_static! {
                 "foreign_api_secret_path" => cfg.foreign_api_secret_path = value,
                 "grin_dir"                => cfg.grin_dir                = value,
                 "coingecko_api"           => cfg.coingecko_api           = value,
+                "public_api"              => cfg.public_api              = value,
                 _ => println!("{} Unknown config setting '{}'.", "[ ERROR   ]".red(), name),
             }
         }
 
-        cfg.api_secret         = fs::read_to_string(format!("{}",
-                                     shellexpand::tilde(&cfg.api_secret_path))).unwrap();
-        cfg.foreign_api_secret = fs::read_to_string(format!("{}",
-                                     shellexpand::tilde(&cfg.foreign_api_secret_path))).unwrap();
-        cfg.grin_dir           = format!("{}", shellexpand::tilde(&cfg.grin_dir));
+        if cfg.api_secret_path.is_empty() == false {
+            cfg.api_secret = fs::read_to_string(format!("{}", shellexpand::tilde(&cfg.api_secret_path))).unwrap();
+        }
+
+        if cfg.foreign_api_secret_path.is_empty() == false {
+            cfg.foreign_api_secret = fs::read_to_string(format!("{}", shellexpand::tilde(&cfg.foreign_api_secret_path))).unwrap();
+        }
+
+        if cfg.grin_dir.is_empty() == false {
+            cfg.grin_dir = format!("{}", shellexpand::tilde(&cfg.grin_dir));
+        }
         
         cfg
     };
@@ -58,13 +66,16 @@ pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Resul
     let rpc_url;
     let secret;
 
-    if rpc_type == "owner" {
-        rpc_url = format!("{}://{}:{}/v2/owner", CONFIG.proto, CONFIG.ip, CONFIG.port);
-        secret  = CONFIG.api_secret.clone();
+    if CONFIG.port.is_empty() == false {
+        rpc_url = format!("{}://{}:{}/v2/{}", CONFIG.proto, CONFIG.ip, CONFIG.port, rpc_type);
+    } else {
+        rpc_url = format!("{}://{}/v2/{}", CONFIG.proto, CONFIG.ip, rpc_type);
     }
-    else {
-        rpc_url = format!("{}://{}:{}/v2/foreign", CONFIG.proto, CONFIG.ip, CONFIG.port);
-        secret  = CONFIG.foreign_api_secret.clone();
+
+    if rpc_type == "owner" {
+        secret = CONFIG.api_secret.clone();
+    } else {
+        secret = CONFIG.foreign_api_secret.clone();
     }
 
     let client = reqwest::Client::new();
@@ -74,6 +85,11 @@ pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Resul
                        .header("content-type", "plain/text")
                        .send()
                        .await?;
+
+    match result.error_for_status_ref() {
+        Ok(_res) => (),
+        Err(err) => { error!("rpc failed, status code: {:?}", err.status().unwrap()); },
+    }
 
     let val: Value = serde_json::from_str(&result.text().await.unwrap())?;
 
@@ -93,9 +109,6 @@ pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
         data.node_ver  = resp["result"]["Ok"]["user_agent"].as_str().unwrap().to_string();
         data.proto_ver = resp["result"]["Ok"]["protocol_version"].to_string();
     }
-
-    // Also set cg_api value
-    data.cg_api = CONFIG.coingecko_api.clone();
 
     Ok(())
 }
@@ -150,7 +163,7 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
     let result;
     let mut val = Value::Null;
 
-    if CONFIG.coingecko_api == "on" {
+    if CONFIG.coingecko_api == "enabled" {
         client = reqwest::Client::new();
         result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true").send().await?;
         val    = serde_json::from_str(&result.text().await.unwrap()).unwrap();
@@ -170,23 +183,18 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
         data.supply    = supply.to_formatted_string(&Locale::en);
 
         // https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153
-        data.soft_supply = format!("{:.2}",
-                                   supply.to_string().parse::<f64>().unwrap() / 3150000000.0 * 100.0);
+        data.soft_supply = format!("{:.2}", supply.to_string().parse::<f64>().unwrap() / 3150000000.0 * 100.0);
     
-        if CONFIG.coingecko_api == "on" && val != Value::Null {
+        if CONFIG.coingecko_api == "enabled" && val != Value::Null {
             // Check if CoingGecko API returned error
             if let Some(status) = val.get("status") {
-                println!("{} {}.", "[ WARNING ]".yellow(),
-                         status["error_message"].as_str().unwrap().to_string());
+                warn!("{}", status["error_message"].as_str().unwrap().to_string());
             } else {
-                data.price_usd  = format!("{:.3}", val["grin"]["usd"].to_string().parse::<f64>()
-                                  .unwrap());
-                data.price_btc  = format!("{:.8}", val["grin"]["btc"].to_string().parse::<f64>()
-                                  .unwrap());
+                data.price_usd  = format!("{:.3}", val["grin"]["usd"].to_string().parse::<f64>().unwrap());
+                data.price_btc  = format!("{:.8}", val["grin"]["btc"].to_string().parse::<f64>().unwrap());
                 data.volume_usd = (val["grin"]["usd_24h_vol"].to_string().parse::<f64>().unwrap() as u64)
                                   .to_formatted_string(&Locale::en);
-                data.volume_btc = format!("{:.2}", val["grin"]["btc_24h_vol"].to_string().parse::<f64>()
-                                  .unwrap());
+                data.volume_btc = format!("{:.2}", val["grin"]["btc_24h_vol"].to_string().parse::<f64>().unwrap());
                 data.cap_usd    = (((supply as f64) * data.price_usd.parse::<f64>().unwrap()) as u64)
                                   .to_formatted_string(&Locale::en);
                 data.cap_btc    = (((supply as f64) * data.price_btc.parse::<f64>().unwrap()) as u64)
@@ -202,16 +210,24 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 // Collecting: disk_usage.
 pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> { 
     let mut data = dashboard.lock().unwrap();
-    let chain_data;
+    let chain_dir;
 
-    if CONFIG.coingecko_api == "on" {
-        chain_data = format!("{}/main/chain_data", CONFIG.grin_dir);
+    if CONFIG.coingecko_api == "enabled" {
+        chain_dir = format!("{}/main/chain_data", CONFIG.grin_dir);
     } else {
-        chain_data = format!("{}/test/chain_data", CONFIG.grin_dir);
+        chain_dir = format!("{}/test/chain_data", CONFIG.grin_dir);
     }
 
-    data.disk_usage = format!("{:.2}", (get_size(chain_data).unwrap() as f64)
-                                       / 1000.0 / 1000.0 / 1000.0);
+    match get_size(chain_dir.clone()) {
+        Ok(chain_size) => data.disk_usage = format!("{:.2}", (chain_size as f64) / 1000.0 / 1000.0 / 1000.0),
+        Err(e)         => {
+            if CONFIG.ip == "127.0.0.1" || CONFIG.ip == "0.0.0.0" {
+                error!("{}: \"{}\"", e, chain_dir);
+            } else {
+                // Ignore error for external node connection
+            }
+        },
+    }
 
     Ok(())
 }
@@ -224,8 +240,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
 
     if height.is_empty() == false && height.parse::<u64>().unwrap() > 1440 {
         let params1 = &format!("[{}, null, null]", height)[..];
-        let params2 = &format!("[{}, null, null]", height.parse::<u64>().unwrap()
-                               - difficulty_window)[..];
+        let params2 = &format!("[{}, null, null]", height.parse::<u64>().unwrap() - difficulty_window)[..];
         let resp1   = call("get_block", params1, "1", "foreign").await?;
         let resp2   = call("get_block", params2, "1", "foreign").await?;
     
@@ -243,9 +258,9 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
             // https://forum.grin.mw/t/difference-c31-and-c32-c33/7018/7
             let hashrate = (net_diff as f64) * 42.0 / 60.0 / 16384.0;
 
-            // KG/s
+            // kG/s
             if hashrate > 1000.0 {
-                data.hashrate   = format!("{:.2} KG/s", hashrate / 1000.0);
+                data.hashrate   = format!("{:.2} kG/s", hashrate / 1000.0);
             // G/s
             } else {
                 data.hashrate   = format!("{:.2} G/s", hashrate);
@@ -253,7 +268,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
             
             data.difficulty = net_diff.to_string();
 
-            if CONFIG.coingecko_api == "on" {
+            if CONFIG.coingecko_api == "enabled" {
                 // Calculating G1-mini production per hour
                 let coins_per_hour = 1.2 / hashrate * 60.0 * 60.0;
 
@@ -261,10 +276,12 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
                 // Assuming $0.07 per kW/h
                 data.production_cost = format!("{:.3}", 120.0 / 1000.0 * 0.07 * (1.0 / coins_per_hour));
 
-                data.reward_ratio    = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                if data.price_usd.is_empty() == false {
+                    data.reward_ratio   = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
                                                         / data.production_cost.parse::<f64>().unwrap());
-                data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
-                                       / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
+                    data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                                                        / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
+                }
             }
         }
     }
@@ -397,6 +414,41 @@ pub async fn get_block_header(hash: &str, height: &mut String)
     
     if resp["result"]["Ok"].is_null() == false {
         *height = resp["result"]["Ok"]["height"].to_string();
+    }
+
+    Ok(())
+}
+
+
+// Get output.
+pub async fn get_output(commit: &str, output: &mut Output) -> Result<(), anyhow::Error> {
+    // First check whether output is broadcasted but not confirmed yet (in mempool)
+    let mut resp = call("get_unconfirmed_transactions", "[]", "1", "foreign").await?;
+
+    if resp["result"]["Ok"].is_null() == false {
+        for tx in resp["result"]["Ok"].as_array().unwrap() {
+            for out in tx["tx"]["body"]["outputs"].as_array().unwrap() {
+                if out["commit"].as_str().unwrap() == commit {
+                    // Only Plain outputs in the mempool
+                    output.out_type = "Plain".to_string();
+                    output.commit   = out["commit"].as_str().unwrap().to_string();
+                    output.status   = "Unconfirmed".to_string();
+                    // Found it, no need to continue
+                    return Ok(());
+                }
+            }
+        }
+    }
+
+    let params = &format!("[[\"{}\"], null, null, true, true]", commit)[..];
+
+    resp = call("get_outputs", params, "1", "foreign").await?;
+
+    if resp["result"]["Ok"][0].is_null() == false {
+        output.height   = resp["result"]["Ok"][0]["block_height"].to_string();
+        output.commit   = resp["result"]["Ok"][0]["commit"].as_str().unwrap().to_string();
+        output.out_type = resp["result"]["Ok"][0]["output_type"].as_str().unwrap().to_string();
+        output.raw_data = serde_json::to_string_pretty(&resp).unwrap()
     }
 
     Ok(())

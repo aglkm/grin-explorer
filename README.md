@@ -22,15 +22,14 @@ Grin is the very first, simple and fair MimbleWimble blockchain implementation.
    cd grin-explorer
    cargo build --release
    ```
-4. Run executable: `./target/release/grin-explorer`
+4. Run executable: `RUST_LOG=rocket=warn,grin_explorer ./target/release/grin-explorer`
 
    You will see the following output:
 
    ```
-   [ INFO    ] Starting up Explorer.
-   [ INFO    ] Starting up Rocket engine.
-   🚀 Rocket has launched from http://127.0.0.1:8000
-   [ OK      ] Explorer Ready.
+   [2024-06-19T13:12:34Z INFO  grin_explorer] starting up.
+   [2024-06-19T13:12:34Z WARN  rocket::launch] 🚀 Rocket has launched from http://127.0.0.1:8000
+   [2024-06-19T13:12:34Z INFO  grin_explorer] ready.
    ```
 
 5. Open explorer in your browser: http://127.0.0.1:8000

@@ -5,7 +5,6 @@ use rocket::fs::FileServer;
 use rocket::State;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use colored::Colorize;
 use rocket::tokio;
 use rocket::response::Redirect;
 use either::Either;
@@ -19,6 +18,8 @@ use crate::data::Dashboard;
 use crate::data::Block;
 use crate::data::Transactions;
 use crate::data::Kernel;
+use crate::data::Output;
+use crate::requests::CONFIG;
 
 
 // Rendering main (Dashboard) page.
@@ -30,7 +31,7 @@ fn index(dashboard: &State<Arc<Mutex<Dashboard>>>) -> Template {
         route:     "index",
         node_ver:  &data.node_ver,
         proto_ver: &data.proto_ver,
-        cg_api:    &data.cg_api,
+        cg_api:    CONFIG.coingecko_api.clone(),
     })
 }
 
@@ -39,7 +40,8 @@ fn index(dashboard: &State<Arc<Mutex<Dashboard>>>) -> Template {
 #[get("/block_list")]
 fn block_list() -> Template {
     Template::render("block_list", context! {
-        route: "block_list",
+        route:  "block_list",
+        cg_api: CONFIG.coingecko_api.clone(),
     })
 }
 
@@ -60,11 +62,13 @@ async fn block_list_by_height(input_height: &str) -> Template {
 
         if index >= height {
             Template::render("block_list", context! {
-                route: "block_list",
+                route:  "block_list",
+                cg_api: CONFIG.coingecko_api.clone(),
             })
         } else {
             Template::render("block_list", context! {
-                route: "block_list_by_height",
+                route:  "block_list_by_height",
+                cg_api: CONFIG.coingecko_api.clone(),
                 index,
                 blocks,
                 height,
@@ -72,7 +76,8 @@ async fn block_list_by_height(input_height: &str) -> Template {
         }
     } else {
         Template::render("block_list", context! {
-            route: "block_list",
+            route:  "block_list",
+            cg_api: CONFIG.coingecko_api.clone(),
         })
     }
 }
@@ -88,14 +93,16 @@ async fn block_details_by_height(height: &str) -> Template {
 
         if block.height.is_empty() == false {
             return Template::render("block_details", context! {
-                route: "block_details",
+                route:  "block_details",
+                cg_api: CONFIG.coingecko_api.clone(),
                 block,
             });
         }
     }
 
     Template::render("error", context! {
-        route: "error",
+        route:  "error",
+        cg_api: CONFIG.coingecko_api.clone(),
     })
 }
 
@@ -114,7 +121,8 @@ async fn block_header_by_hash(hash: &str) -> Either<Template, Redirect> {
     }
 
     return Either::Left(Template::render("error", context! {
-        route: "error",
+        route:  "error",
+        cg_api: CONFIG.coingecko_api.clone(),
     }))
 }
 
@@ -128,13 +136,37 @@ async fn kernel(excess: &str) -> Template {
 
     if kernel.excess.is_empty() == false {
         return Template::render("kernel", context! {
-            route: "kernel",
+            route:  "kernel",
+            cg_api: CONFIG.coingecko_api.clone(),
             kernel,
         })
     }
 
     return Template::render("error", context! {
-        route: "error",
+        route:  "error",
+        cg_api: CONFIG.coingecko_api.clone(),
+    })
+}
+
+
+// Rendering page for a specified output.
+#[get("/output/<commit>")]
+async fn output(commit: &str) -> Template {
+    let mut output = Output::new();
+
+    let _ = requests::get_output(&commit, &mut output).await;
+
+    if output.commit.is_empty() == false {
+        return Template::render("output", context! {
+            route:  "output",
+            cg_api: CONFIG.coingecko_api.clone(),
+            output,
+        })
+    }
+
+    return Template::render("error", context! {
+        route:  "error",
+        cg_api: CONFIG.coingecko_api.clone(),
     })
 }
 
@@ -143,11 +175,14 @@ async fn kernel(excess: &str) -> Template {
 // Using Option<&str> to match '/search' query without input params.
 // https://github.com/rwf2/Rocket/issues/608
 #[get("/search?<input>")]
-fn search(input: Option<&str>) -> Either<Template, Redirect> {
+pub async fn search(input: Option<&str>) -> Either<Template, Redirect> {
     // Unwrap Option and forward to Search page if no parameters
     let input = match input {
         Some(value) => value,
-        None => return Either::Left(Template::render("search", context! { route: "search", })),
+        None => return Either::Left(Template::render("search", context! {
+                           route:  "search",
+                           cg_api: CONFIG.coingecko_api.clone(),
+                       })),
     };
 
     // Check for valid chars
@@ -161,46 +196,68 @@ fn search(input: Option<&str>) -> Either<Template, Redirect> {
         } else if input.len() == 64 {
             return Either::Right(Redirect::to(uri!(block_header_by_hash(input))));
             
-        // Kernel
+        // Kernel or Unspent Output
         } else if input.len() == 66 {
-            return Either::Right(Redirect::to(uri!(kernel(input))));
+            // First search for Kernel.
+            // If found, redirect to Kernel page, otherwise search for Unspent Output.
+            // As we can't distinguish between Kernel and Output, this will produce a redundant
+            // get_kernel call, but will allow for better UI (no need to ask user to input the type
+            // of the search request).
+            let mut kernel = Kernel::new();
+
+            let _ = requests::get_kernel(&input, &mut kernel).await;
+
+            if kernel.excess.is_empty() == false {
+                // Here we are redirecting to kernel page and call get_kernel again there.
+                // Kernel page is a separate route and we want it to be accessed directly and
+                // via search functionality.
+                return Either::Right(Redirect::to(uri!(kernel(input))));
+            } else {
+                // If Kernel not found, then search for Unspent Output
+                return Either::Right(Redirect::to(uri!(output(input))));
+            }
         }
     }
     
     Either::Left(Template::render("error", context! {
-        route: "error",
+        route:  "error",
+        cg_api: CONFIG.coingecko_api.clone(),
     }))
 }
 
 
 // Owner API.
+// Whitelisted methods: get_connected_peers, get_peers, get_status.
 #[post("/v2/owner", data="<data>")]
 async fn api_owner(data: &str) -> String {
-    let result = serde_json::from_str(data);
+    if CONFIG.public_api == "enabled" {
+        let result = serde_json::from_str(data);
 
-    let v: Value = match result {
-        Ok(value) => value,
-        Err(_err) => return "{\"error\":\"bad syntax\"}".to_string(),
-    };
-
-    let method = match v["method"].as_str() {
-        Some(value) => value,
-        _ => return "{\"error\":\"bad syntax\"}".to_string(),
-    };
-    
-    // Whitelisted methods: get_connected_peer, get_peers, get_status.
-    if method == "get_connected_peers" || method == "get_peers" || method == "get_status" {
-        let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "owner").await;
-
-        let result = match resp {
+        let v: Value = match result {
             Ok(value) => value,
-            Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
+            Err(_err) => return "{\"error\":\"bad syntax\"}".to_string(),
         };
 
-        return result.to_string();
-    }
+        let method = match v["method"].as_str() {
+            Some(value) => value,
+            _ => return "{\"error\":\"bad syntax\"}".to_string(),
+        };
+    
+        if method == "get_connected_peers" || method == "get_peers" || method == "get_status" {
+            let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "owner").await;
 
-    "{\"error\":\"not allowed\"}".to_string()
+            let result = match resp {
+                Ok(value) => value,
+                Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
+            };
+
+            return result.to_string();
+        }
+
+        "{\"error\":\"not allowed\"}".to_string()
+    } else {
+        "{\"error\":\"not allowed\"}".to_string()
+    }
 }
 
 
@@ -208,26 +265,30 @@ async fn api_owner(data: &str) -> String {
 // All methods are whitelisted.
 #[post("/v2/foreign", data="<data>")]
 async fn api_foreign(data: &str) -> String {
-    let result = serde_json::from_str(data);
+    if CONFIG.public_api == "enabled" {
+        let result = serde_json::from_str(data);
 
-    let v: Value = match result {
-        Ok(value) => value,
-        Err(_err) => return "{\"error\":\"bad syntax\"}".to_string(),
-    };
+        let v: Value = match result {
+            Ok(value) => value,
+            Err(_err) => return "{\"error\":\"bad syntax\"}".to_string(),
+        };
 
-    let method = match v["method"].as_str() {
-        Some(value) => value,
-        _ => return "{\"error\":\"bad syntax\"}".to_string(),
-    };
+        let method = match v["method"].as_str() {
+            Some(value) => value,
+            _ => return "{\"error\":\"bad syntax\"}".to_string(),
+        };
 
-    let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "foreign").await;
+        let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "foreign").await;
 
-    let result = match resp {
-        Ok(value) => value,
-        Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
-    };
+        let result = match resp {
+            Ok(value) => value,
+            Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
+        };
 
-    result.to_string()
+        return result.to_string();
+    } else {
+        "{\"error\":\"not allowed\"}".to_string()
+    }
 }
 
 
@@ -369,7 +430,11 @@ fn last_block_age(blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
 fn disk_usage(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    format!("{} GB", data.disk_usage)
+    if data.disk_usage.is_empty() == false {
+        return format!("{} GB", data.disk_usage);
+    } else {
+        return format!("<i class=\"bi bi-x-lg\"></i>");
+    }
 }
 
 
@@ -575,7 +640,9 @@ fn block_list_index(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 // Main
 #[rocket::main]
 async fn main() {
-    println!("{} Starting up Explorer.", "[ INFO    ]".cyan());
+    env_logger::init();
+
+    info!("starting up.");
     
     let dash         = Arc::new(Mutex::new(Dashboard::new()));
     let dash_clone   = dash.clone();
@@ -595,12 +662,12 @@ async fn main() {
                 Ok(_v)  => {
                     if ready == false {
                         ready = true;
-                        println!("{} Explorer Ready.", "[ OK      ]".green());
+                        info!("ready.");
                     }
                 },
                 Err(e) => {
                     ready = false;
-                    println!("{} {}.", "[ ERROR   ]".red(), e);
+                    error!("{}", e);
                 },
             }
             
@@ -608,8 +675,6 @@ async fn main() {
         }
     });
     
-    println!("{} Starting up Rocket engine.", "[ INFO    ]".cyan());
-
     // Starting Rocket engine.
     let _ = rocket::build()
             .manage(dash)
@@ -624,7 +689,7 @@ async fn main() {
                                 block_weight, block_details_by_height, block_header_by_hash,
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
-                                api_owner, api_foreign])
+                                output, api_owner, api_foreign])
             .mount("/static", FileServer::from("static"))
             .attach(Template::fairing())
             .launch()

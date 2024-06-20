@@ -35,8 +35,6 @@ pub struct Dashboard {
     // mempool
     pub txns:            String,
     pub stem:            String,
-    // coingecko api
-    pub cg_api:          String,
 }
 
 impl Dashboard {
@@ -66,7 +64,6 @@ impl Dashboard {
             breakeven_cost:  String::new(),
             txns:            String::new(),
             stem:            String::new(),
-            cg_api:          String::new(),
         }
     }
 }
@@ -170,6 +167,7 @@ pub struct ExplorerConfig {
     pub api_secret:              String,
     pub foreign_api_secret:      String,
     pub coingecko_api:           String,
+    pub public_api:              String,
 }
 
 impl ExplorerConfig {
@@ -185,6 +183,29 @@ impl ExplorerConfig {
             api_secret:              String::new(),
             foreign_api_secret:      String::new(),
             coingecko_api:           String::new(),
+            public_api:              String::new(),
+        }
+    }
+}
+
+// Output data
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Output {
+    pub height:   String,
+    pub commit:   String,
+    pub out_type: String,
+    pub status:   String,
+    pub raw_data: String,
+}
+
+impl Output {
+    pub fn new() -> Output {
+        Output {
+            height:   String::new(),
+            commit:   String::new(),
+            out_type: String::new(),
+            status:   String::new(),
+            raw_data: String::new(),
         }
     }
 }

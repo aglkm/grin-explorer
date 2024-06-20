@@ -4,11 +4,11 @@
 
 <code>
 
-  <div class="card">
+  <div class="card border-start-0 border-end-0 rounded-0">
     <div class="card-body mx-2 mt-2 mb-3">
       <div class="d-flex justify-content-start mb-1">
-        <i class="bi bi-box me-2"></i>
-        <div class="value-text text-end" hx-get="/rpc/block/latest" hx-trigger="load, every 10s"></div>
+        <i class="bi bi-box darkorange-text"></i>&nbsp;        
+        <div class="darkorange-text text-end" hx-get="/rpc/block/latest" hx-trigger="load, every 10s"></div>
       </div>
       <form class="input-group" role="search" action="/search" method="GET" autocomplete="off">
         <input class="form-control text-center ms-0 me-2" type="search" placeholder="Explore Grin Network" aria-label="Search" name="input" required>
@@ -18,13 +18,12 @@
       </form>
       <br><br>
       <div class="value-text mb-2">Supported search inputs:</div>
-      <div class="value-text"><i class="bi bi-dot"></i> block number</div>
-      <div class="value-text"><i class="bi bi-dot"></i> block hash</div>
-      <div class="value-text"><i class="bi bi-dot"></i> kernel</div>
+      <div class="value-text"><i class="bi bi-dot"></i> Block Number</div>
+      <div class="value-text"><i class="bi bi-dot"></i> Block Hash</div>
+      <div class="value-text"><i class="bi bi-dot"></i> Kernel</div>
+      <div class="value-text"><i class="bi bi-dot"></i> Unspent Output</div>
     </div>
   </div>
-
-  <br>
 
 </code>
 
