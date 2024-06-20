@@ -18,6 +18,7 @@ use crate::data::Dashboard;
 use crate::data::Block;
 use crate::data::Transactions;
 use crate::data::Kernel;
+use crate::data::Output;
 use crate::requests::CONFIG;
 
 
@@ -148,11 +149,33 @@ async fn kernel(excess: &str) -> Template {
 }
 
 
+// Rendering page for a specified output.
+#[get("/output/<commit>")]
+async fn output(commit: &str) -> Template {
+    let mut output = Output::new();
+
+    let _ = requests::get_output(&commit, &mut output).await;
+
+    if output.commit.is_empty() == false {
+        return Template::render("output", context! {
+            route:  "output",
+            cg_api: CONFIG.coingecko_api.clone(),
+            output,
+        })
+    }
+
+    return Template::render("error", context! {
+        route:  "error",
+        cg_api: CONFIG.coingecko_api.clone(),
+    })
+}
+
+
 // Handling search request.
 // Using Option<&str> to match '/search' query without input params.
 // https://github.com/rwf2/Rocket/issues/608
 #[get("/search?<input>")]
-fn search(input: Option<&str>) -> Either<Template, Redirect> {
+pub async fn search(input: Option<&str>) -> Either<Template, Redirect> {
     // Unwrap Option and forward to Search page if no parameters
     let input = match input {
         Some(value) => value,
@@ -173,9 +196,26 @@ fn search(input: Option<&str>) -> Either<Template, Redirect> {
         } else if input.len() == 64 {
             return Either::Right(Redirect::to(uri!(block_header_by_hash(input))));
             
-        // Kernel
+        // Kernel or Unspent Output
         } else if input.len() == 66 {
-            return Either::Right(Redirect::to(uri!(kernel(input))));
+            // First search for Kernel.
+            // If found, redirect to Kernel page, otherwise search for Unspent Output.
+            // As we can't distinguish between Kernel and Output, this will produce a redundant
+            // get_kernel call, but will allow for better UI (no need to ask user to input the type
+            // of the search request).
+            let mut kernel = Kernel::new();
+
+            let _ = requests::get_kernel(&input, &mut kernel).await;
+
+            if kernel.excess.is_empty() == false {
+                // Here we are redirecting to kernel page and call get_kernel again there.
+                // Kernel page is a separate route and we want it to be accessed directly and
+                // via search functionality.
+                return Either::Right(Redirect::to(uri!(kernel(input))));
+            } else {
+                // If Kernel not found, then search for Unspent Output
+                return Either::Right(Redirect::to(uri!(output(input))));
+            }
         }
     }
     
@@ -222,8 +262,7 @@ async fn api_owner(data: &str) -> String {
 
 
 // Foreign API.
-// All methods are whitelisted, except get_outputs.
-// get_outputs consumes CPU and blocks certain other rpc calls.
+// All methods are whitelisted.
 #[post("/v2/foreign", data="<data>")]
 async fn api_foreign(data: &str) -> String {
     if CONFIG.public_api == "enabled" {
@@ -239,18 +278,14 @@ async fn api_foreign(data: &str) -> String {
             _ => return "{\"error\":\"bad syntax\"}".to_string(),
         };
 
-        if method != "get_outputs" {
-            let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "foreign").await;
+        let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "foreign").await;
 
-            let result = match resp {
-                Ok(value) => value,
-                Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
-            };
+        let result = match resp {
+            Ok(value) => value,
+            Err(_err) => return "{\"error\":\"rpc call failed\"}".to_string(),
+        };
 
-            return result.to_string();
-        }
-
-        "{\"error\":\"not allowed\"}".to_string()
+        return result.to_string();
     } else {
         "{\"error\":\"not allowed\"}".to_string()
     }
@@ -654,7 +689,7 @@ async fn main() {
                                 block_weight, block_details_by_height, block_header_by_hash,
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
-                                api_owner, api_foreign])
+                                output, api_owner, api_foreign])
             .mount("/static", FileServer::from("static"))
             .attach(Template::fairing())
             .launch()

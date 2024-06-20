@@ -1,0 +1,52 @@
+{% extends "base" %}
+
+{% block content %}
+
+<code>
+
+  <div class="card rounded-0">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <div class="darkorange-text"><i class="bi bi-card-text"></i> OUTPUT</div>
+        {% if output.status == "Unconfirmed" %}
+          <span class="badge text-bg-warning px-2 py-2">UNCONFIRMED</span>
+        {% endif %}
+      </div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Commitment&nbsp;</div>
+        <div class="value-text text-break text-end">{{ output.commit }}</div>
+      </div>
+      {% if output.status != "Unconfirmed" %}
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Block Height&nbsp;</div>
+        <div class="value-text text-end">
+          <a class="text-decoration-none" href="/block/{{ output.height }}">
+            {{ output.height }} <i class="bi bi-box-arrow-up-right"></i>
+          </a>
+        </div>
+      </div>
+      {% endif %}
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Type&nbsp;</div>
+        <div class="value-text text-end">{{ output.out_type }}</div>
+      </div>
+    </div>
+  </div>
+
+  {% if output.status != "Unconfirmed" %}
+    <div class="card border-top-0 rounded-0">
+      <div class="card-body" align="left">
+        <div class="darkorange-text"><i class="bi bi-layout-text-sidebar-reverse"></i> RAW DATA</div>
+        <br>
+        <div class="value-text">{{ output.raw_data }}</div>
+      </div>
+    </div>
+  {% endif %}
+
+</code>
+
+{% endblock %}
+
