@@ -91,7 +91,7 @@ pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Resul
         Err(err) => { error!("rpc failed, status code: {:?}", err.status().unwrap()); },
     }
 
-    let val: Value = serde_json::from_str(&result.text().await.unwrap())?;
+    let val: Value = serde_json::from_str(&result.text().await?)?;
 
     Ok(val)
 }
@@ -158,7 +158,7 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>)
 
 
 // Collecting: supply, inflation, price_usd, price_btc, volume_usd, volume_btc, cap_usd, cap_btc.
-pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
+pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::Error> {
     let client;
     let result;
     let mut val = Value::Null;
@@ -166,7 +166,7 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
     if CONFIG.coingecko_api == "enabled" {
         client = reqwest::Client::new();
         result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true").send().await?;
-        val    = serde_json::from_str(&result.text().await.unwrap()).unwrap();
+        val    = serde_json::from_str(&result.text().await?)?;
     }
 
     let mut data = dashboard.lock().unwrap();
