@@ -2,8 +2,8 @@
 use rocket_dyn_templates::{Template, context};
 use rocket::fs::FileServer;
 use rocket::{State, tokio};
-use rocket::serde::json::Json;
 use rocket::response::Redirect;
+use rocket::serde::json::json;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use either::Either;
@@ -228,18 +228,18 @@ pub async fn search(input: Option<&str>) -> Either<Template, Redirect> {
 // Owner API.
 // Whitelisted methods: get_connected_peers, get_peers, get_status.
 #[post("/v2/owner", data="<data>")]
-async fn api_owner(data: &str) -> Json<String> {
+async fn api_owner(data: &str) -> Value {
     if CONFIG.public_api == "enabled" {
         let result = serde_json::from_str(data);
 
         let v: Value = match result {
             Ok(value) => value,
-            Err(_err) => return Json("{\"error\":\"bad syntax\"}".to_string()),
+            Err(_err) => return json!({"error":"bad syntax"}),
         };
 
         let method = match v["method"].as_str() {
             Some(value) => value,
-            _ => return Json("{\"error\":\"bad syntax\"}".to_string()),
+            _ => return json!({"error":"bad syntax"}),
         };
     
         if method == "get_connected_peers" || method == "get_peers" || method == "get_status" {
@@ -247,15 +247,15 @@ async fn api_owner(data: &str) -> Json<String> {
 
             let result = match resp {
                 Ok(value) => value,
-                Err(_err) => return Json("{\"error\":\"rpc call failed\"}".to_string()),
+                Err(_err) => return json!({"error":"rpc call failed"}),
             };
 
-            return Json(result.to_string());
+            return json!(result);
         }
 
-        Json("{\"error\":\"not allowed\"}".to_string())
+        json!({"error":"not allowed"})
     } else {
-        Json("{\"error\":\"not allowed\"}".to_string())
+        json!({"error":"not allowed"})
     }
 }
 
@@ -263,30 +263,30 @@ async fn api_owner(data: &str) -> Json<String> {
 // Foreign API.
 // All methods are whitelisted.
 #[post("/v2/foreign", data="<data>")]
-async fn api_foreign(data: &str) -> Json<String> {
+async fn api_foreign(data: &str) -> Value {
     if CONFIG.public_api == "enabled" {
         let result = serde_json::from_str(data);
 
         let v: Value = match result {
             Ok(value) => value,
-            Err(_err) => return Json("{\"error\":\"bad syntax\"}".to_string()),
+            Err(_err) => return json!({"error":"bad syntax"}),
         };
 
         let method = match v["method"].as_str() {
             Some(value) => value,
-            _ => return Json("{\"error\":\"bad syntax\"}".to_string()),
+            _ => return json!({"error":"bad syntax"}),
         };
 
         let resp = requests::call(method, v["params"].to_string().as_str(), v["id"].to_string().as_str(), "foreign").await;
 
         let result = match resp {
             Ok(value) => value,
-            Err(_err) => return Json("{\"error\":\"rpc call failed\"}".to_string()),
+            Err(_err) => return json!({"error":"rpc call failed"}),
         };
 
-        return Json(result.to_string());
+        return json!(result);
     } else {
-        Json("{\"error\":\"not allowed\"}".to_string())
+        json!({"error":"not allowed"})
     }
 }
 
