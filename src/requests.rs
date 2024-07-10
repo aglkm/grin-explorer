@@ -80,9 +80,9 @@ pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Resul
 
     let client = reqwest::Client::new();
     let result = client.post(rpc_url)
-                       .body(format!("{{\"method\": \"{}\", \"params\": {}, \"id\": {}}}", method, params, id))
+                       .body(format!("{{\"method\": \"{}\", \"params\": {}, \"id\": {}, \"jsonrpc\": \"2.0\"}}", method, params, id))
                        .basic_auth(CONFIG.user.clone(), Some(secret))
-                       .header("content-type", "plain/text")
+                       .header("content-type", "application/json")
                        .send()
                        .await?;
 
