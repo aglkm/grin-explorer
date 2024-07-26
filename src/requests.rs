@@ -3,7 +3,6 @@ use serde_json::Value;
 use std::sync::{Arc, Mutex};
 use num_format::{Locale, ToFormattedString};
 use fs_extra::dir::get_size;
-use colored::Colorize;
 use humantime::format_duration;
 use std::time::Duration;
 use chrono::{Utc, DateTime};
@@ -40,7 +39,7 @@ lazy_static! {
                 "grin_dir"                => cfg.grin_dir                = value,
                 "coingecko_api"           => cfg.coingecko_api           = value,
                 "public_api"              => cfg.public_api              = value,
-                _ => println!("{} Unknown config setting '{}'.", "[ ERROR   ]".red(), name),
+                _ => error!("unknown config setting '{}'.", name),
             }
         }
 
