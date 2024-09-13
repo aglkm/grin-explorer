@@ -187,7 +187,7 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
         if CONFIG.coingecko_api == "enabled" && val != Value::Null {
             // Check if CoingGecko API returned error
             if let Some(status) = val.get("status") {
-                warn!("{}", status["error_message"].as_str().unwrap().to_string());
+                warn!("{}", status["error_message"].to_string());
             } else {
                 data.price_usd  = format!("{:.3}", val["grin"]["usd"].to_string().parse::<f64>().unwrap());
                 data.price_btc  = format!("{:.8}", val["grin"]["btc"].to_string().parse::<f64>().unwrap());

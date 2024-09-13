@@ -24,7 +24,6 @@ pub struct Dashboard {
     pub cap_btc:         String,
     // blockchain
     pub disk_usage:      String,
-    pub age:             String,
     // hashrate
     pub hashrate:        String,
     pub difficulty:      String,
@@ -56,7 +55,6 @@ impl Dashboard {
             cap_usd:         String::new(),
             cap_btc:         String::new(),
             disk_usage:      String::new(),
-            age:             String::new(),
             hashrate:        String::new(),
             difficulty:      String::new(),
             production_cost: String::new(),

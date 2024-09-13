@@ -1,4 +1,5 @@
 #[macro_use] extern crate rocket;
+use either::Either;
 use rocket_dyn_templates::{Template, context};
 use rocket::fs::FileServer;
 use rocket::{State, tokio};
@@ -6,18 +7,17 @@ use rocket::response::Redirect;
 use rocket::serde::json::json;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
-use either::Either;
 use serde_json::Value;
 
-mod worker;
-mod requests;
 mod data;
+mod requests;
+mod worker;
 
-use crate::data::Dashboard;
 use crate::data::Block;
-use crate::data::Transactions;
+use crate::data::Dashboard;
 use crate::data::Kernel;
 use crate::data::Output;
+use crate::data::Transactions;
 use crate::requests::CONFIG;
 
 
