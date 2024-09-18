@@ -155,7 +155,7 @@ impl Transactions {
 // Explorer configuration
 #[derive(Debug)]
 pub struct ExplorerConfig {
-    pub ip:                      String,
+    pub host:                    String,
     pub port:                    String,
     pub proto:                   String,
     pub user:                    String,
@@ -166,12 +166,13 @@ pub struct ExplorerConfig {
     pub foreign_api_secret:      String,
     pub coingecko_api:           String,
     pub public_api:              String,
+    pub external_nodes:          Vec<String>,
 }
 
 impl ExplorerConfig {
     pub fn new() -> ExplorerConfig {
         ExplorerConfig {
-            ip:                      String::new(),
+            host:                    String::new(),
             port:                    String::new(),
             proto:                   String::new(),
             user:                    String::new(),
@@ -182,9 +183,11 @@ impl ExplorerConfig {
             foreign_api_secret:      String::new(),
             coingecko_api:           String::new(),
             public_api:              String::new(),
+            external_nodes:          Vec::new(),
         }
     }
 }
+
 
 // Output data
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -204,6 +207,25 @@ impl Output {
             out_type: String::new(),
             status:   String::new(),
             raw_data: String::new(),
+        }
+    }
+}
+
+
+// Statistics data
+#[derive(Debug)]
+pub struct Statistics {
+    pub user_agent: Vec<String>,
+    pub count:      Vec<String>,
+    pub total:      u32,
+}
+
+impl Statistics {
+    pub fn new() -> Statistics {
+        Statistics {
+            user_agent: Vec::new(),
+            count:      Vec::new(),
+            total:      0,
         }
     }
 }

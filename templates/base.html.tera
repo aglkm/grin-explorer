@@ -44,6 +44,9 @@
               <li class="nav-item">
 	        <a class="nav-link" href="/block_list"><i class="bi bi-box"></i> Blocks</a>
               </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/stats"><i class="bi bi-calculator"></i> Statistics</a>
+              </li>
 	    {% elif route == "block_list" or route == "block_list_by_height" %}
               <li class="nav-item">
                 <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
@@ -51,12 +54,28 @@
               <li class="nav-item">
                 <a class="nav-link" href="/block_list"><div class="darkorange-text"><i class="bi bi-box"></i> Blocks</div></a>
               </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/stats"><i class="bi bi-calculator"></i> Statistics</a>
+              </li>
+	    {% elif route == "stats" %}
+              <li class="nav-item">
+                <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/block_list"><i class="bi bi-box"></i> Blocks</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/stats"><div class="darkorange-text"><i class="bi bi-calculator"></i> Statistics</div></a>
+              </li>
 	    {% else %}
               <li class="nav-item">
                 <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/block_list"><i class="bi bi-box"></i> Blocks</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/stats"><i class="bi bi-calculator"></i> Statistics</a>
               </li>
 	    {% endif %}
           </ul>
@@ -220,7 +239,7 @@
             <div class="row mb-2">
               <div class="col d-flex justify-content-center">
                 <a class="text-decoration-none me-2" href="https://github.com/aglkm/grin-explorer">
-                  <span style="color:grey"><i class="bi bi-github me-1"></i>v.0.1.5</span>
+                  <span style="color:grey"><i class="bi bi-github me-1"></i>v.0.1.6</span>
 		</a>
                 <a class="text-decoration-none" href="/search">
                   <span style="color:grey"><i class="bi bi-search me-1"></i>Search</span>

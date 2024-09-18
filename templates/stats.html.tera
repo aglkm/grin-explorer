@@ -1,0 +1,132 @@
+{% extends "base" %}
+
+{% block content %}
+
+  <script src="/static/scripts/chart.js"></script>
+
+  <code>
+
+    <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+      <div class="card-body" align="center">
+        <div class="value-text">
+          <div class="darkorange-text"><i class="bi bi-pc-display-horizontal"></i> NODE VERSION STATS ({{ total }})</div>
+          <div style="position: relative; height:60vh; width:90vw"><canvas id="1"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-none d-sm-block"> <!-- Show on >= sm screens -->
+      <div class="card-group">
+        <div class="card border-start-0 rounded-0">
+          <div class="card-body">
+            <div class="darkorange-text">
+              #
+            </div>
+	  </div>
+        </div>
+        <div class="card rounded-0">
+          <div class="card-body">
+            <div class="darkorange-text">
+              VERSION
+            </div>
+	  </div>
+        </div>
+        <div class="card border-end-0 rounded-0">
+          <div class="card-body">
+            <div class="darkorange-text">
+              COUNT
+            </div>
+	  </div>
+        </div>
+      </div>
+  
+      {% for v in user_agent %}
+        <div class="card-group rounded-0">
+          <div class="card border-top-0 border-start-0 rounded-0">
+            <div class="card-body">
+              <div class="value-text">
+                {{ loop.index }}
+              </div>
+            </div>
+          </div>
+          <div class="card border-top-0 rounded-0">
+            <div class="card-body">
+              <div class="value-text">
+                {{ v }}
+              </div>
+            </div>
+          </div>
+          <div class="card border-top-0 border-end-0 rounded-0">
+            <div class="card-body">
+              <div class="value-text">
+                {{ count[loop.index0] }}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="d-sm-none"> <!-- Show on < sm screens-->
+      {% for v in user_agent %}
+          {% if loop.index0 == 0 %}
+            <div class="card border-start-0 rounded-0">
+          {% else %}
+            <div class="card border-top-0 border-start-0 rounded-0">
+          {% endif %}
+            <div class="card-body">
+              <div class="d-flex justify-content-start">
+                <div class="darkorange-text">
+                  #{{ loop.index }}
+                </div>
+              </div>
+              <div class="d-flex justify-content-between">
+                <div class="value-text">
+                  {{ v }}
+                </div>
+                <div class="value-text">
+                  {{ count[loop.index0] }}
+                </div>
+              </div>
+            </div>
+          </div>
+      {% endfor %}
+    </div>
+
+  </code>
+
+  <script>
+    var ctx = document.getElementById('1').getContext('2d');
+
+    var options = {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: 'gray',
+          },
+          position: 'top'
+        },
+      },
+    };
+
+    var data = {
+      labels: {{ user_agent }},
+      datasets: [{
+          label: " Count",
+          borderWidth: 1,
+          data: {{ count }}
+      }]
+    };
+
+    new Chart(document.getElementById("1"), {
+      type: 'pie',
+      data: data,
+      options: options
+    });
+
+  </script>
+
+
+{% endblock %}
+

@@ -11,36 +11,60 @@ use std::collections::HashMap;
 use std::fs;
 use lazy_static::lazy_static;
 
-use crate::data::Dashboard;
 use crate::data::Block;
-use crate::data::Transactions;
+use crate::data::Dashboard;
 use crate::data::ExplorerConfig;
 use crate::data::Kernel;
 use crate::data::Output;
+use crate::data::Statistics;
+use crate::data::Transactions;
 
 
 // Static explorer config structure
 lazy_static! {
     pub static ref CONFIG: ExplorerConfig = {
-        let mut cfg  = ExplorerConfig::new();
-        let settings = Config::builder().add_source(config::File::with_name("Explorer"))
-                                        .build().unwrap();
+        let mut cfg = ExplorerConfig::new();
+        let toml    = Config::builder().add_source(config::File::with_name("Explorer")).build().unwrap();
 
-        let settings: HashMap<String, String> = settings.try_deserialize().unwrap();
-
-        for (name, value) in settings {
-            match name.as_str() {
-                "ip"                      => cfg.ip                      = value,
-                "port"                    => cfg.port                    = value,
-                "proto"                   => cfg.proto                   = value,
-                "user"                    => cfg.user                    = value,
-                "api_secret_path"         => cfg.api_secret_path         = value,
-                "foreign_api_secret_path" => cfg.foreign_api_secret_path = value,
-                "grin_dir"                => cfg.grin_dir                = value,
-                "coingecko_api"           => cfg.coingecko_api           = value,
-                "public_api"              => cfg.public_api              = value,
-                _ => error!("unknown config setting '{}'.", name),
-            }
+        // Mandatory settings
+        cfg.host          = toml.get_string("host").unwrap();
+        cfg.proto         = toml.get_string("proto").unwrap();
+        cfg.coingecko_api = toml.get_string("coingecko_api").unwrap();
+        cfg.public_api    = toml.get_string("public_api").unwrap();
+        
+        // Optional settings
+        match toml.get_string("port") {
+            Ok(v)   => cfg.port = v,
+            Err(_e) => {},
+        }
+        
+        match toml.get_string("user") {
+            Ok(v)   => cfg.user = v,
+            Err(_e) => {},
+        }
+        
+        match toml.get_string("api_secret_path") {
+            Ok(v)   => cfg.api_secret_path = v,
+            Err(_e) => {},
+        }
+        
+        match toml.get_string("foreign_api_secret_path") {
+            Ok(v)   => cfg.foreign_api_secret_path = v,
+            Err(_e) => {},
+        }
+        
+        match toml.get_string("grin_dir") {
+            Ok(v)   => cfg.grin_dir = v,
+            Err(_e) => {},
+        }
+       
+        match toml.get_array("external_nodes") {
+            Ok(nodes)   => {
+                               for endpoint in nodes.clone() {
+                                   cfg.external_nodes.push(endpoint.into_string().unwrap());
+                               }
+                           },
+            Err(_e) => {},
         }
 
         if cfg.api_secret_path.is_empty() == false {
@@ -66,10 +90,43 @@ pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Resul
     let secret;
 
     if CONFIG.port.is_empty() == false {
-        rpc_url = format!("{}://{}:{}/v2/{}", CONFIG.proto, CONFIG.ip, CONFIG.port, rpc_type);
+        rpc_url = format!("{}://{}:{}/v2/{}", CONFIG.proto, CONFIG.host, CONFIG.port, rpc_type);
     } else {
-        rpc_url = format!("{}://{}/v2/{}", CONFIG.proto, CONFIG.ip, rpc_type);
+        rpc_url = format!("{}://{}/v2/{}", CONFIG.proto, CONFIG.host, rpc_type);
     }
+
+    if rpc_type == "owner" {
+        secret = CONFIG.api_secret.clone();
+    } else {
+        secret = CONFIG.foreign_api_secret.clone();
+    }
+
+    let client = reqwest::Client::new();
+    let result = client.post(rpc_url)
+                       .body(format!("{{\"method\": \"{}\", \"params\": {}, \"id\": {}, \"jsonrpc\": \"2.0\"}}", method, params, id))
+                       .basic_auth(CONFIG.user.clone(), Some(secret))
+                       .header("content-type", "application/json")
+                       .send()
+                       .await?;
+
+    match result.error_for_status_ref() {
+        Ok(_res) => (),
+        Err(err) => { error!("rpc failed, status code: {:?}", err.status().unwrap()); },
+    }
+
+    let val: Value = serde_json::from_str(&result.text().await?)?;
+
+    Ok(val)
+}
+
+
+// RPC requests to grin node.
+// The same call as above but with the option to add ip, proto and port.
+pub async fn call_external(method: &str, params: &str, id: &str, rpc_type: &str, endpoint: String) -> Result<Value, anyhow::Error> {
+    let rpc_url;
+    let secret;
+
+    rpc_url = format!("{}/v2/{}", endpoint, rpc_type);
 
     if rpc_type == "owner" {
         secret = CONFIG.api_secret.clone();
@@ -129,16 +186,15 @@ pub async fn get_mempool(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow:
 }
 
 
-// Collecting: inbound, outbound.
-pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>)
-             -> Result<(), anyhow::Error> {
-    let resp = call("get_connected_peers", "[]", "1", "owner").await?;
+// Collecting: inbound, outbound, user_agent.
+pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: Arc<Mutex<Statistics>>) -> Result<(), anyhow::Error> {
+    let mut peers    = HashMap::new();
+    let mut inbound  = 0;
+    let mut outbound = 0;
 
-    let mut data = dashboard.lock().unwrap();
+    let resp = call("get_connected_peers", "[]", "1", "owner").await?;
     
     if resp != Value::Null {
-        let mut inbound  = 0;
-        let mut outbound = 0;
 
         for peer in resp["result"]["Ok"].as_array().unwrap() {
             if peer["direction"] == "Inbound" {
@@ -147,10 +203,46 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>)
             if peer["direction"] == "Outbound" {
                 outbound += 1;
             }
+            // Collecting user_agent nodes stats
+            *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
         }
-        data.inbound  = inbound;
-        data.outbound = outbound;
+
     }
+
+    // Collecting peers stats from external endpoints
+    for endpoint in CONFIG.external_nodes.clone() {
+        match call_external("get_connected_peers", "[]", "1", "owner", endpoint).await {
+            Ok(resp) => {
+                            if resp != Value::Null {
+                                for peer in resp["result"]["Ok"].as_array().unwrap() {
+                                    // Collecting user_agent nodes stats
+                                    *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
+                                }
+                            }
+                         },
+            Err(e)   => warn!("{}", e),
+        }
+    }
+
+    // Sort HashMap into Vec
+    let mut peers_vec: Vec<(&String, &u32)> = peers.iter().collect();
+    peers_vec.sort_by(|a, b| b.1.cmp(a.1));
+
+    let mut dash  = dashboard.lock().unwrap();
+    let mut stats = statistics.lock().unwrap();
+
+    stats.user_agent.clear();
+    stats.count.clear();
+    stats.total = 0;
+
+    for v in peers_vec {
+        stats.total = stats.total + v.1;
+        stats.user_agent.push(v.0.to_string());
+        stats.count.push(v.1.to_string());
+    }
+
+    dash.inbound  = inbound;
+    dash.outbound = outbound;
 
     Ok(())
 }
@@ -220,7 +312,7 @@ pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
     match get_size(chain_dir.clone()) {
         Ok(chain_size) => data.disk_usage = format!("{:.2}", (chain_size as f64) / 1000.0 / 1000.0 / 1000.0),
         Err(e)         => {
-            if CONFIG.ip == "127.0.0.1" || CONFIG.ip == "0.0.0.0" {
+            if CONFIG.host == "127.0.0.1" || CONFIG.host == "0.0.0.0" {
                 error!("{}: \"{}\"", e, chain_dir);
             } else {
                 // Ignore error for external node connection

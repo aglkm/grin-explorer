@@ -1,5 +1,5 @@
 # Node address.
-ip = "127.0.0.1"
+host = "127.0.0.1"
 
 # Node port.
 port = "3413"
@@ -25,9 +25,12 @@ coingecko_api = "enabled"
 # Enable or disable node POST API public access.
 public_api = "enabled"
 
+# List of external node endpoints, used for peer stats.
+# Comment out if you wish, only local peer stats will be used then.
+# external_nodes = ["https://grinnode.live:3413", "https://grincoin.org"] 
 
 # Grinnode config
-# ip = "grinnode.live"
+# host = "grinnode.live"
 # port = "3413"
 # proto = "https"
 # coingecko_api = "enabled"
@@ -35,14 +38,14 @@ public_api = "enabled"
 
 
 # Grincoin config
-# ip = "grincoin.org"
+# host = "grincoin.org"
 # proto = "https"
 # coingecko_api = "enabled"
 # public_api = "enabled"
 
 
 # Testnet config
-# ip = "127.0.0.1"
+# host = "127.0.0.1"
 # port = "13413"
 # proto = "http"
 # user = "grin"

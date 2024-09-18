@@ -17,6 +17,7 @@ use crate::data::Block;
 use crate::data::Dashboard;
 use crate::data::Kernel;
 use crate::data::Output;
+use crate::data::Statistics;
 use crate::data::Transactions;
 use crate::requests::CONFIG;
 
@@ -222,6 +223,21 @@ pub async fn search(input: Option<&str>) -> Either<Template, Redirect> {
         route:  "error",
         cg_api: CONFIG.coingecko_api.clone(),
     }))
+}
+
+
+// Rendering Statistics page.
+#[get("/stats")]
+fn stats(statistics: &State<Arc<Mutex<Statistics>>>) -> Template {
+    let data = statistics.lock().unwrap();
+
+    Template::render("stats", context! {
+        route:      "stats",
+        user_agent: data.user_agent.clone(),
+        count:      data.count.clone(),
+        total:      data.total,
+        cg_api:     CONFIG.coingecko_api.clone(),
+    })
 }
 
 
@@ -649,13 +665,15 @@ async fn main() {
     let blocks_clone = blocks.clone();
     let txns         = Arc::new(Mutex::new(Transactions::new()));
     let txns_clone   = txns.clone();
+    let stats        = Arc::new(Mutex::new(Statistics::new()));
+    let stats_clone  = stats.clone();
     let mut ready    = false;
 
     // Starting the Worker
     tokio::spawn(async move {
         loop {
             let result = worker::run(dash_clone.clone(), blocks_clone.clone(),
-                                     txns_clone.clone()).await;
+                                     txns_clone.clone(), stats_clone.clone()).await;
             
             match result {
                 Ok(_v)  => {
@@ -679,6 +697,7 @@ async fn main() {
             .manage(dash)
             .manage(blocks)
             .manage(txns)
+            .manage(stats)
             .mount("/", routes![index, peers_inbound, peers_outbound, sync_status, market_supply,
                                 inflation_rate, volume_usd, volume_btc, price_usd, price_btc,
                                 mcap_usd, mcap_btc,latest_height, disk_usage, network_hashrate,
@@ -688,7 +707,7 @@ async fn main() {
                                 block_weight, block_details_by_height, block_header_by_hash,
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
-                                output, api_owner, api_foreign])
+                                output, api_owner, api_foreign, stats])
             .mount("/static", FileServer::from("static"))
             .attach(Template::fairing())
             .launch()
