@@ -41,7 +41,6 @@ fn index(dashboard: &State<Arc<Mutex<Dashboard>>>) -> Template {
 fn block_list() -> Template {
     Template::render("block_list", context! {
         route:  "block_list",
-        cg_api: CONFIG.coingecko_api.clone(),
     })
 }
 
@@ -63,12 +62,10 @@ async fn block_list_by_height(input_height: &str) -> Template {
         if index >= height {
             Template::render("block_list", context! {
                 route:  "block_list",
-                cg_api: CONFIG.coingecko_api.clone(),
             })
         } else {
             Template::render("block_list", context! {
                 route:  "block_list_by_height",
-                cg_api: CONFIG.coingecko_api.clone(),
                 index,
                 blocks,
                 height,
@@ -77,7 +74,6 @@ async fn block_list_by_height(input_height: &str) -> Template {
     } else {
         Template::render("block_list", context! {
             route:  "block_list",
-            cg_api: CONFIG.coingecko_api.clone(),
         })
     }
 }
@@ -94,7 +90,6 @@ async fn block_details_by_height(height: &str) -> Template {
         if block.height.is_empty() == false {
             return Template::render("block_details", context! {
                 route:  "block_details",
-                cg_api: CONFIG.coingecko_api.clone(),
                 block,
             });
         }
@@ -102,7 +97,6 @@ async fn block_details_by_height(height: &str) -> Template {
 
     Template::render("error", context! {
         route:  "error",
-        cg_api: CONFIG.coingecko_api.clone(),
     })
 }
 
@@ -122,7 +116,6 @@ async fn block_header_by_hash(hash: &str) -> Either<Template, Redirect> {
 
     return Either::Left(Template::render("error", context! {
         route:  "error",
-        cg_api: CONFIG.coingecko_api.clone(),
     }))
 }
 
@@ -137,14 +130,12 @@ async fn kernel(excess: &str) -> Template {
     if kernel.excess.is_empty() == false {
         return Template::render("kernel", context! {
             route:  "kernel",
-            cg_api: CONFIG.coingecko_api.clone(),
             kernel,
         })
     }
 
     return Template::render("error", context! {
         route:  "error",
-        cg_api: CONFIG.coingecko_api.clone(),
     })
 }
 
@@ -159,14 +150,12 @@ async fn output(commit: &str) -> Template {
     if output.commit.is_empty() == false {
         return Template::render("output", context! {
             route:  "output",
-            cg_api: CONFIG.coingecko_api.clone(),
             output,
         })
     }
 
     return Template::render("error", context! {
         route:  "error",
-        cg_api: CONFIG.coingecko_api.clone(),
     })
 }
 
@@ -181,7 +170,6 @@ pub async fn search(input: Option<&str>) -> Either<Template, Redirect> {
         Some(value) => value,
         None => return Either::Left(Template::render("search", context! {
                            route:  "search",
-                           cg_api: CONFIG.coingecko_api.clone(),
                        })),
     };
 
@@ -221,7 +209,6 @@ pub async fn search(input: Option<&str>) -> Either<Template, Redirect> {
     
     Either::Left(Template::render("error", context! {
         route:  "error",
-        cg_api: CONFIG.coingecko_api.clone(),
     }))
 }
 
@@ -236,7 +223,6 @@ fn stats(statistics: &State<Arc<Mutex<Statistics>>>) -> Template {
         user_agent: data.user_agent.clone(),
         count:      data.count.clone(),
         total:      data.total,
-        cg_api:     CONFIG.coingecko_api.clone(),
     })
 }
 
