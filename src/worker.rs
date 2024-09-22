@@ -17,7 +17,7 @@ pub async fn run(dash: Arc<Mutex<Dashboard>>, blocks: Arc<Mutex<Vec<Block>>>,
     let _ = requests::get_connected_peers(dash.clone(), stats.clone()).await?;
     let _ = requests::get_market(dash.clone()).await?;
             requests::get_disk_usage(dash.clone())?;
-    let _ = requests::get_mining_stats(dash.clone()).await?;
+    let _ = requests::get_mining_stats(dash.clone(), stats.clone()).await?;
     let _ = requests::get_recent_blocks(dash.clone(), blocks.clone()).await?;
     let _ = requests::get_txn_stats(dash.clone(), txns.clone()).await?;
 

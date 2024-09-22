@@ -9,95 +9,30 @@
     <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
       <div class="card-body" align="center">
         <div class="value-text">
-          <div class="darkorange-text"><i class="bi bi-pc-display-horizontal"></i> NODE VERSION STATS ({{ total }})</div>
+          <div class="darkorange-text"><i class="bi bi-pc-display-horizontal"></i> NODE VERSIONS ({{ total }})</div>
           <div style="position: relative; height:60vh; width:90vw"><canvas id="1"></canvas></div>
         </div>
       </div>
     </div>
 
-    <div class="d-none d-sm-block"> <!-- Show on >= sm screens -->
-      <div class="card-group">
-        <div class="card border-start-0 rounded-0">
-          <div class="card-body">
-            <div class="darkorange-text">
-              #
-            </div>
-	  </div>
-        </div>
-        <div class="card rounded-0">
-          <div class="card-body">
-            <div class="darkorange-text">
-              VERSION
-            </div>
-	  </div>
-        </div>
-        <div class="card border-end-0 rounded-0">
-          <div class="card-body">
-            <div class="darkorange-text">
-              COUNT
-            </div>
-	  </div>
+    <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+      <div class="card-body" align="center">
+        <div class="value-text">
+          <div class="darkorange-text"><i class="bi bi-pc-display-horizontal"></i> HASHRATE (kG/s)</div>
+          <div style="position: relative; height:60vh; width:90vw"><canvas id="2"></canvas></div>
         </div>
       </div>
-  
-      {% for v in user_agent %}
-        <div class="card-group rounded-0">
-          <div class="card border-top-0 border-start-0 rounded-0">
-            <div class="card-body">
-              <div class="value-text">
-                {{ loop.index }}
-              </div>
-            </div>
-          </div>
-          <div class="card border-top-0 rounded-0">
-            <div class="card-body">
-              <div class="value-text">
-                {{ v }}
-              </div>
-            </div>
-          </div>
-          <div class="card border-top-0 border-end-0 rounded-0">
-            <div class="card-body">
-              <div class="value-text">
-                {{ count[loop.index0] }}
-              </div>
-            </div>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-
-    <div class="d-sm-none"> <!-- Show on < sm screens-->
-      {% for v in user_agent %}
-          {% if loop.index0 == 0 %}
-            <div class="card border-start-0 border-end-0 rounded-0">
-          {% else %}
-            <div class="card border-top-0 border-start-0 border-end-0 rounded-0">
-          {% endif %}
-            <div class="card-body">
-              <div class="d-flex justify-content-start">
-                <div class="darkorange-text">
-                  #{{ loop.index }}
-                </div>
-              </div>
-              <div class="d-flex justify-content-between">
-                <div class="value-text">
-                  {{ v }}
-                </div>
-                <div class="value-text">
-                  {{ count[loop.index0] }}
-                </div>
-              </div>
-            </div>
-          </div>
-      {% endfor %}
     </div>
 
   </code>
 
   <script>
-    var ctx = document.getElementById('1').getContext('2d');
-
+    var ctx = document.getElementById('2').getContext('2d');
+    var gradient = ctx.createLinearGradient(0, 0, 0, 600);
+    gradient.addColorStop(0, 'rgba(178, 81, 16, 1)');
+    gradient.addColorStop(1, 'rgba(255, 158, 93, 0)');
+    
+    <!-- Node Version Chart -->
     var options = {
       maintainAspectRatio: false,
       plugins: {
@@ -125,6 +60,37 @@
       options: options
     });
 
+    <!-- Hashrate Chart -->
+    var options = {
+      maintainAspectRatio: false,
+      interaction: {
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+      }
+    };
+
+    var data = {
+      labels: {{ hash_date }},
+      datasets: [{
+        label: 'Hashrate (kG/s)',
+        data: {{ hashrate }},
+        fill: true,
+        borderColor: "#b25110",
+        backgroundColor: gradient,
+        tension: 0.1
+      }]
+    };
+
+    new Chart(document.getElementById("2"), {
+      type: 'line',
+      data: data,
+      options: options
+    });
+    
   </script>
 
 

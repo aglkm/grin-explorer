@@ -325,7 +325,7 @@ pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 
 
 // Collecting: hashrate, difficulty, production cost, breakeven cost.
-pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::Error> {
+pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>, statistics: Arc<Mutex<Statistics>>) -> Result<(), anyhow::Error> {
     let difficulty_window = 1440;
     let height            = get_current_height(dashboard.clone());
 
@@ -356,7 +356,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
             } else {
                 data.hashrate   = format!("{:.2} G/s", hashrate);
             }
-            
+
             data.difficulty = net_diff.to_string();
 
             if CONFIG.coingecko_api == "enabled" {
@@ -374,6 +374,23 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
                                                         / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
                 }
             }
+
+            let mut stats = statistics.lock().unwrap();
+
+            // Save hashrate into statistics every 24H
+            if stats.timing == 0 || stats.timing >= 86400 {
+                if stats.hashrate.len() == 30 {
+                    stats.hashrate.remove(0);
+                }
+            
+                stats.hashrate.push(format!("{:.2}", hashrate / 1000.0));
+                stats.hash_date.push(format!("\"{}\"", Utc::now().format("%d-%m-%Y")));
+
+                stats.timing = 0;
+            }
+            
+            // Increasing timing by 15 seconds (our data update period)
+            stats.timing = stats.timing + 15;
         }
     }
 

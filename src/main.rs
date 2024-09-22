@@ -223,6 +223,8 @@ fn stats(statistics: &State<Arc<Mutex<Statistics>>>) -> Template {
         user_agent: data.user_agent.clone(),
         count:      data.count.clone(),
         total:      data.total,
+        hashrate:   data.hashrate.clone(),
+        hash_date:  data.hash_date.clone(),
     })
 }
 
@@ -673,7 +675,7 @@ async fn main() {
                     error!("{}", e);
                 },
             }
-            
+
             tokio::time::sleep(Duration::from_secs(15)).await;
         }
     });
