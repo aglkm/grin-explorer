@@ -216,22 +216,29 @@ impl Output {
 #[derive(Debug, Serialize)]
 pub struct Statistics {
     pub timing:     u32,
+    pub date:       Vec<String>,
+    // Node versions
     pub user_agent: Vec<String>,
     pub count:      Vec<String>,
     pub total:      u32,
+    // Hashrate
     pub hashrate:   Vec<String>,
-    pub hash_date:  Vec<String>,
+    // Transactions & fees
+    pub txns:       Vec<String>,
+    pub fees:       Vec<String>,
 }
 
 impl Statistics {
     pub fn new() -> Statistics {
         Statistics {
-            timing:      0,
-            user_agent:  Vec::new(),
-            count:       Vec::new(),
-            total:       0,
-            hashrate:    Vec::new(),
-            hash_date:   Vec::new(),
+            timing:     0,
+            date:       Vec::new(),
+            user_agent: Vec::new(),
+            count:      Vec::new(),
+            total:      0,
+            hashrate:   Vec::new(),
+            txns:       Vec::new(),
+            fees:       Vec::new(),
         }
     }
 }

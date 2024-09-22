@@ -384,13 +384,7 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>, statistics: Arc<
                 }
             
                 stats.hashrate.push(format!("{:.2}", hashrate / 1000.0));
-                stats.hash_date.push(format!("\"{}\"", Utc::now().format("%d-%m-%Y")));
-
-                stats.timing = 0;
             }
-            
-            // Increasing timing by 15 seconds (our data update period)
-            stats.timing = stats.timing + 15;
         }
     }
 
@@ -636,7 +630,8 @@ pub async fn get_block_kernels(height: &String, blocks: &mut Vec<Block>)
 
 // Collecting: period_1h, period_24h, fees_1h, fees_24h.
 pub async fn get_txn_stats(dashboard: Arc<Mutex<Dashboard>>,
-                           transactions: Arc<Mutex<Transactions>>) -> Result<(), Error> {
+                           transactions: Arc<Mutex<Transactions>>,
+                           statistics: Arc<Mutex<Statistics>>)-> Result<(), Error> {
     let mut blocks = Vec::<Block>::new();
     let height     = get_current_height(dashboard.clone());
 
@@ -682,6 +677,19 @@ pub async fn get_txn_stats(dashboard: Arc<Mutex<Dashboard>>,
             txns.period_24h = ker_count_24h.to_string();
             txns.fees_1h    = format!("{:.2}", fees_1h / 1000000000.0);
             txns.fees_24h   = format!("{:.2}", fees_24h / 1000000000.0);
+            
+            let mut stats = statistics.lock().unwrap();
+
+            // Save txns into statistics every 24H
+            if stats.timing == 0 || stats.timing >= 86400 {
+                if stats.txns.len() == 30 {
+                    stats.txns.remove(0);
+                    stats.fees.remove(0);
+                }
+            
+                stats.txns.push(txns.period_24h.clone());
+                stats.fees.push(txns.fees_24h.clone());
+            }
         }
     }
 

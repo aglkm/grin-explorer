@@ -220,11 +220,13 @@ fn stats(statistics: &State<Arc<Mutex<Statistics>>>) -> Template {
 
     Template::render("stats", context! {
         route:      "stats",
+        date:       data.date.clone(),
         user_agent: data.user_agent.clone(),
         count:      data.count.clone(),
         total:      data.total,
         hashrate:   data.hashrate.clone(),
-        hash_date:  data.hash_date.clone(),
+        txns:       data.txns.clone(),
+        fees:       data.fees.clone(),
     })
 }
 

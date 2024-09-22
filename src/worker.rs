@@ -1,3 +1,4 @@
+use chrono::Utc;
 use std::sync::{Arc, Mutex};
 
 use crate::data::Block;
@@ -19,7 +20,18 @@ pub async fn run(dash: Arc<Mutex<Dashboard>>, blocks: Arc<Mutex<Vec<Block>>>,
             requests::get_disk_usage(dash.clone())?;
     let _ = requests::get_mining_stats(dash.clone(), stats.clone()).await?;
     let _ = requests::get_recent_blocks(dash.clone(), blocks.clone()).await?;
-    let _ = requests::get_txn_stats(dash.clone(), txns.clone()).await?;
+    let _ = requests::get_txn_stats(dash.clone(), txns.clone(), stats.clone()).await?;
+
+    let mut stats = stats.lock().unwrap();
+
+    // Push new date and restart timer every 24H
+    if stats.timing == 0 || stats.timing >= 86400 {
+        stats.date.push(format!("\"{}\"", Utc::now().format("%d-%m-%Y")));
+        stats.timing = 0;
+    }
+
+    // Increasing timing by 15 seconds (data update period)
+    stats.timing = stats.timing + 15;
 
     Ok(())
 }
