@@ -18,7 +18,7 @@
     <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
       <div class="card-body" align="center">
         <div class="value-text">
-          <div class="darkorange-text"><i class="bi bi-pc-display-horizontal"></i> HASHRATE (kG/s)</div>
+          <div class="darkorange-text"><i class="bi bi-activity"></i> HASHRATE</div>
           <div style="position: relative; height:60vh; width:90vw"><canvas id="2"></canvas></div>
         </div>
       </div>
