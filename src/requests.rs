@@ -325,7 +325,7 @@ pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
 
 
 // Collecting: hashrate, difficulty, production cost, breakeven cost.
-pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>, statistics: Arc<Mutex<Statistics>>) -> Result<(), anyhow::Error> {
+pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::Error> {
     let difficulty_window = 1440;
     let height            = get_current_height(dashboard.clone());
 
@@ -351,11 +351,14 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>, statistics: Arc<
 
             // kG/s
             if hashrate > 1000.0 {
-                data.hashrate   = format!("{:.2} kG/s", hashrate / 1000.0);
+                data.hashrate = format!("{:.2} kG/s", hashrate / 1000.0);
             // G/s
             } else {
-                data.hashrate   = format!("{:.2} G/s", hashrate);
+                data.hashrate = format!("{:.2} G/s", hashrate);
             }
+
+            // Save hashrate as kG/s for chart stats
+            data.hashrate_kgs = format!("{:.2}", hashrate / 1000.0);
 
             data.difficulty = net_diff.to_string();
 
@@ -373,17 +376,6 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>, statistics: Arc<
                     data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
                                                         / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
                 }
-            }
-
-            let mut stats = statistics.lock().unwrap();
-
-            // Collect stats every day, by checking if new date was pushed into the date vector
-            if stats.date.len() != stats.hashrate.len() {
-                if stats.hashrate.len() == 30 {
-                    stats.hashrate.remove(0);
-                }
-            
-                stats.hashrate.push(format!("{:.2}", hashrate / 1000.0));
             }
         }
     }
@@ -630,8 +622,7 @@ pub async fn get_block_kernels(height: &String, blocks: &mut Vec<Block>)
 
 // Collecting: period_1h, period_24h, fees_1h, fees_24h.
 pub async fn get_txn_stats(dashboard: Arc<Mutex<Dashboard>>,
-                           transactions: Arc<Mutex<Transactions>>,
-                           statistics: Arc<Mutex<Statistics>>)-> Result<(), Error> {
+                           transactions: Arc<Mutex<Transactions>>)-> Result<(), Error> {
     let mut blocks = Vec::<Block>::new();
     let height     = get_current_height(dashboard.clone());
 
@@ -677,19 +668,6 @@ pub async fn get_txn_stats(dashboard: Arc<Mutex<Dashboard>>,
             txns.period_24h = ker_count_24h.to_string();
             txns.fees_1h    = format!("{:.2}", fees_1h / 1000000000.0);
             txns.fees_24h   = format!("{:.2}", fees_24h / 1000000000.0);
-            
-            let mut stats = statistics.lock().unwrap();
-
-            // Collect stats every day, by checking if new date was pushed into the date vector
-            if stats.date.len() != stats.txns.len() {
-                if stats.txns.len() == 30 {
-                    stats.txns.remove(0);
-                    stats.fees.remove(0);
-                }
-            
-                stats.txns.push(txns.period_24h.clone());
-                stats.fees.push(txns.fees_24h.clone());
-            }
         }
     }
 

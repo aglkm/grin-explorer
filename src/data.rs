@@ -25,6 +25,7 @@ pub struct Dashboard {
     pub disk_usage:      String,
     // hashrate
     pub hashrate:        String,
+    pub hashrate_kgs:    String,
     pub difficulty:      String,
     // mining
     pub production_cost: String,
@@ -55,6 +56,7 @@ impl Dashboard {
             cap_btc:         String::new(),
             disk_usage:      String::new(),
             hashrate:        String::new(),
+            hashrate_kgs:    String::new(),
             difficulty:      String::new(),
             production_cost: String::new(),
             reward_ratio:    String::new(),

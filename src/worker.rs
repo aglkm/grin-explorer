@@ -18,21 +18,35 @@ pub async fn run(dash: Arc<Mutex<Dashboard>>, blocks: Arc<Mutex<Vec<Block>>>,
     let _ = requests::get_connected_peers(dash.clone(), stats.clone()).await?;
     let _ = requests::get_market(dash.clone()).await?;
             requests::get_disk_usage(dash.clone())?;
-    let _ = requests::get_mining_stats(dash.clone(), stats.clone()).await?;
+    let _ = requests::get_mining_stats(dash.clone()).await?;
     let _ = requests::get_recent_blocks(dash.clone(), blocks.clone()).await?;
-    let _ = requests::get_txn_stats(dash.clone(), txns.clone(), stats.clone()).await?;
+    let _ = requests::get_txn_stats(dash.clone(), txns.clone()).await?;
 
     let mut stats = stats.lock().unwrap();
+    let dash      = dash.lock().unwrap();
+    let txns      = txns.lock().unwrap();
 
-    // Every day push new date into the vector
+    // Every day push new stats into the vectors
     if let Some(v) = stats.date.last() {
-        // If new day, pushing date into the vector
+        // If new day, push the stats
         if *v != format!("\"{}\"", Utc::now().format("%d-%m-%Y")) {
+            if stats.date.len() == 30 {
+                stats.date.remove(0);
+                stats.hashrate.remove(0);
+                stats.txns.remove(0);
+                stats.fees.remove(0);
+            }
             stats.date.push(format!("\"{}\"", Utc::now().format("%d-%m-%Y")));
+            stats.hashrate.push(dash.hashrate_kgs.clone());
+            stats.txns.push(txns.period_24h.clone());
+            stats.fees.push(txns.fees_24h.clone());
         }
     } else {
-        // Vector is empty, pushing current date
+        // Vector is empty, pushing current stats
         stats.date.push(format!("\"{}\"", Utc::now().format("%d-%m-%Y")));
+        stats.hashrate.push(dash.hashrate_kgs.clone());
+        stats.txns.push(txns.period_24h.clone());
+        stats.fees.push(txns.fees_24h.clone());
     }
 
     Ok(())
