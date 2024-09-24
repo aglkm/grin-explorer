@@ -24,14 +24,16 @@ pub async fn run(dash: Arc<Mutex<Dashboard>>, blocks: Arc<Mutex<Vec<Block>>>,
 
     let mut stats = stats.lock().unwrap();
 
-    // Push new date and restart timer every 24H
-    if stats.timing == 0 || stats.timing >= 86400 {
+    // Every day push new date into the vector
+    if let Some(v) = stats.date.last() {
+        // If new day, pushing date into the vector
+        if *v != format!("\"{}\"", Utc::now().format("%d-%m-%Y")) {
+            stats.date.push(format!("\"{}\"", Utc::now().format("%d-%m-%Y")));
+        }
+    } else {
+        // Vector is empty, pushing current date
         stats.date.push(format!("\"{}\"", Utc::now().format("%d-%m-%Y")));
-        stats.timing = 0;
     }
-
-    // Increasing timing by 15 seconds (data update period)
-    stats.timing = stats.timing + 15;
 
     Ok(())
 }

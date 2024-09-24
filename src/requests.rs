@@ -377,8 +377,8 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>, statistics: Arc<
 
             let mut stats = statistics.lock().unwrap();
 
-            // Save hashrate into statistics every 24H
-            if stats.timing == 0 || stats.timing >= 86400 {
+            // Collect stats every day, by checking if new date was pushed into the date vector
+            if stats.date.len() != stats.hashrate.len() {
                 if stats.hashrate.len() == 30 {
                     stats.hashrate.remove(0);
                 }
@@ -680,8 +680,8 @@ pub async fn get_txn_stats(dashboard: Arc<Mutex<Dashboard>>,
             
             let mut stats = statistics.lock().unwrap();
 
-            // Save txns into statistics every 24H
-            if stats.timing == 0 || stats.timing >= 86400 {
+            // Collect stats every day, by checking if new date was pushed into the date vector
+            if stats.date.len() != stats.txns.len() {
                 if stats.txns.len() == 30 {
                     stats.txns.remove(0);
                     stats.fees.remove(0);

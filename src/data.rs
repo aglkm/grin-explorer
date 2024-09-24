@@ -1,6 +1,5 @@
 use serde::{Serialize, Deserialize};
 
-
 // Dashboard data 
 #[derive(Debug)]
 pub struct Dashboard {
@@ -215,7 +214,6 @@ impl Output {
 // Statistics data
 #[derive(Debug, Serialize)]
 pub struct Statistics {
-    pub timing:     u32,
     pub date:       Vec<String>,
     // Node versions
     pub user_agent: Vec<String>,
@@ -231,7 +229,6 @@ pub struct Statistics {
 impl Statistics {
     pub fn new() -> Statistics {
         Statistics {
-            timing:     0,
             date:       Vec::new(),
             user_agent: Vec::new(),
             count:      Vec::new(),
