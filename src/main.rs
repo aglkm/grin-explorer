@@ -533,7 +533,7 @@ fn txns_count_24h(transactions: &State<Arc<Mutex<Transactions>>>) -> String {
 fn block_link(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
     let data = blocks.lock().unwrap();
 
-    if data.is_empty() == false {
+    if data.is_empty() == false && count < 10 {
         return format!("<a href=/block/{} class='text-decoration-none'>{}</a>",
                        data[count].height, data[count].height);
     }
@@ -546,7 +546,7 @@ fn block_link(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
 fn block_link_color(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
     let data = blocks.lock().unwrap();
 
-    if data.is_empty() == false {
+    if data.is_empty() == false && count < 10 {
         return format!("<a href=/block/{} class='text-decoration-none darkorange-text'>{}</a>",
                        data[count].height, data[count].height);
     }
@@ -559,7 +559,7 @@ fn block_link_color(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> Str
 fn block_time(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
     let data = blocks.lock().unwrap();
 
-    if data.is_empty() == false {
+    if data.is_empty() == false && count < 10 {
         return data[count].time.clone();
     }
 
@@ -571,7 +571,7 @@ fn block_time(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
 fn block_txns(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
     let data = blocks.lock().unwrap();
 
-    if data.is_empty() == false {
+    if data.is_empty() == false && count < 10 {
         return data[count].ker_len.to_string();
     }
 
@@ -583,7 +583,7 @@ fn block_txns(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
 fn block_inputs(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
     let data = blocks.lock().unwrap();
 
-    if data.is_empty() == false {
+    if data.is_empty() == false && count < 10 {
         return data[count].in_len.to_string();
     }
 
@@ -595,7 +595,7 @@ fn block_inputs(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String 
 fn block_outputs(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
     let data = blocks.lock().unwrap();
 
-    if data.is_empty() == false {
+    if data.is_empty() == false && count < 10 {
         return data[count].out_len.to_string();
     }
 
@@ -607,7 +607,7 @@ fn block_outputs(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String
 fn block_fees(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
     let data = blocks.lock().unwrap();
 
-    if data.is_empty() == false {
+    if data.is_empty() == false && count < 10 {
         return format!("ツ {}", data[count].fees / 1000000000.0);
     }
 
@@ -619,8 +619,11 @@ fn block_fees(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
 fn block_size(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
     let data = blocks.lock().unwrap();
 
-    data[count].size.clone()
+    if data.is_empty() == false && count < 10 {
+        return data[count].size.clone();
+    }
 
+    "".to_string()
 }
 
 
@@ -628,7 +631,7 @@ fn block_size(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
 fn block_weight(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
     let data = blocks.lock().unwrap();
 
-    if data.is_empty() == false {
+    if data.is_empty() == false && count < 10 {
         return format!("{} %", data[count].weight);
     }
 
