@@ -11,13 +11,8 @@ use std::collections::HashMap;
 use std::fs;
 use lazy_static::lazy_static;
 
-use crate::data::Block;
-use crate::data::Dashboard;
-use crate::data::ExplorerConfig;
-use crate::data::Kernel;
-use crate::data::Output;
-use crate::data::Statistics;
-use crate::data::Transactions;
+use crate::data::{Block, Dashboard, ExplorerConfig, Kernel, Output, Statistics, Transactions};
+use crate::data::{KERNEL_WEIGHT, INPUT_WEIGHT, OUTPUT_WEIGHT, KERNEL_SIZE, INPUT_SIZE, OUTPUT_SIZE};
 
 
 // Static explorer config structure
@@ -387,12 +382,6 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
 // Collecting block data for recent blocks (block_list page).
 pub async fn get_block_list_data(height: &String, block: &mut Block)
                                   -> Result<(), anyhow::Error> {
-    // Max block weight is 40000
-    // One unit of weight is 32 bytes
-    let kernel_weight = 3.0;
-    let input_weight  = 1.0;
-    let output_weight = 21.0;
-
     if height.is_empty() == false {
         let params = &format!("[{}, null, null]", height)[..];
         let resp   = call("get_block", params, "1", "foreign").await?;
@@ -419,17 +408,17 @@ pub async fn get_block_list_data(height: &String, block: &mut Block)
                 let fee = kernel["fee"].to_string().parse::<f64>().unwrap();
 
                 block.fees    += fee;
-                block.weight  += kernel_weight;
+                block.weight  += KERNEL_WEIGHT;
                 block.ker_len = block.ker_len + 1;
             }
 
             for _input in resp["result"]["Ok"]["inputs"].as_array().unwrap() {
-                block.weight += input_weight;
+                block.weight += INPUT_WEIGHT;
                 block.in_len = block.in_len + 1;
             }
 
             for _output in resp["result"]["Ok"]["outputs"].as_array().unwrap() {
-                block.weight  += output_weight;
+                block.weight  += OUTPUT_WEIGHT;
                 block.out_len = block.out_len + 1;
             }
         } else {
@@ -437,7 +426,17 @@ pub async fn get_block_list_data(height: &String, block: &mut Block)
         }
     }
 
-    block.weight  = format!("{:.2}", block.weight / 40000.0 * 100.0).parse::<f64>().unwrap();
+    block.weight = format!("{:.2}", block.weight / 40000.0 * 100.0).parse::<f64>().unwrap();
+
+    let block_size = ((block.ker_len * KERNEL_SIZE) + (block.in_len * INPUT_SIZE) + (block.out_len * OUTPUT_SIZE)) as f64;
+
+    if block_size > 1000000.0 {
+        block.size = format!("{:.2} MB", block_size / 1000.0 / 1000.0);
+    } else if block_size > 1000.0 {
+        block.size = format!("{:.2} KB", block_size / 1000.0);
+    } else {
+        block.size = format!("{} B", block_size);
+    }
 
     Ok(())
 }
@@ -446,12 +445,6 @@ pub async fn get_block_list_data(height: &String, block: &mut Block)
 // Collecting block data.
 pub async fn get_block_data(height: &str, block: &mut Block)
              -> Result<(), anyhow::Error> {
-    // Max block weight is 40000
-    // One unit of weight is 32 bytes
-    let kernel_weight = 3.0;
-    let input_weight  = 1.0;
-    let output_weight = 21.0;
-
     if height.is_empty() == false {
         let params = &format!("[{}, null, null]", height)[..];
 
@@ -473,18 +466,18 @@ pub async fn get_block_data(height: &str, block: &mut Block)
                                     kernel["features"].as_str().unwrap().to_string(),
                                     (fee / 1000000000.0).to_string()));
                 block.fees += fee;
-                block.weight += kernel_weight;
+                block.weight += KERNEL_WEIGHT;
             }
 
             for input in resp["result"]["Ok"]["inputs"].as_array().unwrap() {
                 block.inputs.push(input.as_str().unwrap().to_string());
-                block.weight += input_weight;
+                block.weight += INPUT_WEIGHT;
             }
 
             for output in resp["result"]["Ok"]["outputs"].as_array().unwrap() {
                 block.outputs.push((output["commit"].as_str().unwrap().to_string(),
                                    output["output_type"].as_str().unwrap().to_string()));
-                block.weight += output_weight;
+                block.weight += OUTPUT_WEIGHT;
             }
 
             block.weight   = format!("{:.2}", block.weight / 40000.0 * 100.0).parse::<f64>().unwrap();
@@ -492,6 +485,16 @@ pub async fn get_block_data(height: &str, block: &mut Block)
             block.in_len   = block.inputs.iter().count() as u64;
             block.out_len  = block.outputs.iter().count() as u64;
             block.raw_data = serde_json::to_string_pretty(&resp).unwrap();
+
+            let block_size = ((block.ker_len * KERNEL_SIZE) + (block.in_len * INPUT_SIZE) + (block.out_len * OUTPUT_SIZE)) as f64;
+
+            if block_size > 1000000.0 {
+                block.size = format!("{:.2} MB", block_size / 1000.0 / 1000.0);
+            } else if block_size > 1000.0 {
+                block.size = format!("{:.2} KB", block_size / 1000.0);
+            } else {
+                block.size = format!("{} B", block_size);
+            }
         }
     }
 

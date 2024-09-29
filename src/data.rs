@@ -1,5 +1,18 @@
 use serde::{Serialize, Deserialize};
 
+    
+// Weights
+pub const KERNEL_WEIGHT: f64 = 3.0;
+pub const INPUT_WEIGHT:  f64 = 1.0;
+pub const OUTPUT_WEIGHT: f64 = 21.0;
+
+    
+// Sizes in bytes
+pub const KERNEL_SIZE: u64 = 1 + 8 + 8 + 33 + 64;
+pub const INPUT_SIZE:  u64 = 1 + 33;
+pub const OUTPUT_SIZE: u64 = 674 + 33 + 1;
+
+
 // Dashboard data 
 #[derive(Debug)]
 pub struct Dashboard {
@@ -76,6 +89,7 @@ pub struct Block {
     pub time:     String,
     pub version:  String,
     pub weight:   f64,
+    pub size:     String,
     pub fees:     f64,
     pub kernels:  Vec<(String, String, String)>,
     pub inputs:   Vec<String>,
@@ -94,6 +108,7 @@ impl Block {
             time:     String::new(),
             version:  String::new(),
             weight:   0.0,
+            size:     String::new(),
             fees:     0.0,
             kernels:  Vec::new(),
             inputs:   Vec::new(),

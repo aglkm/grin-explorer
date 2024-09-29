@@ -615,6 +615,15 @@ fn block_fees(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
 }
 
 
+#[get("/rpc/block/size?<count>")]
+fn block_size(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
+    let data = blocks.lock().unwrap();
+
+    data[count].size.clone()
+
+}
+
+
 #[get("/rpc/block/weight?<count>")]
 fn block_weight(count: usize, blocks: &State<Arc<Mutex<Vec<Block>>>>) -> String {
     let data = blocks.lock().unwrap();
@@ -694,7 +703,7 @@ async fn main() {
                                 network_difficulty, mempool_txns, mempool_stem, txns_count_1h,
                                 txns_count_24h, block_list, block_link, block_link_color,
                                 block_time, block_txns, block_inputs, block_outputs, block_fees,
-                                block_weight, block_details_by_height, block_header_by_hash,
+                                block_size, block_weight, block_details_by_height, block_header_by_hash,
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
                                 output, api_owner, api_foreign, stats])

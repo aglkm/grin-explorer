@@ -24,6 +24,11 @@
       </div>
       <br>
       <div class="d-flex justify-content-between">
+        <div class="value-text">Size&nbsp;</div>
+        <div class="value-text text-end">{{ block.size }}</div>
+      </div>
+      <br>
+      <div class="d-flex justify-content-between">
         <div class="value-text">Weight&nbsp;</div>
         <div class="value-text text-end">{{ block.weight }} %</div>
       </div>

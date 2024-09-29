@@ -51,6 +51,13 @@
       <div class="card border-bottom-0 border-end-0 rounded-0">
         <div class="card-body">
           <div class="darkorange-text">
+            SIZE
+          </div>
+	</div>
+      </div>
+      <div class="card border-bottom-0 border-end-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
             WEIGHT
           </div>
 	</div>
@@ -115,6 +122,15 @@
               <div class="value-text">ツ {{ blocks[i].fees / 1000000000.0 }}</div>
             {% else %}
               <div class="value-text" hx-get="/rpc/block/fees" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+            {% endif %}
+          </div>
+	</div>
+        <div class="card border-bottom-0 border-end-0 rounded-0">
+          <div class="card-body">
+            {% if route == "block_list_by_height" %}
+              <div class="value-text">{{ blocks[i].size }}</div>
+            {% else %}
+              <div class="value-text" hx-get="/rpc/block/size" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
             {% endif %}
           </div>
 	</div>
@@ -195,6 +211,15 @@
                 {% endif %}
               </div>
 	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Size</div>
+                {% if route == "block_list_by_height" %}
+                  <div class="value-text">{{ blocks[i].size }}</div>
+                {% else %}
+		  <div class="value-text text-end" hx-get="/rpc/block/size" hx-vals='{"count": "{{ i }}"}' hx-trigger="load, every 10s"></div>
+                {% endif %}
+              </div>
+              <br>
               <div class="d-flex justify-content-between">
 	        <div class="value-text">Weight</div>
                 {% if route == "block_list_by_height" %}
