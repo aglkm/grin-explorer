@@ -47,6 +47,8 @@ pub struct Dashboard {
     // mempool
     pub txns:            String,
     pub stem:            String,
+    // utxo
+    pub utxo_count:      String,
 }
 
 impl Dashboard {
@@ -76,6 +78,7 @@ impl Dashboard {
             breakeven_cost:  String::new(),
             txns:            String::new(),
             stem:            String::new(),
+            utxo_count:      String::new(),
         }
     }
 }
@@ -241,6 +244,8 @@ pub struct Statistics {
     // Transactions & fees
     pub txns:       Vec<String>,
     pub fees:       Vec<String>,
+    //UTXOs
+    pub utxo_count: Vec<String>,
 }
 
 impl Statistics {
@@ -253,6 +258,7 @@ impl Statistics {
             hashrate:   Vec::new(),
             txns:       Vec::new(),
             fees:       Vec::new(),
+            utxo_count: Vec::new(),
         }
     }
 }

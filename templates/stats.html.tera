@@ -18,7 +18,7 @@
     <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
       <div class="card-body" align="center">
         <div class="value-text">
-          <div class="darkorange-text"><i class="bi bi-activity"></i> HASHRATE</div>
+          <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
           <div style="position: relative; height:60vh; width:90vw"><canvas id="2"></canvas></div>
         </div>
       </div>
@@ -27,8 +27,17 @@
     <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
       <div class="card-body" align="center">
         <div class="value-text">
-          <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
+          <div class="darkorange-text"><i class="bi bi-activity"></i> HASHRATE</div>
           <div style="position: relative; height:60vh; width:90vw"><canvas id="3"></canvas></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+      <div class="card-body" align="center">
+        <div class="value-text">
+          <div class="darkorange-text"><i class="bi bi-card-list"></i> UNSPENT OUTPUTS</div>
+          <div style="position: relative; height:60vh; width:90vw"><canvas id="4"></canvas></div>
         </div>
       </div>
     </div>
@@ -36,11 +45,7 @@
   </code>
 
   <script>
-    var ctx = document.getElementById('2').getContext('2d');
-    var gradient = ctx.createLinearGradient(0, 0, 0, 600);
-    gradient.addColorStop(0, 'rgba(178, 81, 16, 1)');
-    gradient.addColorStop(1, 'rgba(255, 158, 93, 0)');
-    
+
     <!-- Node Version Chart -->
     var options = {
       maintainAspectRatio: false,
@@ -68,51 +73,6 @@
       data: data,
       options: options
     });
-
-
-    <!-- Hashrate Chart -->
-    var options = {
-      maintainAspectRatio: false,
-      interaction: {
-        intersect: false,
-      },
-      plugins: {
-        legend: {
-          display: false
-        },
-      },
-      scales: {
-        x: { 
-          grid: {
-            display: false
-          }
-        },
-        y: {
-          grid: {
-            display: false
-          }
-        },
-      }
-    };
-
-    var data = {
-      labels: {{ date }},
-      datasets: [{
-        label: 'Hashrate (kG/s)',
-        data: {{ hashrate }},
-        fill: true,
-        borderColor: "#b25110",
-        backgroundColor: gradient,
-        tension: 0.1
-      }]
-    };
-
-    new Chart(document.getElementById("2"), {
-      type: 'line',
-      data: data,
-      options: options
-    });
-    
 
     <!-- Transactions & Fees Chart -->
     var options = {
@@ -157,7 +117,118 @@
       ]
     };
 
+    new Chart(document.getElementById("2"), {
+      type: 'line',
+      data: data,
+      options: options
+    });
+
+
+    <!-- Hashrate Chart -->
+    var ctx_hash = document.getElementById('2').getContext('2d');
+    var gradient_hash = ctx_hash.createLinearGradient(0, 0, 0, 600);
+    gradient_hash.addColorStop(0, 'rgba(178, 81, 16, 1)');
+    gradient_hash.addColorStop(1, 'rgba(255, 158, 93, 0)');
+    
+    var options = {
+      maintainAspectRatio: false,
+      interaction: {
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+      },
+      scales: {
+        x: { 
+          grid: {
+            display: false
+          }
+        },
+        y: {
+          grid: {
+            display: false
+          }
+        },
+      }
+    };
+
+    var data = {
+      labels: {{ date }},
+      datasets: [{
+        label: 'Hashrate (kG/s)',
+        data: {{ hashrate }},
+        fill: true,
+        borderColor: "#b25110",
+        backgroundColor: gradient_hash,
+        tension: 0.1
+      }]
+    };
+
     new Chart(document.getElementById("3"), {
+      type: 'line',
+      data: data,
+      options: options
+    });
+    
+
+    <!-- Unspent Outputs Chart -->
+    var ctx_utxo = document.getElementById('2').getContext('2d');
+    var gradient_utxo = ctx_hash.createLinearGradient(0, 0, 0, 600);
+    gradient_utxo.addColorStop(0, 'rgba(178, 81, 16, 1)');
+    gradient_utxo.addColorStop(1, 'rgba(255, 158, 93, 0)');
+
+    var options = {
+      maintainAspectRatio: false,
+      interaction: {
+        intersect: false,
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            footer: function(tooltipItems) {
+              let size = 0;
+              tooltipItems.forEach(function(tooltipItem) {
+                size = tooltipItem.parsed.y * {{ output_size }} / 1000 / 1000;
+              });
+              return 'Size: ' + size.toFixed(2) + ' MB';
+            }
+          }
+        }
+      },
+      scales: {
+        x: { 
+          grid: {
+            display: false
+          }
+        },
+        y: {
+          grid: {
+            display: false
+          }
+        },
+      }
+    };
+
+    var data = {
+      labels: {{ date }},
+      datasets: [
+        {
+          label: 'Unspent Outputs',
+          data: {{ utxo_count }},
+          fill: true,
+          borderColor: "#b25110",
+          backgroundColor: gradient_utxo,
+          tension: 0.1
+        }
+      ]
+    };
+
+    new Chart(document.getElementById("4"), {
       type: 'line',
       data: data,
       options: options

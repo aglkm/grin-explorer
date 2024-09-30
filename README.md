@@ -27,9 +27,10 @@ Grin is the very first, simple and fair MimbleWimble blockchain implementation.
    You will see the following output:
 
    ```
-   [2024-06-19T13:12:34Z INFO  grin_explorer] starting up.
-   [2024-06-19T13:12:34Z WARN  rocket::launch] 🚀 Rocket has launched from http://127.0.0.1:8000
-   [2024-06-19T13:12:34Z INFO  grin_explorer] ready.
+   [2024-09-30T13:30:02Z INFO  grin_explorer] starting up.
+   [2024-09-30T13:30:02Z WARN  rocket::launch] 🚀 Rocket has launched from http://127.0.0.1:8000
+   [2024-09-30T13:30:03Z INFO  grin_explorer] worker::data ready.
+   [2024-09-30T13:30:10Z INFO  grin_explorer] worker::stats ready.
    ```
 
 5. Open explorer in your browser: http://127.0.0.1:8000

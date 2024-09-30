@@ -1,4 +1,5 @@
 #[macro_use] extern crate rocket;
+use chrono::Utc;
 use either::Either;
 use rocket_dyn_templates::{Template, context};
 use rocket::fs::FileServer;
@@ -9,17 +10,12 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use serde_json::Value;
 
+use crate::data::{Block, Dashboard, Kernel, Output, Statistics, Transactions, OUTPUT_SIZE};
+use crate::requests::CONFIG;
+
 mod data;
 mod requests;
 mod worker;
-
-use crate::data::Block;
-use crate::data::Dashboard;
-use crate::data::Kernel;
-use crate::data::Output;
-use crate::data::Statistics;
-use crate::data::Transactions;
-use crate::requests::CONFIG;
 
 
 // Rendering main (Dashboard) page.
@@ -219,14 +215,16 @@ fn stats(statistics: &State<Arc<Mutex<Statistics>>>) -> Template {
     let data = statistics.lock().unwrap();
 
     Template::render("stats", context! {
-        route:      "stats",
-        date:       data.date.clone(),
-        user_agent: data.user_agent.clone(),
-        count:      data.count.clone(),
-        total:      data.total,
-        hashrate:   data.hashrate.clone(),
-        txns:       data.txns.clone(),
-        fees:       data.fees.clone(),
+        route:       "stats",
+        date:        data.date.clone(),
+        user_agent:  data.user_agent.clone(),
+        count:       data.count.clone(),
+        total:       data.total,
+        hashrate:    data.hashrate.clone(),
+        txns:        data.txns.clone(),
+        fees:        data.fees.clone(),
+        utxo_count:  data.utxo_count.clone(),
+        output_size: OUTPUT_SIZE,
     })
 }
 
@@ -669,25 +667,49 @@ async fn main() {
     let txns_clone   = txns.clone();
     let stats        = Arc::new(Mutex::new(Statistics::new()));
     let stats_clone  = stats.clone();
-    let mut ready    = false;
 
-    // Starting the Worker
+    let mut ready_data  = false;
+    let mut ready_stats = false;
+    let mut date        = "".to_string();
+
+    // Collecting main data
     tokio::spawn(async move {
         loop {
-            let result = worker::run(dash_clone.clone(), blocks_clone.clone(),
-                                     txns_clone.clone(), stats_clone.clone()).await;
+            let result = worker::data(dash_clone.clone(), blocks_clone.clone(),
+                                      txns_clone.clone(), stats_clone.clone()).await;
             
             match result {
                 Ok(_v)  => {
-                    if ready == false {
-                        ready = true;
-                        info!("ready.");
+                    if ready_data == false {
+                        ready_data = true;
+                        info!("worker::data ready.");
                     }
                 },
                 Err(e) => {
-                    ready = false;
+                    ready_data = false;
                     error!("{}", e);
                 },
+            }
+
+            let date_now = format!("\"{}\"", Utc::now().format("%d-%m-%Y"));
+
+            if date.is_empty() || date != date_now {
+                date = date_now;
+                let result = worker::stats(dash_clone.clone(), txns_clone.clone(),
+                                           stats_clone.clone()).await;
+            
+                match result {
+                    Ok(_v)  => {
+                        if ready_stats == false {
+                            ready_stats = true;
+                            info!("worker::stats ready.");
+                        }
+                    },
+                    Err(e) => {
+                        ready_stats = false;
+                        error!("{}", e);
+                    },
+                }
             }
 
             tokio::time::sleep(Duration::from_secs(15)).await;

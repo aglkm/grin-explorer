@@ -748,3 +748,42 @@ pub async fn get_block_list_by_height(height: &str, blocks: &mut Vec<Block>,
     Ok(())
 }
 
+// Collecting unspent outputs.
+pub async fn get_unspent_outputs(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::Error> {
+    let mut highest_mmr_index = 0;
+    let mut current_mmr_index = 0;
+    let mut utxo_count        = 0;
+
+    // Get the highest MMR index
+    let resp = call("get_unspent_outputs", "[1, null, 10000, false]", "1", "foreign").await?;
+
+    if resp != Value::Null {
+        highest_mmr_index = resp["result"]["Ok"]["highest_index"].to_string().parse::<u64>().unwrap();
+        current_mmr_index = resp["result"]["Ok"]["outputs"].as_array().unwrap().last().unwrap()["mmr_index"].to_string().parse::<u64>().unwrap();
+    }
+
+    // Get all unspent outputs
+    while current_mmr_index < highest_mmr_index {
+        current_mmr_index = current_mmr_index + 1;
+        let params = &format!("[{}, {}, 10000, false]", current_mmr_index, highest_mmr_index)[..];
+
+        let resp = call("get_unspent_outputs", params, "1", "foreign").await?;
+    
+        if resp != Value::Null {
+            if let Some(v) = resp["result"]["Ok"]["outputs"].as_array().unwrap().last() {
+                current_mmr_index = v["mmr_index"].to_string().parse::<u64>().unwrap();
+                utxo_count = utxo_count + resp["result"]["Ok"]["outputs"].as_array().unwrap().len();
+            } else {
+                // Break the loop if we got no outputs from the node request
+                break;
+            }
+        }
+    }
+
+    let mut data = dashboard.lock().unwrap();
+
+    data.utxo_count = utxo_count.to_string();
+
+    Ok(())
+}
+
