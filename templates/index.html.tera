@@ -66,39 +66,31 @@
       </div>
 
       <div class="card-group">
-        <div class="card card-background border-0">
-          <div class="card border-bottom-0 border-start-0 rounded-0 mx-0 mt-0">
-            <div class="card-body" align="left">
-	      <div class="darkorange-text"><i class="bi bi-grid"></i> BLOCKCHAIN</div>
-              <br>
-              <div class="d-flex justify-content-between">
-	        <div class="value-text">Size&nbsp;</div><div class="value-text text-end" hx-get="/rpc/disk/usage" hx-trigger="load, every 10s"></div>
-              </div>
-	      <br>
-              <div class="d-flex justify-content-between">
-	        <div class="value-text">Block Height&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/latest" hx-trigger="load, every 10s"></div>
-              </div>
-	      <br>
-              <div class="d-flex justify-content-between">
-	        <div class="value-text">Time Since Last Block&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/time_since_last" hx-trigger="load, every 10s"></div>
-              </div>
+        <div class="card border-bottom-0 border-start-0 rounded-0 mx-0 mt-0">
+          <div class="card-body" align="left">
+	    <div class="darkorange-text"><i class="bi bi-grid"></i> BLOCKCHAIN</div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Size&nbsp;</div><div class="value-text text-end" hx-get="/rpc/disk/usage" hx-trigger="load, every 10s"></div>
             </div>
-          </div>
-          <div class="card border-bottom-0 border-start-0 rounded-0 mx-0 my-0">
-            <div class="card-body" align="left">
-              <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
-              <br>
-              <div class="d-flex justify-content-between">
-	        <div class="value-text">1H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
-              </div>
-	      <br>
-              <div class="d-flex justify-content-between">
-	        <div class="value-text">24H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
-              </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Block Height&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/latest" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Time Since Last Block&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/time_since_last" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Unspent Outputs&nbsp;</div><div class="value-text text-end" hx-get="/rpc/blockchain/unspent_outputs" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">Kernels&nbsp;</div><div class="value-text text-end" hx-get="/rpc/blockchain/kernels" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
-
         <div class="card border-bottom-0 border-end-0 rounded-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-hammer"></i> MINING</div>
@@ -146,7 +138,20 @@
       </div>
 
       <div class="card-group">
-        <div class="card rounded-0 border-start-0">
+        <div class="card border-bottom-0 border-start-0 rounded-0">
+          <div class="card-body" align="left">
+            <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
+            <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">1H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_1h" hx-trigger="load, every 10s"></div>
+            </div>
+            <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">24H Period&nbsp;</div><div class="value-text text-end" hx-get="/rpc/txns/count_24h" hx-trigger="load, every 10s"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card rounded-0 border-bottom-0 border-start-0 border-end-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-receipt"></i> MEMPOOL</div>
             <br>
@@ -159,7 +164,9 @@
             </div>
           </div>
         </div>
-        <div class="card rounded-0">
+      </div>
+      <div class="card-group">
+        <div class="card rounded-0 border-start-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-diagram-3"></i> CONNECTIONS</div>
             <br>
@@ -172,7 +179,7 @@
             </div>
           </div>
         </div>
-        <div class="card rounded-0 border-end-0">
+        <div class="card rounded-0 border-start-0 border-end-0">
           <div class="card-body" align="left">
             <div class="darkorange-text"><i class="bi bi-pc-display-horizontal"></i> NODE</div>
             <br>
@@ -263,6 +270,14 @@
 	      <br>
               <div class="d-flex justify-content-between">
 	        <div class="value-text">Time Since Last Block&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/time_since_last" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Unspent Outputs&nbsp;</div><div class="value-text text-end" hx-get="/rpc/blockchain/unspent_outputs" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Kernels&nbsp;</div><div class="value-text text-end" hx-get="/rpc/blockchain/kernels" hx-trigger="load, every 10s"></div>
               </div>
           </div>
         </div>
@@ -519,6 +534,14 @@
               <div class="d-flex justify-content-between">
 	        <div class="value-text">Time Since Last Block&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/time_since_last" hx-trigger="load, every 10s"></div>
               </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Unspent Outputs&nbsp;</div><div class="value-text text-end" hx-get="/rpc/blockchain/unspent_outputs" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Kernels&nbsp;</div><div class="value-text text-end" hx-get="/rpc/blockchain/kernels" hx-trigger="load, every 10s"></div>
+              </div>
             </div>
           </div>
           <div class="card border-bottom-0 border-end-0 rounded-0">
@@ -625,6 +648,14 @@
 	      <br>
               <div class="d-flex justify-content-between">
 	        <div class="value-text">Time Since Last Block&nbsp;</div><div class="value-text text-end" hx-get="/rpc/block/time_since_last" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Unspent Outputs&nbsp;</div><div class="value-text text-end" hx-get="/rpc/blockchain/unspent_outputs" hx-trigger="load, every 10s"></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Kernels&nbsp;</div><div class="value-text text-end" hx-get="/rpc/blockchain/kernels" hx-trigger="load, every 10s"></div>
               </div>
           </div>
         </div>

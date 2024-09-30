@@ -148,17 +148,24 @@ pub async fn call_external(method: &str, params: &str, id: &str, rpc_type: &str,
 }
 
 
-// Collecting: height, sync, node_ver, proto_ver.
+// Collecting: height, sync, node_ver, proto_ver, kernel_mmr_size.
 pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::Error> {
-    let resp = call("get_status", "[]", "1", "owner").await?;
+    let resp1 = call("get_status", "[]", "1", "owner").await?;
 
-    let mut data = dashboard.lock().unwrap();
+    if resp1 != Value::Null {
+        let params = &format!("[{}, null, null]", resp1["result"]["Ok"]["tip"]["height"])[..];
+        let resp2  = call("get_block", params, "1", "foreign").await?;
 
-    if resp != Value::Null {
-        data.height    = resp["result"]["Ok"]["tip"]["height"].to_string();
-        data.sync      = resp["result"]["Ok"]["sync_status"].as_str().unwrap().to_string();
-        data.node_ver  = resp["result"]["Ok"]["user_agent"].as_str().unwrap().to_string();
-        data.proto_ver = resp["result"]["Ok"]["protocol_version"].to_string();
+        let mut data = dashboard.lock().unwrap();
+
+        if resp2 != Value::Null {
+            data.kernel_mmr_size = resp2["result"]["Ok"]["header"]["kernel_mmr_size"].to_string();
+        }
+
+        data.height    = resp1["result"]["Ok"]["tip"]["height"].to_string();
+        data.sync      = resp1["result"]["Ok"]["sync_status"].as_str().unwrap().to_string();
+        data.node_ver  = resp1["result"]["Ok"]["user_agent"].as_str().unwrap().to_string();
+        data.proto_ver = resp1["result"]["Ok"]["protocol_version"].to_string();
     }
 
     Ok(())

@@ -49,6 +49,8 @@ pub struct Dashboard {
     pub stem:            String,
     // utxo
     pub utxo_count:      String,
+    // kernel
+    pub kernel_mmr_size: String,
 }
 
 impl Dashboard {
@@ -79,6 +81,7 @@ impl Dashboard {
             txns:            String::new(),
             stem:            String::new(),
             utxo_count:      String::new(),
+            kernel_mmr_size: String::new(),
         }
     }
 }

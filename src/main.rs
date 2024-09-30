@@ -1,6 +1,7 @@
 #[macro_use] extern crate rocket;
 use chrono::Utc;
 use either::Either;
+use num_format::{Locale, ToFormattedString};
 use rocket_dyn_templates::{Template, context};
 use rocket::fs::FileServer;
 use rocket::{State, tokio};
@@ -10,7 +11,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use serde_json::Value;
 
-use crate::data::{Block, Dashboard, Kernel, Output, Statistics, Transactions, OUTPUT_SIZE};
+use crate::data::{Block, Dashboard, Kernel, Output, Statistics, Transactions, OUTPUT_SIZE, KERNEL_SIZE};
 use crate::requests::CONFIG;
 
 mod data;
@@ -649,7 +650,50 @@ fn block_list_index(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 
     "".to_string()
 }
-// End of HTMX backends.
+
+
+#[get("/rpc/blockchain/unspent_outputs")]
+fn unspent_outputs(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
+    let data = dashboard.lock().unwrap();
+
+    if data.utxo_count.is_empty() == false {
+        let utxo_count    = data.utxo_count.parse::<u64>().unwrap();
+        let mut utxo_size = utxo_count as f64 * OUTPUT_SIZE as f64 / 1000.0 / 1000.0;
+        let mut unit      = "MB";
+        
+        if utxo_size > 1000000000.0 {
+            unit = "GB";
+            utxo_size = utxo_size / 1000.0;
+        }
+        
+        return format!("{} ({:.2} {})", utxo_count.to_formatted_string(&Locale::en), utxo_size, unit);
+    }
+
+    "".to_string()
+}
+
+
+#[get("/rpc/blockchain/kernels")]
+fn kernels(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
+    let data = dashboard.lock().unwrap();
+
+    if data.utxo_count.is_empty() == false {
+        let kernel_count    = data.kernel_mmr_size.parse::<u64>().unwrap() / 2;
+        let mut kernel_size = kernel_count as f64 * KERNEL_SIZE as f64 / 1000.0 / 1000.0;
+        let mut unit        = "MB";
+
+        if kernel_size > 1000000000.0 {
+            unit = "GB";
+            kernel_size = kernel_size / 1000.0;
+        }
+        
+        return format!("{} ({:.2} {})", kernel_count.to_formatted_string(&Locale::en), kernel_size, unit);
+    }
+    
+    "".to_string()
+}
+
+// End of HTMX routes.
 
 
 // Main
@@ -731,7 +775,7 @@ async fn main() {
                                 block_size, block_weight, block_details_by_height, block_header_by_hash,
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
-                                output, api_owner, api_foreign, stats])
+                                output, api_owner, api_foreign, stats, unspent_outputs, kernels])
             .mount("/static", FileServer::from("static"))
             .attach(Template::fairing())
             .launch()
