@@ -17,6 +17,7 @@ pub const OUTPUT_SIZE: u64 = 674 + 33 + 1;
 #[derive(Debug)]
 pub struct Dashboard {
     // status
+    pub chain:           String,
     pub height:          String,
     pub sync:            String,
     pub node_ver:        String,
@@ -56,6 +57,7 @@ pub struct Dashboard {
 impl Dashboard {
     pub fn new() -> Dashboard {
         Dashboard {
+            chain:           String::new(),
             height:          String::new(),
             sync:            String::new(),
             node_ver:        String::new(),

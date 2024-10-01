@@ -162,6 +162,7 @@ pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
             data.kernel_mmr_size = resp2["result"]["Ok"]["header"]["kernel_mmr_size"].to_string();
         }
 
+        data.chain     = resp1["result"]["Ok"]["chain"].to_string();
         data.height    = resp1["result"]["Ok"]["tip"]["height"].to_string();
         data.sync      = resp1["result"]["Ok"]["sync_status"].as_str().unwrap().to_string();
         data.node_ver  = resp1["result"]["Ok"]["user_agent"].as_str().unwrap().to_string();
@@ -305,10 +306,14 @@ pub fn get_disk_usage(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), Error> {
     let mut data = dashboard.lock().unwrap();
     let chain_dir;
 
-    if CONFIG.coingecko_api == "enabled" {
+    if data.chain == "main" {
         chain_dir = format!("{}/main/chain_data", CONFIG.grin_dir);
-    } else {
+    } else if data.chain == "test" {
         chain_dir = format!("{}/test/chain_data", CONFIG.grin_dir);
+    } else {
+        // Chain parameter in get_status() rpc is added in 5.3.3 node.
+        // Default to main chain in case of node version less than 5.3.3.
+        chain_dir = format!("{}/main/chain_data", CONFIG.grin_dir);
     }
 
     match get_size(chain_dir.clone()) {
