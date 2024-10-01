@@ -663,7 +663,7 @@ fn unspent_outputs(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
         let mut utxo_size = utxo_count as f64 * OUTPUT_SIZE as f64 / 1000.0 / 1000.0;
         let mut unit      = "MB";
         
-        if utxo_size > 1000000000.0 {
+        if utxo_size > 1000.0 {
             unit = "GB";
             utxo_size = utxo_size / 1000.0;
         }
@@ -684,7 +684,7 @@ fn kernels(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
         let mut kernel_size = kernel_count as f64 * KERNEL_SIZE as f64 / 1000.0 / 1000.0;
         let mut unit        = "MB";
 
-        if kernel_size > 1000000000.0 {
+        if kernel_size > 1000.0 {
             unit = "GB";
             kernel_size = kernel_size / 1000.0;
         }
