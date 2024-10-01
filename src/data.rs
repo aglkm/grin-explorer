@@ -24,7 +24,7 @@ pub struct Dashboard {
     // connections
     pub inbound:         u16,
     pub outbound:        u16,
-    //price & market
+    // price & market
     pub supply:          String,
     pub soft_supply:     String,
     pub inflation:       String,
@@ -247,8 +247,10 @@ pub struct Statistics {
     // Transactions & fees
     pub txns:       Vec<String>,
     pub fees:       Vec<String>,
-    //UTXOs
+    // UTXOs
     pub utxo_count: Vec<String>,
+    // Kernels
+    pub kernels:    Vec<String>,
 }
 
 impl Statistics {
@@ -262,6 +264,7 @@ impl Statistics {
             txns:       Vec::new(),
             fees:       Vec::new(),
             utxo_count: Vec::new(),
+            kernels:    Vec::new(),
         }
     }
 }

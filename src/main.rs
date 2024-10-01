@@ -225,7 +225,9 @@ fn stats(statistics: &State<Arc<Mutex<Statistics>>>) -> Template {
         txns:        data.txns.clone(),
         fees:        data.fees.clone(),
         utxo_count:  data.utxo_count.clone(),
+        kernels:     data.kernels.clone(),
         output_size: OUTPUT_SIZE,
+        kernel_size: KERNEL_SIZE,
     })
 }
 
@@ -677,7 +679,7 @@ fn unspent_outputs(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 fn kernels(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    if data.utxo_count.is_empty() == false {
+    if data.kernel_mmr_size.is_empty() == false {
         let kernel_count    = data.kernel_mmr_size.parse::<u64>().unwrap() / 2;
         let mut kernel_size = kernel_count as f64 * KERNEL_SIZE as f64 / 1000.0 / 1000.0;
         let mut unit        = "MB";
