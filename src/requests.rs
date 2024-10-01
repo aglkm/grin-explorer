@@ -162,7 +162,7 @@ pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
             data.kernel_mmr_size = resp2["result"]["Ok"]["header"]["kernel_mmr_size"].to_string();
         }
 
-        data.chain     = resp1["result"]["Ok"]["chain"].to_string();
+        data.chain     = resp1["result"]["Ok"]["chain"].as_str().unwrap().to_string();
         data.height    = resp1["result"]["Ok"]["tip"]["height"].to_string();
         data.sync      = resp1["result"]["Ok"]["sync_status"].as_str().unwrap().to_string();
         data.node_ver  = resp1["result"]["Ok"]["user_agent"].as_str().unwrap().to_string();
