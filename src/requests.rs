@@ -116,23 +116,15 @@ pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Resul
 
 
 // RPC requests to grin node.
-// The same call as above but with the option to add ip, proto and port.
+// The same call as above but with no api secrets usage and the option to specify custom endpoint.
 pub async fn call_external(method: &str, params: &str, id: &str, rpc_type: &str, endpoint: String) -> Result<Value, anyhow::Error> {
     let rpc_url;
-    let secret;
 
     rpc_url = format!("{}/v2/{}", endpoint, rpc_type);
-
-    if rpc_type == "owner" {
-        secret = CONFIG.api_secret.clone();
-    } else {
-        secret = CONFIG.foreign_api_secret.clone();
-    }
 
     let client = reqwest::Client::new();
     let result = client.post(rpc_url)
                        .body(format!("{{\"method\": \"{}\", \"params\": {}, \"id\": {}, \"jsonrpc\": \"2.0\"}}", method, params, id))
-                       .basic_auth(CONFIG.user.clone(), Some(secret))
                        .header("content-type", "application/json")
                        .send()
                        .await?;
