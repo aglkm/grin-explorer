@@ -151,7 +151,9 @@ pub async fn get_status(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
         let mut data = dashboard.lock().unwrap();
 
         if resp2 != Value::Null {
-            data.kernel_mmr_size = resp2["result"]["Ok"]["header"]["kernel_mmr_size"].to_string();
+            if resp2["result"]["Ok"]["header"]["kernel_mmr_size"] != Value::Null {
+                data.kernel_mmr_size = resp2["result"]["Ok"]["header"]["kernel_mmr_size"].to_string();
+            }
         }
 
         if resp1["result"]["Ok"]["chain"] == Value::Null {

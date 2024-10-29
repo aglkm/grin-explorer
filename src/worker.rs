@@ -47,8 +47,10 @@ pub async fn stats(dash: Arc<Mutex<Dashboard>>, txns: Arc<Mutex<Transactions>>, 
     stats.fees.push(txns.fees_24h.clone());
     stats.utxo_count.push(dash.utxo_count.clone());
 
-    let kernel_count = dash.kernel_mmr_size.parse::<u64>().unwrap() / 2;
-    stats.kernels.push(kernel_count.to_string());
+    if dash.kernel_mmr_size.is_empty() == false {
+        let kernel_count = dash.kernel_mmr_size.parse::<u64>().unwrap() / 2;
+        stats.kernels.push(kernel_count.to_string());
+    }
 
     Ok(())
 }
