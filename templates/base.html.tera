@@ -195,6 +195,12 @@
                     <a class="text-decoration-none" href="https://grinflation.com/">Grinflation</a>
                   </div>
                 </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://grinexplorer.net/">Grinexplorer</a>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -223,7 +229,37 @@
                 </div>
               </div>
             </div>
-          </div>
+
+            <div class="card border-0">
+              <div class="card-body" align="left">
+                <div class="darkorange-text">Wallets</div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+		    <a class="text-decoration-none" href="https://github.com/mimblewimble/grin-wallet/">
+                      Grin Wallet
+                    </a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://getgrin.github.io/">
+		      Grim
+		    </a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://grinplusplus.github.io/">
+		      Grin++
+		    </a>
+                  </div>
+                </div>
+              </div>
+	    </div>
+	  </div>
 
           <br>
 
