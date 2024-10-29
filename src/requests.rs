@@ -783,12 +783,14 @@ pub async fn get_unspent_outputs(dashboard: Arc<Mutex<Dashboard>>) -> Result<(),
         let resp = call("get_unspent_outputs", params, "1", "foreign").await?;
     
         if resp != Value::Null {
-            if let Some(v) = resp["result"]["Ok"]["outputs"].as_array().unwrap().last() {
-                current_mmr_index = v["mmr_index"].to_string().parse::<u64>().unwrap();
-                utxo_count = utxo_count + resp["result"]["Ok"]["outputs"].as_array().unwrap().len();
-            } else {
-                // Break the loop if we got no outputs from the node request
-                break;
+            if resp["result"]["Ok"]["outputs"] != Value::Null {
+                if let Some(v) = resp["result"]["Ok"]["outputs"].as_array().unwrap().last() {
+                    current_mmr_index = v["mmr_index"].to_string().parse::<u64>().unwrap();
+                    utxo_count = utxo_count + resp["result"]["Ok"]["outputs"].as_array().unwrap().len();
+                } else {
+                    // Break the loop if we got no outputs from the node request
+                    break;
+                }
             }
         }
     }
