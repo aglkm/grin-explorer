@@ -125,7 +125,7 @@
             {% endif %}
           </div>
 	</div>
-        <div class="card border-bottom-0 border-end-0 rounded-0">
+        <div class="card border-bottom-0 rounded-0">
           <div class="card-body">
             {% if route == "block_list_by_height" %}
               <div class="value-text">{{ blocks[i].size }}</div>
