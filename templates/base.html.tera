@@ -47,6 +47,9 @@
               <li class="nav-item">
 	        <a class="nav-link" href="/stats"><i class="bi bi-calculator"></i> Statistics</a>
               </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/emission"><i class="bi bi-graph-down-arrow"></i> Emission</a>
+              </li>
 	    {% elif route == "block_list" or route == "block_list_by_height" %}
               <li class="nav-item">
                 <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
@@ -56,6 +59,9 @@
               </li>
               <li class="nav-item">
 	        <a class="nav-link" href="/stats"><i class="bi bi-calculator"></i> Statistics</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/emission"><i class="bi bi-graph-down-arrow"></i> Emission</a>
               </li>
 	    {% elif route == "stats" %}
               <li class="nav-item">
@@ -67,6 +73,22 @@
               <li class="nav-item">
 	        <a class="nav-link" href="/stats"><div class="darkorange-text"><i class="bi bi-calculator"></i> Statistics</div></a>
               </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/emission"><i class="bi bi-graph-down-arrow"></i> Emission</a>
+              </li>
+	    {% elif route == "emission" %}
+              <li class="nav-item">
+                <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/block_list"><i class="bi bi-box"></i> Blocks</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/stats"><i class="bi bi-calculator"></i> Statistics</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/emission"><div class="darkorange-text"><i class="bi bi-graph-down-arrow"></i> Emission</div></a>
+              </li>
 	    {% else %}
               <li class="nav-item">
                 <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
@@ -76,6 +98,9 @@
               </li>
               <li class="nav-item">
 	        <a class="nav-link" href="/stats"><i class="bi bi-calculator"></i> Statistics</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/emission"><i class="bi bi-graph-down-arrow"></i> Emission</a>
               </li>
 	    {% endif %}
           </ul>
@@ -187,12 +212,6 @@
                 <div class="d-flex justify-content-start">
 	          <div class="value-text">
                     <a class="text-decoration-none" href="https://grinnode.live/">Grinnode</a>
-                  </div>
-                </div>
-                <br>
-                <div class="d-flex justify-content-start">
-	          <div class="value-text">
-                    <a class="text-decoration-none" href="https://grinflation.com/">Grinflation</a>
                   </div>
                 </div>
                 <br>

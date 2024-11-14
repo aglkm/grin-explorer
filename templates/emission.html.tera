@@ -1,0 +1,127 @@
+{% extends "base" %}
+
+{% block content %}
+
+{% if cg_api == "enabled" %}
+<code>
+
+  <div class="card border-start-0 border-end-0 border-bottom-0 rounded-0">
+    <div class="card-body" align="center">
+      <h5>Inflation Rate</h5>
+      <h5><span class="green-text" hx-get="/rpc/inflation/rate" hx-trigger="load, every 10s">%</span></h5>
+      <br>
+      <h5>Price</h5>
+      <h5><span class="green-text" hx-get="/rpc/price/usd" hx-trigger="load, every 10s"></span> <span class="darkorange-text" hx-get="/rpc/price/btc" hx-trigger="load, every 10s"></span></h5><br>
+      <h5>Supply</h5>
+      <h5><span class="green-text" hx-get="/rpc/market/supply" hx-trigger="load, every 10s">/span></h5>
+      <br>
+      <h5>Market Cap</h5>
+      <h5><span class="green-text" hx-get="/rpc/market/cap_usd" hx-trigger="load, every 10s"></span> <span class="darkorange-text" hx-get="/rpc/market/cap_btc" hx-trigger="load, every 10s"></span></h5>
+    </div>
+  </div>
+
+</code>
+
+  <div class="card border-start-0 border-end-0 border-top-0 border-bottom-0 rounded-0">
+    <div class="card-body" align=center>
+
+      <figure class="text-center">
+        <blockquote class="blockquote">
+          <p class="fw-lighter">Grin was started with as fair of a launch as possible for what's under our control. We did this for good reason: we believe in Grin's mission to enable private money for everyone and open access to it.</p>
+        </blockquote>
+        <figcaption class="blockquote-footer">
+          <cite title="Source Title">Ignotus Peverell</cite>
+        </figcaption>
+      </figure>
+
+    </div>
+  </div>
+
+<code>
+
+  <div class="card border-start-0 border-end-0 border-top-0 border-bottom-0 rounded-0">
+    <div class="card-body" align=center>
+      <div><h5>Emission <i class="bi bi-fire"></i> 1 GRIN/SEC</h5></div>
+      <br>
+      <h6>
+        1 Minute ツ 60<br>
+        <span class="green-text">$ {{ usd_minute }} </span>
+        <span class="darkorange-text">{{ btc_minute }}</span>
+      </h6>
+      <br>
+      <h6>
+        1 Hour ツ 3,600<br>
+        <span class="green-text">$ {{ usd_hour }} </span>
+        <span class="darkorange-text">₿ {{ btc_hour }}</span>
+      </h6>
+      <br>
+      <h6>
+        1 Day ツ 86,400<br>
+        <span class="green-text">$ {{ usd_day }} </span>
+        <span class="darkorange-text">₿ {{ btc_day }}</span>
+      </h6>
+      <br>
+      <h6>
+        1 Week ツ 604,800<br>
+        <span class="green-text">$ {{ usd_week }} </span>
+        <span class="darkorange-text">₿ {{ btc_week }}</span>
+      </h6>
+      <br>
+      <h6>
+        1 Month ツ 2,592,000<br>
+        <span class="green-text">$ {{ usd_month }} </span>
+        <span class="darkorange-text">₿ {{ btc_month }}</span>
+      </h6>
+      <br>
+      <h6>
+        1 Year ツ 31,557,600<br>
+        <span class="green-text">$ {{ usd_year }} </span>
+        <span class="darkorange-text">₿ {{ btc_year }}</span>
+      </h6>
+    </div>
+  </div>
+
+</code>
+
+  <div class="card border-start-0 border-end-0 border-top-0 border-bottom-0 rounded-0">
+    <div class="card-body" align=center>
+
+      <figure class="text-center">
+        <blockquote class="blockquote">
+          <p class="fw-lighter">I don't measure grin's success by its marketcap, but by its elegance, simplicity, scalability and long term survival.</p>
+        </blockquote>
+        <figcaption class="blockquote-footer">
+          <cite title="Source Title">John Tromp</cite>
+        </figcaption>
+      </figure>
+
+    </div>
+  </div>
+
+{% endif %}
+
+<code>
+
+  <div class="card border-start-0 border-end-0 border-top-0 rounded-0">
+    <div class="card-body" align=center>
+      <div><h5>Inflation Rate by Year</span><h5></div>
+        <br>
+        <h6>
+          <span class="text-secondary">2019</span> ツ 0 <i class="bi bi-dash-lg"></i>
+        </h6>
+      {% for i in range(end=100) %}
+        <br>
+        <h6>
+          <span class="text-secondary">{{ 2019 + i + 1 }}</span> ツ {{ ((i + 1) * 31557600) | separate_with_commas }}
+          <span class="green-text">
+            {{ (31557600 / ((i + 1) * 31557600)) * 100 | round(method="ceil", precision=2)}} %
+          </span>
+        </h6>
+      {% endfor %}
+    </div>
+  </div>
+
+</code>
+
+{% endblock %}
+

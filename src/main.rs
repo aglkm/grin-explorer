@@ -10,6 +10,7 @@ use rocket::serde::json::json;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use serde_json::Value;
+use tera_thousands::separate_with_commas;
 
 use crate::data::{Block, Dashboard, Kernel, Output, Statistics, Transactions, OUTPUT_SIZE, KERNEL_SIZE};
 use crate::requests::CONFIG;
@@ -131,7 +132,7 @@ async fn kernel(excess: &str) -> Template {
         })
     }
 
-    return Template::render("error", context! {
+    Template::render("error", context! {
         route:  "error",
     })
 }
@@ -151,7 +152,7 @@ async fn output(commit: &str) -> Template {
         })
     }
 
-    return Template::render("error", context! {
+    Template::render("error", context! {
         route:  "error",
     })
 }
@@ -228,6 +229,38 @@ fn stats(statistics: &State<Arc<Mutex<Statistics>>>) -> Template {
         kernels:     data.kernels.clone(),
         output_size: OUTPUT_SIZE,
         kernel_size: KERNEL_SIZE,
+    })
+}
+
+
+// Rendering Grinflation page.
+#[get("/emission")]
+fn emission(dashboard: &State<Arc<Mutex<Dashboard>>>) -> Template {
+    let data = dashboard.lock().unwrap();
+
+    let mut usd = 0.0;
+    let mut btc = 0.0;
+
+    if data.price_usd.is_empty() == false && data.price_btc.is_empty() == false {
+        usd = data.price_usd.parse::<f64>().unwrap();
+        btc = data.price_btc.parse::<f64>().unwrap();
+    }
+
+    Template::render("emission", context! {
+        route:      "emission",
+        cg_api:     CONFIG.coingecko_api.clone(),
+        usd_minute: format!("{:.2}", usd * 60.0),
+        usd_hour:   ((usd * 3600.0) as u64).to_formatted_string(&Locale::en),
+        usd_day:    ((usd * 86400.0) as u64).to_formatted_string(&Locale::en),
+        usd_week:   ((usd * 604800.0) as u64).to_formatted_string(&Locale::en),
+        usd_month:  ((usd * 2592000.0) as u64).to_formatted_string(&Locale::en),
+        usd_year:   ((usd * 31557600.0) as u64).to_formatted_string(&Locale::en),
+        btc_minute: format!("{:.8}", btc * 60.0),
+        btc_hour:   format!("{:.8}", btc * 3600.0),
+        btc_day:    format!("{:.8}", btc * 86400.0),
+        btc_week:   format!("{:.8}", btc * 604800.0),
+        btc_month:  format!("{:.8}", btc * 2592000.0),
+        btc_year:   format!("{:.8}", btc * 31557600.0),
     })
 }
 
@@ -777,9 +810,10 @@ async fn main() {
                                 block_size, block_weight, block_details_by_height, block_header_by_hash,
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
-                                output, api_owner, api_foreign, stats, unspent_outputs, kernels])
+                                output, api_owner, api_foreign, stats, unspent_outputs, kernels,
+                                emission])
             .mount("/static", FileServer::from("static"))
-            .attach(Template::fairing())
+            .attach(Template::custom(|engines| {engines.tera.register_filter("separate_with_commas", separate_with_commas)}))
             .launch()
             .await;
 }
