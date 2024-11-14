@@ -171,6 +171,9 @@ pub async fn search(input: Option<&str>) -> Either<Template, Redirect> {
                        })),
     };
 
+    // Trim and lowercase the input
+    let input = input.trim().to_lowercase();
+
     // Check for valid chars
     if input.chars().all(|x| (x >= 'a' && x <= 'f') || (x >= '0' && x <= '9')) == true {
 
