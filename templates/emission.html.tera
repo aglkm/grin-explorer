@@ -46,7 +46,7 @@
       <h6>
         1 Minute ツ 60<br>
         <span class="green-text">$ {{ usd_minute }} </span>
-        <span class="darkorange-text">{{ btc_minute }}</span>
+        <span class="darkorange-text">₿ {{ btc_minute }}</span>
       </h6>
       <br>
       <h6>
