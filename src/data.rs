@@ -191,6 +191,7 @@ pub struct ExplorerConfig {
     pub coingecko_api:           String,
     pub public_api:              String,
     pub external_nodes:          Vec<String>,
+    pub database:                String,
 }
 
 impl ExplorerConfig {
@@ -208,6 +209,7 @@ impl ExplorerConfig {
             coingecko_api:           String::new(),
             public_api:              String::new(),
             external_nodes:          Vec::new(),
+            database:                String::new(),
         }
     }
 }
@@ -250,7 +252,7 @@ pub struct Statistics {
     pub txns:       Vec<String>,
     pub fees:       Vec<String>,
     // UTXOs
-    pub utxo_count: Vec<String>,
+    pub utxos: Vec<String>,
     // Kernels
     pub kernels:    Vec<String>,
 }
@@ -265,7 +267,7 @@ impl Statistics {
             hashrate:   Vec::new(),
             txns:       Vec::new(),
             fees:       Vec::new(),
-            utxo_count: Vec::new(),
+            utxos: Vec::new(),
             kernels:    Vec::new(),
         }
     }

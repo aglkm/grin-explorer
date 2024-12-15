@@ -19,6 +19,12 @@
       <div class="card-body" align="center">
         <div class="value-text">
           <div class="darkorange-text"><i class="bi bi-speedometer2"></i> TRANSACTIONS & FEES</div>
+          <div class="btn-group" role="group" id="txnBtnGroup">
+            <button type="button" class="btn btn-outline-secondary btn-sm active" onclick="txnTimePeriod(this)" value="month">1m</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="txnTimePeriod(this)" value="sixmonths">6m</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="txnTimePeriod(this)" value="year">1y</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="txnTimePeriod(this)" value="all">All</button>
+          </div>
           <div style="position: relative; height:60vh; width:90vw"><canvas id="2"></canvas></div>
         </div>
       </div>
@@ -28,6 +34,12 @@
       <div class="card-body" align="center">
         <div class="value-text">
           <div class="darkorange-text"><i class="bi bi-activity"></i> HASHRATE</div>
+          <div class="btn-group" role="group" id="hashBtnGroup">
+            <button type="button" class="btn btn-outline-secondary btn-sm active" onclick="hashTimePeriod(this)" value="month">1m</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="hashTimePeriod(this)" value="sixmonths">6m</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="hashTimePeriod(this)" value="year">1y</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="hashTimePeriod(this)" value="all">All</button>
+          </div>
           <div style="position: relative; height:60vh; width:90vw"><canvas id="3"></canvas></div>
         </div>
       </div>
@@ -37,6 +49,12 @@
       <div class="card-body" align="center">
         <div class="value-text">
           <div class="darkorange-text"><i class="bi bi-card-list"></i> UNSPENT OUTPUTS</div>
+          <div class="btn-group" role="group" id="utxoBtnGroup">
+            <button type="button" class="btn btn-outline-secondary btn-sm active" onclick="utxoTimePeriod(this)" value="month">1m</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="utxoTimePeriod(this)" value="sixmonths">6m</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="utxoTimePeriod(this)" value="year">1y</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="utxoTimePeriod(this)" value="all">All</button>
+          </div>
           <div style="position: relative; height:60vh; width:90vw"><canvas id="4"></canvas></div>
         </div>
       </div>
@@ -46,6 +64,12 @@
       <div class="card-body" align="center">
         <div class="value-text">
           <div class="darkorange-text"><i class="bi bi-card-list"></i> KERNELS</div>
+          <div class="btn-group" role="group" id="kerBtnGroup">
+            <button type="button" class="btn btn-outline-secondary btn-sm active" onclick="kerTimePeriod(this)" value="month">1m</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="kerTimePeriod(this)" value="sixmonths">6m</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="kerTimePeriod(this)" value="year">1y</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="kerTimePeriod(this)" value="all">All</button>
+          </div>
           <div style="position: relative; height:60vh; width:90vw"><canvas id="5"></canvas></div>
         </div>
       </div>
@@ -92,7 +116,7 @@
       plugins: {
         legend: {
           display: true
-        },
+        }
       },
       scales: {
         x: { 
@@ -109,24 +133,28 @@
     };
 
     var data = {
-      labels: {{ date }},
+      labels: {{ m_date }},
       datasets: [
         {
           label: 'Transactions',
-          data: {{ txns }},
+          data: {{ m_txns }},
           fill: false,
-          tension: 0.1
+          tension: 0.1,
+          radius: 0,
+          hoverRadius: 4
         },
         {
           label: 'Fees',
-          data: {{ fees }},
+          data: {{ m_fees }},
           fill: false,
-          tension: 0.1
+          tension: 0.1,
+          radius: 0,
+          hoverRadius: 4
         }
       ]
     };
 
-    new Chart(document.getElementById("2"), {
+    const txnChart = new Chart(document.getElementById("2"), {
       type: 'line',
       data: data,
       options: options
@@ -147,7 +175,7 @@
       plugins: {
         legend: {
           display: false
-        },
+        }
       },
       scales: {
         x: { 
@@ -164,18 +192,20 @@
     };
 
     var data = {
-      labels: {{ date }},
+      labels: {{ m_date }},
       datasets: [{
         label: 'Hashrate (kG/s)',
-        data: {{ hashrate }},
+        data: {{ m_hashrate }},
         fill: true,
         borderColor: "#b25110",
         backgroundColor: gradient_hash,
-        tension: 0.1
+        tension: 0.1,
+        radius: 0,
+        hoverRadius: 4
       }]
     };
 
-    new Chart(document.getElementById("3"), {
+    const hashChart = new Chart(document.getElementById("3"), {
       type: 'line',
       data: data,
       options: options
@@ -224,20 +254,22 @@
     };
 
     var data = {
-      labels: {{ date }},
+      labels: {{ m_date }},
       datasets: [
         {
           label: 'Unspent Outputs',
-          data: {{ utxo_count }},
+          data: {{ m_utxos }},
           fill: true,
           borderColor: "#b25110",
           backgroundColor: gradient_utxo,
-          tension: 0.1
+          tension: 0.1,
+          radius: 0,
+          hoverRadius: 4
         }
       ]
     };
 
-    new Chart(document.getElementById("4"), {
+    const utxoChart = new Chart(document.getElementById("4"), {
       type: 'line',
       data: data,
       options: options
@@ -286,27 +318,184 @@
     };
 
     var data = {
-      labels: {{ date }},
+      labels: {{ m_date }},
       datasets: [
         {
           label: 'Kernels',
-          data: {{ kernels }},
+          data: {{ m_kernels }},
           fill: true,
           borderColor: "#b25110",
           backgroundColor: gradient_utxo,
-          tension: 0.1
+          tension: 0.1,
+          radius: 0,
+          hoverRadius: 4
         }
       ]
     };
 
-    new Chart(document.getElementById("5"), {
+    const kerChart = new Chart(document.getElementById("5"), {
       type: 'line',
       data: data,
       options: options
     });
-    
-  </script>
+ 
+    // Fill Transactions&Fees chart based on period 
+    function txnTimePeriod(period) {
+      if(period.value == 'month') {
+        txnChart.data.labels = {{ m_date }};
+        txnChart.data.datasets[0].data = {{ m_txns }};
+        txnChart.data.datasets[1].data = {{ m_fees }};
+      }
 
+      if(period.value == 'sixmonths') {
+        txnChart.data.labels = {{ sm_date }};
+        txnChart.data.datasets[0].data = {{ sm_txns }};
+        txnChart.data.datasets[1].data = {{ sm_fees }};
+      }
+
+      if(period.value == 'year') {
+        txnChart.data.labels = {{ y_date }};
+        txnChart.data.datasets[0].data = {{ y_txns }};
+        txnChart.data.datasets[1].data = {{ y_fees }};
+      }
+
+      if(period.value == 'all') {
+        txnChart.data.labels = {{ date }};
+        txnChart.data.datasets[0].data = {{ txns }};
+        txnChart.data.datasets[1].data = {{ fees }};
+      }
+
+      txnChart.update();
+    }
+
+    // Fill Hashrate chart based on period 
+    function hashTimePeriod(period) {
+      if(period.value == 'month') {
+        hashChart.data.labels = {{ m_date }};
+        hashChart.data.datasets[0].data = {{ m_hashrate }};
+      }
+
+      if(period.value == 'sixmonths') {
+        hashChart.data.labels = {{ sm_date }};
+        hashChart.data.datasets[0].data = {{ sm_hashrate }};
+      }
+
+      if(period.value == 'year') {
+        hashChart.data.labels = {{ y_date }};
+        hashChart.data.datasets[0].data = {{ y_hashrate }};
+      }
+
+      if(period.value == 'all') {
+        hashChart.data.labels = {{ date }};
+        hashChart.data.datasets[0].data = {{ hashrate }};
+      }
+
+      hashChart.update();
+    }
+
+    // Fill Utxo chart based on period 
+    function utxoTimePeriod(period) {
+      if(period.value == 'month') {
+        utxoChart.data.labels = {{ m_date }};
+        utxoChart.data.datasets[0].data = {{ m_utxos }};
+      }
+
+      if(period.value == 'sixmonths') {
+        utxoChart.data.labels = {{ sm_date }};
+        utxoChart.data.datasets[0].data = {{ sm_utxos }};
+      }
+
+      if(period.value == 'year') {
+        utxoChart.data.labels = {{ y_date }};
+        utxoChart.data.datasets[0].data = {{ y_utxos }};
+      }
+
+      if(period.value == 'all') {
+        utxoChart.data.labels = {{ date }};
+        utxoChart.data.datasets[0].data = {{ utxos }};
+      }
+
+      utxoChart.update();
+    }
+
+    // Fill Kernels chart based on period 
+    function kerTimePeriod(period) {
+      if(period.value == 'month') {
+        kerChart.data.labels = {{ m_date }};
+        kerChart.data.datasets[0].data = {{ m_kernels }};
+      }
+
+      if(period.value == 'sixmonths') {
+        kerChart.data.labels = {{ sm_date }};
+        kerChart.data.datasets[0].data = {{ sm_kernels }};
+      }
+
+      if(period.value == 'year') {
+        kerChart.data.labels = {{ y_date }};
+        kerChart.data.datasets[0].data = {{ y_kernels }};
+      }
+
+      if(period.value == 'all') {
+        kerChart.data.labels = {{ date }};
+        kerChart.data.datasets[0].data = {{ kernels }};
+      }
+
+      kerChart.update();
+    }
+  
+    //
+    // Code to toogle .active class on period switch buttons
+    //
+
+    // Get the container element
+    var txnBtnContainer = document.getElementById("txnBtnGroup");
+    var hashBtnContainer = document.getElementById("hashBtnGroup");
+    var utxoBtnContainer = document.getElementById("utxoBtnGroup");
+    var kerBtnContainer = document.getElementById("kerBtnGroup");
+
+    // Get all buttons with class="btn" inside the container
+    var txnBtns = txnBtnContainer.getElementsByClassName("btn");
+    var hashBtns = hashBtnContainer.getElementsByClassName("btn");
+    var utxoBtns = utxoBtnContainer.getElementsByClassName("btn");
+    var kerBtns = kerBtnContainer.getElementsByClassName("btn");
+
+    // Loop through the buttons and add the active class to the current/clicked button
+    for (var i = 0; i < txnBtns.length; i++) {
+      txnBtns[i].addEventListener("click", function() {
+        var current = txnBtnContainer.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        this.className += " active";
+      });
+    } 
+
+    // Loop through the buttons and add the active class to the current/clicked button
+    for (var i = 0; i < hashBtns.length; i++) {
+      hashBtns[i].addEventListener("click", function() {
+        var current = hashBtnContainer.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        this.className += " active";
+      });
+    } 
+
+    // Loop through the buttons and add the active class to the current/clicked button
+    for (var i = 0; i < utxoBtns.length; i++) {
+      utxoBtns[i].addEventListener("click", function() {
+        var current = utxoBtnContainer.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        this.className += " active";
+      });
+    } 
+
+    // Loop through the buttons and add the active class to the current/clicked button
+    for (var i = 0; i < kerBtns.length; i++) {
+      kerBtns[i].addEventListener("click", function() {
+        var current = kerBtnContainer.getElementsByClassName("active");
+        current[0].className = current[0].className.replace(" active", "");
+        this.className += " active";
+      });
+    } 
+
+  </script>
 
 {% endblock %}
 

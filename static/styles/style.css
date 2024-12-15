@@ -114,10 +114,9 @@ footer {
   background-color: silver !important;
 }
 
-.dark-mode button:focus { outline:0; }
-
-.dark-mode button:hover, 
-.dark-mode button:active {
+.dark-mode button:hover,
+.dark-mode button:focus,
+.dark-mode .btn.active {
   color: silver !important;
 }
 

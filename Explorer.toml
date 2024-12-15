@@ -27,7 +27,13 @@ public_api = "enabled"
 
 # List of external node endpoints, used for peer stats.
 # Comment out if you wish, only local peer stats will be used then.
-# external_nodes = ["https://grinnode.live:3413", "https://grincoin.org"] 
+# external_nodes = ["https://grinnode.live:3413", "https://grincoin.org"]
+
+# Database path.
+# By default, it will be created in the current directory.
+# Comment out if you don't want to use sqlite database
+database = "database.sqlite"
+
 
 # Grinnode config
 # host = "grinnode.live"
@@ -35,6 +41,7 @@ public_api = "enabled"
 # proto = "https"
 # coingecko_api = "enabled"
 # public_api = "enabled"
+# database = "database.sqlite"
 
 
 # Grincoin config
@@ -42,6 +49,7 @@ public_api = "enabled"
 # proto = "https"
 # coingecko_api = "enabled"
 # public_api = "enabled"
+# database = "database.sqlite"
 
 
 # Testnet config
@@ -54,4 +62,5 @@ public_api = "enabled"
 # grin_dir = "~/.grin"
 # coingecko_api = "disabled"
 # public_api = "enabled"
+# database = "database.sqlite"
 

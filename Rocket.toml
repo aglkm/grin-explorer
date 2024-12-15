@@ -5,3 +5,6 @@ address = "127.0.0.1"
 # E.g. Mainnet (8000) and Testnet (8001) instances.
 # port = 8000
 
+[default.databases.sqlite_db]
+url = "database.sqlite"
+

@@ -13,9 +13,11 @@ use serde_json::Value;
 use tera_thousands::separate_with_commas;
 
 use crate::data::{Block, Dashboard, Kernel, Output, Statistics, Transactions, OUTPUT_SIZE, KERNEL_SIZE};
-use crate::requests::CONFIG;
+use crate::exconfig::CONFIG;
 
 mod data;
+mod database;
+mod exconfig;
 mod requests;
 mod worker;
 
@@ -219,24 +221,112 @@ pub async fn search(input: Option<&str>) -> Either<Template, Redirect> {
 fn stats(statistics: &State<Arc<Mutex<Statistics>>>) -> Template {
     let data = statistics.lock().unwrap();
 
+    // Get the length of our data vectors (all vectors are the same size)
+    let len = data.date.len();
+
+    // Construct chart periods
+    let mut month      = 0;
+    let mut six_months = 0;
+    let mut year       = 0;
+
+    // Usize type can't be negative, so check the lenght of the vector
+    if len > 30 {
+        month = len - 30;
+    }
+    if len > (30 * 6) {
+        six_months = len - (30 * 6);
+    }
+    if len > 365 {
+        year = len - 365;
+    }
+
+    let mut m_date     = data.date.clone();
+    let mut m_hashrate = data.hashrate.clone();
+    let mut m_txns     = data.txns.clone();
+    let mut m_fees     = data.fees.clone();
+    let mut m_utxos    = data.utxos.clone();
+    let mut m_kernels  = data.kernels.clone();
+
+    // Get stats for a month period
+    if month > 0 {  
+        m_date     = data.date.get(month..).unwrap().to_vec();
+        m_hashrate = data.hashrate.get(month..).unwrap().to_vec();
+        m_txns     = data.txns.get(month..).unwrap().to_vec();
+        m_fees     = data.fees.get(month..).unwrap().to_vec();
+        m_utxos    = data.utxos.get(month..).unwrap().to_vec();
+        m_kernels  = data.kernels.get(month..).unwrap().to_vec();
+    }
+
+    let mut sm_date     = data.date.clone();
+    let mut sm_hashrate = data.hashrate.clone();
+    let mut sm_txns     = data.txns.clone();
+    let mut sm_fees     = data.fees.clone();
+    let mut sm_utxos    = data.utxos.clone();
+    let mut sm_kernels  = data.kernels.clone();
+
+    // Get stats for six months period
+    if six_months > 0 {  
+        sm_date     = data.date.get(six_months..).unwrap().to_vec();
+        sm_hashrate = data.hashrate.get(six_months..).unwrap().to_vec();
+        sm_txns     = data.txns.get(six_months..).unwrap().to_vec();
+        sm_fees     = data.fees.get(six_months..).unwrap().to_vec();
+        sm_utxos    = data.utxos.get(six_months..).unwrap().to_vec();
+        sm_kernels  = data.kernels.get(six_months..).unwrap().to_vec();
+    }
+        
+    let mut y_date     = data.date.clone();
+    let mut y_hashrate = data.hashrate.clone();
+    let mut y_txns     = data.txns.clone();
+    let mut y_fees     = data.fees.clone();
+    let mut y_utxos    = data.utxos.clone();
+    let mut y_kernels  = data.kernels.clone();
+        
+    // Get stats for a year period
+    if year > 0 {  
+        y_date     = data.date.get(year..).unwrap().to_vec();
+        y_hashrate = data.hashrate.get(year..).unwrap().to_vec();
+        y_txns     = data.txns.get(year..).unwrap().to_vec();
+        y_fees     = data.fees.get(year..).unwrap().to_vec();
+        y_utxos    = data.utxos.get(year..).unwrap().to_vec();
+        y_kernels  = data.kernels.get(year..).unwrap().to_vec();
+    }
+
     Template::render("stats", context! {
-        route:       "stats",
-        date:        data.date.clone(),
-        user_agent:  data.user_agent.clone(),
-        count:       data.count.clone(),
-        total:       data.total,
-        hashrate:    data.hashrate.clone(),
-        txns:        data.txns.clone(),
-        fees:        data.fees.clone(),
-        utxo_count:  data.utxo_count.clone(),
-        kernels:     data.kernels.clone(),
+        route:      "stats",
+        user_agent: data.user_agent.clone(),
+        count:      data.count.clone(),
+        total:      data.total,
+        date:       data.date.clone(),
+        hashrate:   data.hashrate.clone(),
+        txns:       data.txns.clone(),
+        fees:       data.fees.clone(),
+        utxos:      data.utxos.clone(),
+        kernels:    data.kernels.clone(),
+        m_date,
+        m_hashrate,
+        m_txns,
+        m_fees,
+        m_utxos,
+        m_kernels,
+        sm_date,
+        sm_hashrate,
+        sm_txns,
+        sm_fees,
+        sm_utxos,
+        sm_kernels,
+        y_date,
+        y_hashrate,
+        y_txns,
+        y_fees,
+        y_utxos,
+        y_kernels,
         output_size: OUTPUT_SIZE,
         kernel_size: KERNEL_SIZE,
     })
 }
 
 
-// Rendering Grinflation page.
+// Rendering Emission page.
 #[get("/emission")]
 fn emission(dashboard: &State<Arc<Mutex<Dashboard>>>) -> Template {
     let data = dashboard.lock().unwrap();
@@ -752,7 +842,36 @@ async fn main() {
 
     let mut ready_data  = false;
     let mut ready_stats = false;
+    let mut ready_db    = false;
     let mut date        = "".to_string();
+    
+    // Initializing db and table
+    if CONFIG.database.is_empty() == false {
+        info!("initializing db.");
+        let conn = database::open_db_connection(&CONFIG.database).expect("failed to open database");
+        database::create_statistics_table(&conn).expect("failed to create statistics table");
+
+        let mut s = stats.lock().unwrap();
+        let mut d = dash.lock().unwrap();
+
+        // Reading the database
+        s.date     = database::read_row(&conn, "date").unwrap();
+        s.hashrate = database::read_row(&conn, "hashrate").unwrap();
+        s.txns     = database::read_row(&conn, "txns").unwrap();
+        s.fees     = database::read_row(&conn, "fees").unwrap();
+        s.utxos    = database::read_row(&conn, "utxos").unwrap();
+        s.kernels  = database::read_row(&conn, "kernels").unwrap();
+
+        // Read utxos right here, because we have it in worker::stats thread launched next day only
+        if s.utxos.is_empty() == false {
+            d.utxo_count = s.utxos.get(s.utxos.len() - 1).unwrap().to_string();
+        }
+
+        // Get the latest date
+        if s.date.is_empty() == false {
+            date = s.date.get(s.date.len() - 1).unwrap().to_string();
+        }
+    }
 
     // Collecting main data
     tokio::spawn(async move {
@@ -775,7 +894,7 @@ async fn main() {
 
             let date_now = format!("\"{}\"", Utc::now().format("%d-%m-%Y"));
 
-            if date.is_empty() || date != date_now {
+            if date != date_now {
                 date = date_now;
                 let result = worker::stats(dash_clone.clone(), txns_clone.clone(),
                                            stats_clone.clone()).await;
@@ -784,6 +903,7 @@ async fn main() {
                     Ok(_v)  => {
                         if ready_stats == false {
                             ready_stats = true;
+                            ready_db    = true;
                             info!("worker::stats ready.");
                         }
                     },
@@ -792,6 +912,10 @@ async fn main() {
                         error!("{}", e);
                     },
                 }
+            // Got stats from DB, indicate ready state
+            } else if ready_db == false && CONFIG.database.is_empty() == false {
+                info!("worker::stats ready.");
+                ready_db = true;
             }
 
             tokio::time::sleep(Duration::from_secs(15)).await;
