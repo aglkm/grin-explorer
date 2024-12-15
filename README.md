@@ -11,6 +11,7 @@ Grin is the very first, simple and fair MimbleWimble blockchain implementation.
 ## Prerequisites
 
 - Rust: https://www.rust-lang.org/tools/install.
+- SQLite: `sudo apt install sqlite3 libsqlite3-dev`
 - Grin node: https://github.com/mimblewimble/grin. You need to enable archival mode, so the explorer can see all the blocks, otherwise only the recent blocks can be explored.
 
 
