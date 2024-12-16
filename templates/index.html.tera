@@ -160,7 +160,12 @@
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">Stem&nbsp;</div><div class="value-text text-end" hx-get="/rpc/mempool/stem" hx-trigger="load, every 10s"></div>
+	      <div class="value-text">Stem
+                <!-- Button trigger soft supply explanation modal -->
+                <button class="btn-sm shadow-none" data-bs-toggle="modal" data-bs-target="#stem">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+              </div><div class="value-text text-end" hx-get="/rpc/mempool/stem" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
@@ -348,7 +353,12 @@
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">Stem&nbsp;</div><div class="value-text text-end" hx-get="/rpc/mempool/stem" hx-trigger="load, every 10s"></div>
+	      <div class="value-text">Stem
+                <!-- Button trigger soft supply explanation modal -->
+                <button class="btn-sm shadow-none" data-bs-toggle="modal" data-bs-target="#stem">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+              </div><div class="value-text text-end" hx-get="/rpc/mempool/stem" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
@@ -386,90 +396,6 @@
 </div>
 
 
-<!-- Modals. Explanations of several dashboard stats. -->
-<div class="card border-0">
-
-<div class="modal fade" id="soft_sup" tabindex="-1" aria-labelledby="soft_sup_label" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="soft_sup_label">Soft Total Supply</h1>
-        <div data-bs-theme="light">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-      </div>
-      <div class="modal-body">
-        Percentage of issued coins from the soft total supply (3150M) when inflation will reach <1%.
-        <br>
-        <br>
-        <a class="text-decoration-none" href="https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153">https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal fade" id="mining_cost" tabindex="-1" aria-labelledby="mining_cost_label" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="mining_cost_label">Estimated Mining Cost</h1>
-        <div data-bs-theme="light">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-      </div>
-      <div class="modal-body">
-        Mining cost to produce 1 grin coin.<br>
-        Assuming that:<br>
-        Miner is G1-mini ASIC.<br>
-        Electricity cost is $0.07 per kW/h.<br>
-        <br>
-        <a class="text-decoration-none" href="https://ipollo.com/products/ipollo-g1-mini">https://ipollo.com/products/ipollo-g1-mini</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="ratio" tabindex="-1" aria-labelledby="ratio_label" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="ratio_label">Reward/Cost Ratio</h1>
-        <div data-bs-theme="light">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-      </div>
-      <div class="modal-body">
-        Shows the result of the following formula:<br>
-        Price of 1 Grin (USD) / Mining Cost of 1 Grin (USD).<br>
-        <br>
-        <i class="bi bi-hand-thumbs-down"></i> - <= 1<br>
-        <i class="bi bi-hand-thumbs-up"></i> - from 1 to 2<br>
-        <i class="bi bi-emoji-sunglasses"></i> - from 2 to 3<br>
-        <i class='bi bi-rocket-takeoff'></i> - >= 3
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="breakeven" tabindex="-1" aria-labelledby="breakeven_label" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="breakeven_label">Breakeven Electricity Cost</h1>
-        <div data-bs-theme="light">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-      </div>
-      <div class="modal-body">
-        Electricity threshold cost below which mining is profitable.<br>
-        Assuming G1-mini ASIC as a miner device.
-      </div>
-    </div>
-  </div>
-</div>
-
-</div>
 
 {% else %}
 {# CoinGecko API is disabled #}
@@ -569,7 +495,12 @@
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">Stem&nbsp;</div><div class="value-text text-end" hx-get="/rpc/mempool/stem" hx-trigger="load, every 10s"></div>
+	      <div class="value-text">Stem
+                <!-- Button trigger soft supply explanation modal -->
+                <button class="btn-sm shadow-none" data-bs-toggle="modal" data-bs-target="#stem">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+              </div><div class="value-text text-end" hx-get="/rpc/mempool/stem" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
@@ -699,7 +630,12 @@
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
-	      <div class="value-text">Stem&nbsp;</div><div class="value-text text-end" hx-get="/rpc/mempool/stem" hx-trigger="load, every 10s"></div>
+	      <div class="value-text">Stem
+                <!-- Button trigger soft supply explanation modal -->
+                <button class="btn-sm shadow-none" data-bs-toggle="modal" data-bs-target="#stem">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+              </div><div class="value-text text-end" hx-get="/rpc/mempool/stem" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
@@ -736,6 +672,7 @@
 
 </div>
 
+{% endif %}
 
 <!-- Modals. Explanations of several dashboard stats. -->
 <div class="card border-0">
@@ -759,9 +696,86 @@
   </div>
 </div>
 
+<div class="modal fade" id="mining_cost" tabindex="-1" aria-labelledby="mining_cost_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="mining_cost_label">Estimated Mining Cost</h1>
+        <div data-bs-theme="light">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        Mining cost to produce 1 grin coin.<br>
+        Assuming that:<br>
+        Miner is G1-mini ASIC.<br>
+        Electricity cost is $0.07 per kW/h.<br>
+        <br>
+        <a class="text-decoration-none" href="https://ipollo.com/products/ipollo-g1-mini">https://ipollo.com/products/ipollo-g1-mini</a>
+      </div>
+    </div>
+  </div>
 </div>
 
-{% endif %}
+<div class="modal fade" id="ratio" tabindex="-1" aria-labelledby="ratio_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="ratio_label">Reward/Cost Ratio</h1>
+        <div data-bs-theme="light">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        Shows the result of the following formula:<br>
+        Price of 1 Grin (USD) / Mining Cost of 1 Grin (USD).<br>
+        <br>
+        <i class="bi bi-hand-thumbs-down"></i> - <= 1<br>
+        <i class="bi bi-hand-thumbs-up"></i> - from 1 to 2<br>
+        <i class="bi bi-emoji-sunglasses"></i> - from 2 to 3<br>
+        <i class='bi bi-rocket-takeoff'></i> - >= 3
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="breakeven" tabindex="-1" aria-labelledby="breakeven_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="breakeven_label">Breakeven Electricity Cost</h1>
+        <div data-bs-theme="light">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        Electricity threshold cost below which mining is profitable.<br>
+        Assuming G1-mini ASIC as a miner device.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="stem" tabindex="-1" aria-labelledby="stem_label" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="stem_label">Stem Phase</h1>
+        <div data-bs-theme="light">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="modal-body">
+        Grin uses Dandelion++ protocol to obscure the origin of a transaction on the network level by routing it through multiple nodes before broadcasting it - <b>Stem Phase</b><br><br>
+        This makes it harder for an adversary to track transactions based on IP addresses.<br>
+        <br>
+        <a class="text-decoration-none" href="https://docs.grin.mw/wiki/miscellaneous/dandelion/">https://docs.grin.mw/wiki/miscellaneous/dandelion/</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
 
 </code>
 
