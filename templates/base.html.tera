@@ -271,6 +271,14 @@
                 <br>
                 <div class="d-flex justify-content-start">
 	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://wallet.easygrin.org/">
+		      Easygrin
+		    </a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
                     <a class="text-decoration-none" href="https://grinplusplus.github.io/">
 		      Grin++
 		    </a>
