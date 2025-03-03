@@ -358,6 +358,16 @@ fn emission(dashboard: &State<Arc<Mutex<Dashboard>>>) -> Template {
 }
 
 
+// Rendering API Overview page.
+#[get("/api_overview")]
+fn api_overview() -> Template {
+    Template::render("api_overview", context! {
+        route:            "api_overview",
+        public_api:       CONFIG.public_api.clone(),
+    })
+}
+
+
 // Owner API.
 // Whitelisted methods: get_connected_peers, get_peers, get_status.
 #[post("/v2/owner", data="<data>")]
@@ -938,7 +948,7 @@ async fn main() {
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
                                 output, api_owner, api_foreign, stats, unspent_outputs, kernels,
-                                emission])
+                                emission, api_overview])
             .mount("/static", FileServer::from("static"))
             .attach(Template::custom(|engines| {engines.tera.register_filter("separate_with_commas", separate_with_commas)}))
             .launch()

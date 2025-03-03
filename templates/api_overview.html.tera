@@ -1,0 +1,61 @@
+{% extends "base" %}
+
+{% block content %}
+
+<code>
+
+  <div class="card border-start-0 border-end-0 rounded-0">
+    <div class="card-body">
+      <h4><i class="bi bi-robot me-3"></i>API Overview</h4>
+      {% if public_api != "enabled" %}
+        <div class="alert alert-danger" role="alert">
+          API is disabled. Set 'public_api = enabled' in Explorer.toml to enable.
+        </div>
+      {% endif %}
+      <div>The API provides access to Grin node's Foreign and Owner endpoints.</div>
+      <br>
+      <h5>Foreign API</h5>
+      <div>get_block</div>
+      <div>get_blocks</div>
+      <div>get_kernel</div>
+      <div>get_outputs</div>
+      <div>get_pmmr_indices</div>
+      <div>get_pool_size</div>
+      <div>get_stempool_size</div>
+      <div>get_tip</div>
+      <div>get_unconfirmed_transactions</div>
+      <div>get_unspent_outputs</div>
+      <div>get_version</div>
+      <div>push_transaction</div>
+      <br>
+      <div class="card">
+        <div class="card-body">
+          <b>Example:</b><br> curl -X POST --data '{"jsonrpc":"2.0","method":"get_tip","params":[],"id":1}' https://grincoin.org/v2/foreign
+        </div>
+      </div>
+      <br>
+      <h5>Owner API</h5>
+      <div>get_connected_peers</div>
+      <div>get_peers</div>
+      <div>get_status</div>
+      <br>
+      <div class="card">
+        <div class="card-body">
+          <b>Example:</b><br> curl -X POST --data '{"jsonrpc":"2.0","method":"get_status","params":[],"id":1}' https://grincoin.org/v2/owner
+        </div>
+      </div>
+      <br>
+      <h5>GET API</h5>
+      <div>There are also several GET APIs provided by the explorer.</div>
+      <br>
+      <a href="https://grincoin.org/rpc/block/latest">https://grincoin.org/rpc/block/latest</a><br>
+      <a href="https://grincoin.org/rpc/market/supply">https://grincoin.org/rpc/market/supply</a><br>
+      <a href="https://grincoin.org/rpc/network/hashrate">https://grincoin.org/rpc/network/hashrate</a><br>
+      <a href="https://grincoin.org/rpc/network/difficulty">https://grincoin.org/rpc/network/difficulty</a><br><br>
+    </div>
+  </div>
+
+</code>
+
+{% endblock %}
+

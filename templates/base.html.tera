@@ -296,8 +296,11 @@
                 <a class="text-decoration-none me-2" href="https://github.com/aglkm/grin-explorer">
                   <span style="color:grey"><i class="bi bi-github me-1"></i>v.0.1.8</span>
 		</a>
-                <a class="text-decoration-none" href="/search">
+                <a class="text-decoration-none me-2" href="/search">
                   <span style="color:grey"><i class="bi bi-search me-1"></i>Search</span>
+		</a>
+                <a class="text-decoration-none" href="/api_overview">
+                  <span style="color:grey"><i class="bi bi-robot me-1"></i>API</span>
 		</a>
 	      </div>
             </div>
