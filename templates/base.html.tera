@@ -141,7 +141,7 @@
                 <br>
                 <div class="d-flex justify-content-start">
 	          <div class="value-text">
-                    <a class="text-decoration-none" href="https://grin.mw/">Grin.MW</a>
+                    <a class="text-decoration-none" href="https://grin.mw/">Grin.mw</a>
                   </div>
                 </div>
                 <br>
@@ -198,7 +198,7 @@
                 <div class="d-flex justify-content-start">
 	          <div class="value-text">
                     <a class="text-decoration-none" href="https://phyro.github.io/what-is-grin">
-                      What Is Grin
+                      What is Grin
                     </a>
                   </div>
                 </div>
@@ -273,6 +273,14 @@
 	          <div class="value-text">
                     <a class="text-decoration-none" href="https://wallet.easygrin.org/">
 		      Easygrin
+		    </a>
+                  </div>
+                </div>
+                <br>
+                <div class="d-flex justify-content-start">
+	          <div class="value-text">
+                    <a class="text-decoration-none" href="https://mwcwallet.com/?Override+Wallet+Type=Grin">
+		      MWC Wallet
 		    </a>
                   </div>
                 </div>
