@@ -279,7 +279,9 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
     
         let mut data = dashboard.lock().unwrap();
 
-        if resp1 != Value::Null && resp2 != Value::Null {
+        if resp1 != Value::Null && resp2 != Value::Null &&
+           resp1["result"]["Ok"].is_null() == false &&
+           resp2["result"]["Ok"].is_null() == false {
             // Calculate network difficulty
             let net_diff = (resp1["result"]["Ok"]["header"]["total_difficulty"]
                            .to_string().parse::<u64>().unwrap()
@@ -319,6 +321,10 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
                                                         / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
                 }
             }
+        } else {
+            error!("get_mining_stats() failed");
+            error!("RPC response 1: {:?}", resp1);
+            error!("RPC response 2: {:?}", resp2);
         }
     }
 
