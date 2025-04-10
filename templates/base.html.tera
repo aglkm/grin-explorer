@@ -310,13 +310,16 @@
             <div class="row mb-2">
               <div class="col d-flex justify-content-center">
                 <a class="text-decoration-none me-2" href="https://github.com/aglkm/grin-explorer">
-                  <span style="color:grey"><i class="bi bi-github me-1"></i>v.0.1.8</span>
+                  <span style="color:grey"><i class="bi bi-github me-1"></i>v0.1.8</span>
 		</a>
                 <a class="text-decoration-none me-2" href="/search">
                   <span style="color:grey"><i class="bi bi-search me-1"></i>Search</span>
 		</a>
-                <a class="text-decoration-none" href="/api_overview">
+		<a class="text-decoration-none me-2" href="/api_overview">
                   <span style="color:grey"><i class="bi bi-robot me-1"></i>API</span>
+		</a>
+                <a class="text-decoration-none me-2" href="/donate">
+                  <span style="color:grey"><i class="bi bi-heart me-1"></i>Donate</span>
 		</a>
 	      </div>
             </div>

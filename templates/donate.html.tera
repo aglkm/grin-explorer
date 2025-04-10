@@ -1,0 +1,26 @@
+{% extends "base" %}
+
+{% block content %}
+
+<code>
+
+  <div class="card border-start-0 border-end-0 rounded-0">
+    <div class="card-body">
+      <h4><i class="bi bi-heart me-3"></i>Donation</h4>
+      <div>Slatepack address:</div>
+      <div class="card">
+        <div class="card-body">
+          grin1flvd36m67w48zeannqyfmlqp23e2eqtp3x4mz4r5m9fuc3es5t0snufawz
+        </div>
+      </div>
+      <br>
+      <div>By donating to Grincoin.org you are supporting its maintenance and development.</div>
+      <br>
+      <div>Thank you!</div>
+    </div>
+  </div>
+
+</code>
+
+{% endblock %}
+
