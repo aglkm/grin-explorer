@@ -32,6 +32,7 @@ pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Resul
 
     let client = reqwest::Client::new();
     let result = client.post(rpc_url)
+                       .timeout(Duration::from_secs(10))
                        .body(format!("{{\"method\": \"{}\", \"params\": {}, \"id\": {}, \"jsonrpc\": \"2.0\"}}", method, params, id))
                        .basic_auth(CONFIG.user.clone(), Some(secret))
                        .header("content-type", "application/json")
@@ -58,6 +59,7 @@ pub async fn call_external(method: &str, params: &str, id: &str, rpc_type: &str,
 
     let client = reqwest::Client::new();
     let result = client.post(rpc_url)
+                       .timeout(Duration::from_secs(10))
                        .body(format!("{{\"method\": \"{}\", \"params\": {}, \"id\": {}, \"jsonrpc\": \"2.0\"}}", method, params, id))
                        .header("content-type", "application/json")
                        .send()
