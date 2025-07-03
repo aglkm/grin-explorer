@@ -161,51 +161,56 @@ async fn output(commit: &str) -> Template {
 
 
 // Handling search request.
-// Using Option<&str> to match '/search' query without input params.
+// Using Option<&str> to match '/search' query without query params.
 // https://github.com/rwf2/Rocket/issues/608
-#[get("/search?<input>")]
-pub async fn search(input: Option<&str>) -> Either<Template, Redirect> {
+#[get("/search?<query>")]
+pub async fn search(query: Option<&str>) -> Either<Template, Redirect> {
     // Unwrap Option and forward to Search page if no parameters
-    let input = match input {
+    let query = match query {
         Some(value) => value,
         None => return Either::Left(Template::render("search", context! {
                            route:  "search",
                        })),
     };
 
-    // Trim and lowercase the input
-    let input = input.trim().to_lowercase();
+    // Trim and lowercase the query
+    let query = query.trim().to_lowercase();
 
     // Check for valid chars
-    if input.chars().all(|x| (x >= 'a' && x <= 'f') || (x >= '0' && x <= '9')) == true {
+    if query.chars().all(|x| (x >= 'a' && x <= 'f') || (x >= '0' && x <= '9')) == true {
 
         // Block number
-        if input.chars().all(char::is_numeric) == true {
-            return Either::Right(Redirect::to(uri!(block_details_by_height(input))));
+        if query.chars().all(char::is_numeric) == true {
+            return Either::Right(Redirect::to(uri!(block_details_by_height(query))));
 
         // Block hash
-        } else if input.len() == 64 {
-            return Either::Right(Redirect::to(uri!(block_header_by_hash(input))));
+        } else if query.len() == 64 {
+            return Either::Right(Redirect::to(uri!(block_header_by_hash(query))));
             
         // Kernel or Unspent Output
-        } else if input.len() == 66 {
+        } else if query.len() == 66 {
             // First search for Kernel.
             // If found, redirect to Kernel page, otherwise search for Unspent Output.
-            // As we can't distinguish between Kernel and Output, this will produce a redundant
-            // get_kernel call, but will allow for better UI (no need to ask user to input the type
-            // of the search request).
+            // As we can't distinguish between Kernel and Output, this will produce redundant
+            // get_kernel and get_output calls, but will allow for better UI (no need to ask user to
+            // input the type of the search request).
             let mut kernel = Kernel::new();
+            let mut output = Output::new();
 
-            let _ = requests::get_kernel(&input, &mut kernel).await;
+            let _ = requests::get_kernel(&query, &mut kernel).await;
 
             if kernel.excess.is_empty() == false {
                 // Here we are redirecting to kernel page and call get_kernel again there.
                 // Kernel page is a separate route and we want it to be accessed directly and
                 // via search functionality.
-                return Either::Right(Redirect::to(uri!(kernel(input))));
+                return Either::Right(Redirect::to(uri!(kernel(query))));
             } else {
                 // If Kernel not found, then search for Unspent Output
-                return Either::Right(Redirect::to(uri!(output(input))));
+                let _ = requests::get_output(&query, &mut output).await;
+
+                if output.commit.is_empty() == false {
+                    return Either::Right(Redirect::to(uri!(output(query))));
+                }
             }
         }
     }

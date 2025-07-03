@@ -108,7 +108,7 @@
 	  <div class="row">
 	    <div class="col-12">
               <form class="input-group my-3" role="search" action="/search" method="GET" autocomplete="off">
-                <input class="form-control ms-0 me-2" type="search" placeholder="Explore Grin Network" aria-label="Search" name="input" required>
+                <input class="form-control ms-0 me-2" type="search" placeholder="Explore Grin Network" aria-label="Search" name="query" required>
                 <button class="btn btn-outline-secondary btn-search" type="submit">
                   <i class="bi bi-search"></i>
                 </button>

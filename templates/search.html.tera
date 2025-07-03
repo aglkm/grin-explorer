@@ -11,13 +11,13 @@
         <div class="darkorange-text text-end" hx-get="/rpc/block/latest" hx-trigger="load, every 10s"></div>
       </div>
       <form class="input-group" role="search" action="/search" method="GET" autocomplete="off">
-        <input class="form-control text-center ms-0 me-2" type="search" placeholder="Explore Grin Network" aria-label="Search" name="input" required>
+        <input class="form-control text-center ms-0 me-2" type="search" placeholder="Explore Grin Network" aria-label="Search" name="query" required>
         <button class="btn btn-outline-secondary btn-search" type="submit">
           <i class="bi bi-search"></i>
         </button>
       </form>
       <br><br>
-      <div class="value-text mb-2">Supported search inputs:</div>
+      <div class="value-text mb-2">Supported search queries:</div>
       <div class="value-text"><i class="bi bi-dot"></i> Block Number</div>
       <div class="value-text"><i class="bi bi-dot"></i> Block Hash</div>
       <div class="value-text"><i class="bi bi-dot"></i> Kernel</div>
