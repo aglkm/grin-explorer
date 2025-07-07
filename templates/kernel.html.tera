@@ -6,12 +6,7 @@
 
   <div class="card border-start-0 border-end-0 rounded-0">
     <div class="card-body">
-      <div class="d-flex justify-content-between">
-        <div class="darkorange-text"><i class="bi bi-card-text"></i> KERNEL</div>
-        {% if kernel.status == "Unconfirmed" %}
-          <span class="badge text-bg-warning px-2 py-2">UNCONFIRMED</span>
-        {% endif %}
-      </div>
+      <div class="darkorange-text"><i class="bi bi-card-text"></i> KERNEL</div>
       <br>
       <div class="d-flex justify-content-between">
         <div class="value-text">Excess&nbsp;</div>
@@ -40,6 +35,11 @@
           <div class="value-text text-end">{{ kernel.fee }}</div>
         </div>
       {% endif %}
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Status&nbsp;</div>
+        <div class="value-text text-end">{{ kernel.status }}</div>
+      </div>
     </div>
   </div>
 

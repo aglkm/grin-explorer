@@ -500,7 +500,16 @@ pub async fn get_output(commit: &str, output: &mut Output) -> Result<(), anyhow:
         output.height   = resp["result"]["Ok"][0]["block_height"].to_string();
         output.commit   = resp["result"]["Ok"][0]["commit"].as_str().unwrap().to_string();
         output.out_type = resp["result"]["Ok"][0]["output_type"].as_str().unwrap().to_string();
-        output.raw_data = serde_json::to_string_pretty(&resp).unwrap()
+        output.raw_data = serde_json::to_string_pretty(&resp).unwrap();
+
+        let resp_status = call("get_status", "[]", "1", "owner").await?;
+
+        if resp_status != Value::Null {
+            let curr_height = resp_status["result"]["Ok"]["tip"]["height"].to_string();
+            let num_conf    = curr_height.parse::<u64>().unwrap() - output.height.parse::<u64>().unwrap() + 1;
+
+            output.status = format!("{} Confirmations", num_conf.to_string());
+        }
     }
 
     Ok(())
@@ -546,7 +555,16 @@ pub async fn get_kernel(excess: &str, kernel: &mut Kernel) -> Result<(), anyhow:
             kernel.ker_type = resp["result"]["Ok"]["tx_kernel"]["features"].as_str().unwrap().to_string();
         }
 
-        kernel.raw_data = serde_json::to_string_pretty(&resp).unwrap()
+        kernel.raw_data = serde_json::to_string_pretty(&resp).unwrap();
+        
+        let resp_status = call("get_status", "[]", "1", "owner").await?;
+
+        if resp_status != Value::Null {
+            let curr_height = resp_status["result"]["Ok"]["tip"]["height"].to_string();
+            let num_conf    = curr_height.parse::<u64>().unwrap() - kernel.height.parse::<u64>().unwrap() + 1;
+
+            kernel.status = format!("{} Confirmations", num_conf.to_string());
+        }
     }
 
     Ok(())

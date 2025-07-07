@@ -6,12 +6,7 @@
 
   <div class="card rounded-0">
     <div class="card-body">
-      <div class="d-flex justify-content-between">
-        <div class="darkorange-text"><i class="bi bi-card-text"></i> OUTPUT</div>
-        {% if output.status == "Unconfirmed" %}
-          <span class="badge text-bg-warning px-2 py-2">UNCONFIRMED</span>
-        {% endif %}
-      </div>
+      <div class="darkorange-text"><i class="bi bi-card-text"></i> OUTPUT</div>
       <br>
       <div class="d-flex justify-content-between">
         <div class="value-text">Commitment&nbsp;</div>
@@ -32,6 +27,11 @@
       <div class="d-flex justify-content-between">
         <div class="value-text">Type&nbsp;</div>
         <div class="value-text text-end">{{ output.out_type }}</div>
+      </div>
+      <br>
+      <div class="d-flex justify-content-between">
+        <div class="value-text">Status&nbsp;</div>
+        <div class="value-text text-end">{{ output.status }}</div>
       </div>
     </div>
   </div>
