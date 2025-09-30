@@ -12,7 +12,7 @@ Grin is the very first, simple and fair MimbleWimble blockchain implementation.
 
 - OS packages:
      + `sudo apt update`
-     + `sudo apt install rustup build-essential pkg-config libssl-dev`
+     + `sudo apt install rustup build-essential pkg-config libssl-dev tor`
 - Rust: https://www.rust-lang.org/tools/install.
      + curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 - SQLite: `sudo apt install sqlite3 libsqlite3-dev`
