@@ -34,6 +34,7 @@ Grin is the very first, simple and fair MimbleWimble blockchain implementation.
    cd grin-explorer
    cargo build --release
    ```
+   Edit Explorer.toml => grin_dir = "~/grin" (remove the dot)
 4. Run executable: `RUST_LOG=rocket=warn,grin_explorer ./target/release/grin-explorer`
 
    You will see the following output:
