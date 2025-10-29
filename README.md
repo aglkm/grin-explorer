@@ -47,3 +47,6 @@ Grin is the very first, simple and fair MimbleWimble blockchain implementation.
    ```
 
 5. Open explorer in your browser: http://127.0.0.1:8000
+
+6. Publish to the internet:
+   The process is quite long, so try to use chatgpt or grok with the prompt: "i setup the grin explorer by github https://github.com/aglkm/grin-explorer good now, now i want to publish from http://127.0.0.1:8000 to my own subdomain https://grinexample.com with nginx and auto ssl certification renewal as well, show me how'
