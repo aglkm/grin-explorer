@@ -487,6 +487,16 @@ fn market_supply(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 }
 
 
+#[get("/rpc/market/unformatted_supply")]
+fn unformatted_supply(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
+    let data = dashboard.lock().unwrap();
+
+    data.supply.chars()
+        .filter(|c| c.is_numeric())
+        .collect()
+}
+
+
 #[get("/rpc/market/soft_supply")]
 fn soft_supply(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
@@ -953,7 +963,7 @@ async fn main() {
             .manage(txns)
             .manage(stats)
             .mount("/", routes![index, peers_inbound, peers_outbound, sync_status, market_supply,
-                                inflation_rate, volume_usd, volume_btc, price_usd, price_btc,
+                                unformatted_supply, inflation_rate, volume_usd, volume_btc, price_usd, price_btc,
                                 mcap_usd, mcap_btc,latest_height, disk_usage, network_hashrate,
                                 network_difficulty, mempool_txns, mempool_stem, txns_count_1h,
                                 txns_count_24h, block_list, block_link, block_link_color,
