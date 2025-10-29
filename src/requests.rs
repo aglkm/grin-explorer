@@ -210,8 +210,9 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
         // 31536000 seconds in a year
         let inflation = (31536000.0 / (supply as f64)) * 100.0;
 
-        data.inflation = format!("{:.2}", inflation);
-        data.supply    = supply.to_formatted_string(&Locale::en);
+        data.inflation  = format!("{:.2}", inflation);
+        data.supply_raw = supply.to_string();
+        data.supply     = supply.to_formatted_string(&Locale::en);
 
         // https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153
         data.soft_supply = format!("{:.2}", supply.to_string().parse::<f64>().unwrap() / 3150000000.0 * 100.0);

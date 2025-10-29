@@ -27,6 +27,7 @@ pub struct Dashboard {
     pub outbound:        u16,
     // price & market
     pub supply:          String,
+    pub supply_raw:      String,
     pub soft_supply:     String,
     pub inflation:       String,
     pub price_usd:       String,
@@ -65,6 +66,7 @@ impl Dashboard {
             inbound:         0,
             outbound:        0,
             supply:          String::new(),
+            supply_raw:      String::new(),
             soft_supply:     String::new(),
             inflation:       String::new(),
             price_usd:       String::new(),

@@ -50,6 +50,7 @@
       <br>
       <a href="https://grincoin.org/rpc/block/latest">https://grincoin.org/rpc/block/latest</a><br>
       <a href="https://grincoin.org/rpc/market/supply">https://grincoin.org/rpc/market/supply</a><br>
+      <a href="https://grincoin.org/rpc/market/supply_raw">https://grincoin.org/rpc/market/supply_raw</a><br>
       <a href="https://grincoin.org/rpc/network/hashrate">https://grincoin.org/rpc/network/hashrate</a><br>
       <a href="https://grincoin.org/rpc/network/difficulty">https://grincoin.org/rpc/network/difficulty</a><br><br>
     </div>

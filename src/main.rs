@@ -487,6 +487,14 @@ fn market_supply(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 }
 
 
+#[get("/rpc/market/supply_raw")]
+fn supply_raw(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
+    let data = dashboard.lock().unwrap();
+
+    data.supply_raw.clone()
+}
+
+
 #[get("/rpc/market/soft_supply")]
 fn soft_supply(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
@@ -962,7 +970,7 @@ async fn main() {
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
                                 output, api_owner, api_foreign, stats, unspent_outputs, kernels,
-                                emission, api_overview, donate])
+                                emission, api_overview, donate, supply_raw])
             .mount("/static", FileServer::from("static"))
             .attach(Template::custom(|engines| {engines.tera.register_filter("separate_with_commas", separate_with_commas)}))
             .launch()
