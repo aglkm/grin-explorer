@@ -199,8 +199,8 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
 
     let count = COINGECKO_COUNT.fetch_add(1, Ordering::Relaxed);
 
-    // Call CG API only once every 10 calls (15sec * 10)
-    if CONFIG.coingecko_api == "enabled" && count % 10 == 0 {
+    // Call CG API only once every 20 calls (15sec * 20)
+    if CONFIG.coingecko_api == "enabled" && count % 20 == 0 {
         client = reqwest::Client::new();
         result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true").send().await?;
         val    = serde_json::from_str(&result.text().await?)?;
