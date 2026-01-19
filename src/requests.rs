@@ -1,11 +1,12 @@
+use chrono::{Utc, DateTime};
+use fs_extra::dir::get_size;
+use humantime::format_duration;
+use num_format::{Locale, ToFormattedString};
 use reqwest::Error;
 use serde_json::Value;
 use std::sync::{Arc, Mutex};
-use num_format::{Locale, ToFormattedString};
-use fs_extra::dir::get_size;
-use humantime::format_duration;
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::Duration;
-use chrono::{Utc, DateTime};
 use std::collections::HashMap;
 
 use crate::data::{Block, Dashboard, Kernel, Output, Statistics, Transactions};
@@ -194,7 +195,12 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
     let result;
     let mut val = Value::Null;
 
-    if CONFIG.coingecko_api == "enabled" {
+    static COINGECKO_COUNT: AtomicU32 = AtomicU32::new(0);
+
+    let count = COINGECKO_COUNT.fetch_add(1, Ordering::Relaxed);
+
+    // Call CG API only once every 10 calls (15sec * 10)
+    if CONFIG.coingecko_api == "enabled" && count % 10 == 0 {
         client = reqwest::Client::new();
         result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true").send().await?;
         val    = serde_json::from_str(&result.text().await?)?;
