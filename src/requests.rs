@@ -202,7 +202,9 @@ pub async fn get_market(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow::
     // Call CG API only once every 20 calls (15sec * 20)
     if CONFIG.coingecko_api == "enabled" && count % 20 == 0 {
         client = reqwest::Client::new();
-        result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true").send().await?;
+        result = client.get("https://api.coingecko.com/api/v3/simple/price?ids=grin&vs_currencies=usd%2Cbtc&include_24hr_vol=true")
+                       .header("User-Agent", "https://github.com/aglkm/grin-explorer")
+                       .send().await?;
         val    = serde_json::from_str(&result.text().await?)?;
     }
 

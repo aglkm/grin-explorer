@@ -353,6 +353,13 @@
 	      </div>
 	    </div>
           </div>
+          {% if cg_api == "enabled" %}
+            <div class="row mb-2">
+              <div class="d-flex justify-content-center">
+                <span style="color:grey">Price data by CoinGecko</span>
+              </div>
+            </div>
+          {% endif %}
         </div>
       </code>
     </footer>
