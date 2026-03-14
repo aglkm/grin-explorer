@@ -130,6 +130,7 @@ pub async fn get_mempool(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow:
 // Collecting: inbound, outbound, user_agent.
 pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: Arc<Mutex<Statistics>>) -> Result<(), anyhow::Error> {
     let mut peers    = HashMap::new();
+    let mut addrs    = Vec::new();
     let mut inbound  = 0;
     let mut outbound = 0;
 
@@ -145,7 +146,10 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
                 outbound += 1;
             }
             // Collecting user_agent nodes stats
-            *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
+            if !addrs.contains(&peer["addr"].to_string()) {
+                *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
+                addrs.push(peer["addr"].to_string());
+            }
         }
 
     }
@@ -157,7 +161,10 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
                             if resp != Value::Null {
                                 for peer in resp["result"]["Ok"].as_array().unwrap() {
                                     // Collecting user_agent nodes stats
-                                    *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
+                                    if !addrs.contains(&peer["addr"].to_string()) {
+                                        *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
+                                        addrs.push(peer["addr"].to_string());
+                                    }
                                 }
                             }
                          },
