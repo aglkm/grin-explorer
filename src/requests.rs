@@ -159,11 +159,13 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
         match call_external("get_connected_peers", "[]", "1", "owner", endpoint).await {
             Ok(resp) => {
                             if resp != Value::Null {
-                                for peer in resp["result"]["Ok"].as_array().unwrap() {
-                                    // Collecting user_agent nodes stats
-                                    if !addrs.contains(&peer["addr"].to_string()) {
-                                        *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
-                                        addrs.push(peer["addr"].to_string());
+                                if resp1["result"]["Ok"].is_null() == false { 
+                                    for peer in resp["result"]["Ok"].as_array().unwrap() {
+                                        // Collecting user_agent nodes stats
+                                        if !addrs.contains(&peer["addr"].to_string()) {
+                                            *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
+                                            addrs.push(peer["addr"].to_string());
+                                        }
                                     }
                                 }
                             }
