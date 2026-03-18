@@ -25,9 +25,13 @@ coingecko_api = "enabled"
 # Enable or disable node POST API public access.
 public_api = "enabled"
 
-# List of external node endpoints, used for peer stats.
+# List of node endpoints that used for collecting peer stats.
 # Comment out if you wish, only local peer stats will be used then.
-# external_nodes = ["https://grinnode.live:3413", "https://grincoin.org"]
+# Note that not all public nodes provide "get_connected_peers" owner API.
+# stats_source = ["https://grinnode.live:3413", "https://grincoin.org"]
+ 
+# List of piblic nodes
+# public_nodes = ["https://grincoin.org", "https://main.gri.mw", "https://mainnet.grinffindor.org", "https://grinnode.live:3413", "https://scan.grin.money"]
 
 # Database path.
 # By default, it will be created in the current directory.
@@ -47,7 +51,7 @@ public_api = "enabled"
 # Grincoin config
 # host = "grincoin.org"
 # proto = "https"
-# coingecko_api = "enabled"
+# coingecko_api = "disabled"
 # public_api = "enabled"
 # database = "database.sqlite"
 
