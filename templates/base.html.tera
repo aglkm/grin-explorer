@@ -367,7 +367,7 @@
             <div class="row mb-2">
               <div class="d-flex justify-content-center">
                 <a class="text-decoration-none me-2" href="https://github.com/aglkm/grin-explorer">
-                  <span style="color:grey"><i class="bi bi-github me-1"></i>v0.1.8</span>
+                  <span style="color:grey"><i class="bi bi-github me-1"></i>v0.1.9</span>
 	        </a>
                 <a class="text-decoration-none me-2" href="/search">
                   <span style="color:grey"><i class="bi bi-search me-1"></i>Search</span>
