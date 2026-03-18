@@ -3,6 +3,7 @@ use std::sync::{Arc, Mutex};
 
 use crate::data::Block;
 use crate::data::Dashboard;
+use crate::data::NetStats;
 use crate::data::Statistics;
 use crate::data::Transactions;
 use crate::database;
@@ -12,23 +13,26 @@ use crate::requests;
 
 // Collecting main data.
 pub async fn data(dash: Arc<Mutex<Dashboard>>, blocks: Arc<Mutex<Vec<Block>>>,
-                  txns: Arc<Mutex<Transactions>>, stats: Arc<Mutex<Statistics>>) -> Result<(), anyhow::Error> {
+                  txns: Arc<Mutex<Transactions>>, stats: Arc<Mutex<Statistics>>,
+                  netstats: Arc<Mutex<NetStats>>) -> Result<(), anyhow::Error> {
     let _ = requests::get_status(dash.clone()).await?;
     let _ = requests::get_mempool(dash.clone()).await?;
-    let _ = requests::get_connected_peers(dash.clone(), stats.clone()).await?;
+    let _ = requests::get_connected_peers(dash.clone(), stats.clone(), netstats.clone()).await?;
     let _ = requests::get_market(dash.clone()).await?;
     let _ = requests::get_disk_usage(dash.clone())?;
     let _ = requests::get_mining_stats(dash.clone()).await?;
     let _ = requests::get_recent_blocks(dash.clone(), blocks.clone()).await?;
     let _ = requests::get_txn_stats(dash.clone(), txns.clone()).await?;
+    let _ = requests::get_pubnodes_stats(netstats.clone()).await?;
 
     Ok(())
 }
 
 // Collecting statistics.
-pub async fn stats(dash: Arc<Mutex<Dashboard>>, txns: Arc<Mutex<Transactions>>, stats: Arc<Mutex<Statistics>>) -> Result<(), anyhow::Error> {
+pub async fn stats(dash: Arc<Mutex<Dashboard>>, txns: Arc<Mutex<Transactions>>, stats: Arc<Mutex<Statistics>>, netstats: Arc<Mutex<NetStats>>) -> Result<(), anyhow::Error> {
 
     let _ = requests::get_unspent_outputs(dash.clone()).await?;
+    let _ = requests::get_reachable_nodes(netstats.clone()).await?;
 
     let mut stats = stats.lock().unwrap();
     let dash      = dash.lock().unwrap();

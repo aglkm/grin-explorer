@@ -12,7 +12,7 @@ use std::time::Duration;
 use serde_json::Value;
 use tera_thousands::separate_with_commas;
 
-use crate::data::{Block, Dashboard, Kernel, Output, Statistics, Transactions, OUTPUT_SIZE, KERNEL_SIZE};
+use crate::data::{Block, Dashboard, Kernel, NetStats, Output, Statistics, Transactions, OUTPUT_SIZE, KERNEL_SIZE};
 use crate::exconfig::CONFIG;
 
 mod data;
@@ -387,6 +387,7 @@ fn donate() -> Template {
     })
 }
 
+
 // Rendering API Overview page.
 #[get("/api_overview")]
 fn api_overview() -> Template {
@@ -394,6 +395,21 @@ fn api_overview() -> Template {
         route:      "api_overview",
         public_api: CONFIG.public_api.clone(),
         cg_api:     CONFIG.coingecko_api.clone(),
+    })
+}
+
+
+// Rendering Network page.
+#[get("/network")]
+fn network(netstats: &State<Arc<Mutex<NetStats>>>) -> Template {
+    let data = netstats.lock().unwrap();
+
+    Template::render("network", context! {
+        route:  "network",
+        pub_nodes: &data.pub_nodes,
+        reach_nodes: &data.reach_nodes,
+        reach_len: &data.reach_nodes.len(),
+        cg_api: CONFIG.coingecko_api.clone(),
     })
 }
 
@@ -879,14 +895,16 @@ async fn main() {
 
     info!("starting up.");
     
-    let dash         = Arc::new(Mutex::new(Dashboard::new()));
-    let dash_clone   = dash.clone();
-    let blocks       = Arc::new(Mutex::new(Vec::<Block>::new()));
-    let blocks_clone = blocks.clone();
-    let txns         = Arc::new(Mutex::new(Transactions::new()));
-    let txns_clone   = txns.clone();
-    let stats        = Arc::new(Mutex::new(Statistics::new()));
-    let stats_clone  = stats.clone();
+    let dash           = Arc::new(Mutex::new(Dashboard::new()));
+    let dash_clone     = dash.clone();
+    let blocks         = Arc::new(Mutex::new(Vec::<Block>::new()));
+    let blocks_clone   = blocks.clone();
+    let txns           = Arc::new(Mutex::new(Transactions::new()));
+    let txns_clone     = txns.clone();
+    let stats          = Arc::new(Mutex::new(Statistics::new()));
+    let stats_clone    = stats.clone();
+    let netstats       = Arc::new(Mutex::new(NetStats::new()));
+    let netstats_clone = netstats.clone();
 
     let mut ready_data  = false;
     let mut ready_stats = false;
@@ -925,7 +943,8 @@ async fn main() {
     tokio::spawn(async move {
         loop {
             let result = worker::data(dash_clone.clone(), blocks_clone.clone(),
-                                      txns_clone.clone(), stats_clone.clone()).await;
+                                      txns_clone.clone(), stats_clone.clone(),
+                                      netstats_clone.clone()).await;
             
             match result {
                 Ok(_v)  => {
@@ -945,7 +964,7 @@ async fn main() {
             if date != date_now {
                 date = date_now;
                 let result = worker::stats(dash_clone.clone(), txns_clone.clone(),
-                                           stats_clone.clone()).await;
+                                           stats_clone.clone(), netstats_clone.clone()).await;
             
                 match result {
                     Ok(_v)  => {
@@ -976,6 +995,7 @@ async fn main() {
             .manage(blocks)
             .manage(txns)
             .manage(stats)
+            .manage(netstats)
             .mount("/", routes![index, peers_inbound, peers_outbound, sync_status, market_supply,
                                 inflation_rate, volume_usd, volume_btc, price_usd, price_btc,
                                 mcap_usd, mcap_btc,latest_height, disk_usage, network_hashrate,
@@ -986,7 +1006,7 @@ async fn main() {
                                 soft_supply, production_cost, reward_ratio, breakeven_cost,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
                                 output, api_owner, api_foreign, stats, unspent_outputs, kernels,
-                                emission, api_overview, donate, supply_raw])
+                                emission, api_overview, donate, supply_raw, network])
             .mount("/static", FileServer::from("static"))
             .attach(Template::custom(|engines| {engines.tera.register_filter("separate_with_commas", separate_with_commas)}))
             .launch()

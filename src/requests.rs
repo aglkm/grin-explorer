@@ -1,15 +1,17 @@
 use chrono::{Utc, DateTime};
+use country_emoji::code_to_flag;
 use fs_extra::dir::get_size;
 use humantime::format_duration;
 use num_format::{Locale, ToFormattedString};
 use reqwest::Error;
 use serde_json::Value;
+use std::net::{TcpStream, SocketAddr};
 use std::sync::{Arc, Mutex};
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::Duration;
 use std::collections::HashMap;
 
-use crate::data::{Block, Dashboard, Kernel, Output, Statistics, Transactions};
+use crate::data::{Block, ConnectedNode, Dashboard, Kernel, NetStats, Output, PublicNode, Statistics, Transactions};
 use crate::data::{KERNEL_WEIGHT, INPUT_WEIGHT, OUTPUT_WEIGHT, KERNEL_SIZE, INPUT_SIZE, OUTPUT_SIZE};
 use crate::exconfig::CONFIG;
 
@@ -128,16 +130,20 @@ pub async fn get_mempool(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), anyhow:
 
 
 // Collecting: inbound, outbound, user_agent.
-pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: Arc<Mutex<Statistics>>) -> Result<(), anyhow::Error> {
-    let mut peers    = HashMap::new();
-    let mut addrs    = Vec::new();
-    let mut inbound  = 0;
-    let mut outbound = 0;
+pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: Arc<Mutex<Statistics>>,
+                                 netstats: Arc<Mutex<NetStats>>) -> Result<(), anyhow::Error> {
+    let mut peers           = HashMap::new();
+    let mut addrs           = Vec::new();
+    let mut connected_nodes = Vec::<ConnectedNode>::new();
+    let mut inbound         = 0;
+    let mut outbound        = 0;
 
     let resp = call("get_connected_peers", "[]", "1", "owner").await?;
     
     if resp != Value::Null {
+        let mut node = ConnectedNode::new();
 
+        // Collecting peers from local node
         for peer in resp["result"]["Ok"].as_array().unwrap() {
             if peer["direction"] == "Inbound" {
                 inbound += 1;
@@ -149,22 +155,29 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
             if !addrs.contains(&peer["addr"].to_string()) {
                 *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
                 addrs.push(peer["addr"].to_string());
+                node.address = peer["addr"].as_str().unwrap().to_string();
+                node.user_agent = peer["user_agent"].as_str().unwrap().to_string();
+                connected_nodes.push(node.clone());
             }
         }
 
     }
 
-    // Collecting peers stats from external endpoints
-    for endpoint in CONFIG.external_nodes.clone() {
+    // Collecting peers from external endpoints
+    for endpoint in CONFIG.stats_source.clone() {
         match call_external("get_connected_peers", "[]", "1", "owner", endpoint).await {
             Ok(resp) => {
                             if resp != Value::Null {
+                                let mut node = ConnectedNode::new();
                                 if resp["result"]["Ok"].is_null() == false { 
                                     for peer in resp["result"]["Ok"].as_array().unwrap() {
                                         // Collecting user_agent nodes stats
                                         if !addrs.contains(&peer["addr"].to_string()) {
                                             *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
                                             addrs.push(peer["addr"].to_string());
+                                            node.address = peer["addr"].as_str().unwrap().to_string();
+                                            node.user_agent = peer["user_agent"].as_str().unwrap().to_string();
+                                            connected_nodes.push(node.clone());
                                         }
                                     }
                                 }
@@ -193,6 +206,10 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
 
     dash.inbound  = inbound;
     dash.outbound = outbound;
+
+    let mut nstats = netstats.lock().unwrap();
+
+    nstats.conn_nodes = connected_nodes.clone();
 
     Ok(())
 }
@@ -778,5 +795,108 @@ pub async fn get_unspent_outputs(dashboard: Arc<Mutex<Dashboard>>) -> Result<(),
     data.utxo_count = utxo_count.to_string();
 
     Ok(())
+}
+
+// Get public nodes data
+pub async fn get_pubnodes_stats(netstats: Arc<Mutex<NetStats>>) -> Result<(), anyhow::Error> {
+    let mut nodes = Vec::<PublicNode>::new();
+
+    for endpoint in CONFIG.public_nodes.clone() {
+        let mut node = PublicNode::new();
+
+        node.name = endpoint
+            .strip_prefix("https://")
+            .or_else(|| endpoint.strip_prefix("http://"))
+            .unwrap_or(&endpoint)
+            .split('/')
+            .next()
+            .unwrap_or("")
+            .to_string();
+
+        match call_external("get_version", "[]", "1", "foreign", endpoint.clone()).await {
+            Ok(resp) => {
+                            if resp != Value::Null {
+                                node.version = resp["result"]["Ok"]["node_version"].as_str().unwrap().to_string();
+                            }
+                        },
+            Err(e)   => {
+                            warn!("{}", e);
+                            continue;
+                        },
+        }
+
+        match call_external("get_tip", "[]", "1", "foreign", endpoint).await {
+            Ok(resp) => {
+                            if resp != Value::Null {
+                                node.height = resp["result"]["Ok"]["height"].to_string();
+                                node.hash = resp["result"]["Ok"]["last_block_pushed"].as_str().unwrap().to_string();
+                            }
+                        },
+            Err(e)   => {
+                            warn!("{}", e);
+                            continue;
+                        },
+        }
+        nodes.push(node);
+    }
+
+    let mut network = netstats.lock().unwrap();
+
+    network.pub_nodes = nodes.clone();
+
+    Ok(())
+}
+
+
+pub async fn get_reachable_nodes(netstats: Arc<Mutex<NetStats>>) -> Result<(), anyhow::Error> {
+    let conn_nodes      = get_conn_nodes(netstats.clone());
+    let mut reach_nodes = Vec::<ConnectedNode>::new();
+
+    for mut node in conn_nodes.clone() {
+        let socket_addr: SocketAddr = match node.address.parse() {
+            Ok(addr) => addr,
+            Err(_)   => continue,
+        };
+
+        // Attempt to connect with a timeout
+        match TcpStream::connect_timeout(&socket_addr, Duration::from_millis(3000)) {
+            Ok(_) => {
+                         let client = reqwest::Client::new();
+                         if let Some((ip, _port)) = node.address.split_once(':') {
+                             //let url = format!("https://api.country.is/{}", ip);
+                             let url = format!("http://ip-api.com/json/{}", ip);
+
+                             let resp: Value = client.get(&url).send().await?.json().await?;
+                             if resp != Value::Null && resp["status"] == "success" {
+                                 if let Some(code) = resp["countryCode"].as_str() {
+                                     node.location = resp["country"].as_str().unwrap().to_string();
+                                     node.isp      = resp["isp"].as_str().unwrap().to_string();
+                                     node.flag     = code_to_flag(code).unwrap().to_string();
+                                 }
+                             }
+                         }
+                         
+                         if !reach_nodes.contains(&node) {
+                             reach_nodes.push(node.clone());
+                         }
+                     },
+            Err(_) => {
+                          reach_nodes.retain(|value| value.address != node.address);
+                      },
+        }
+    }
+
+    let mut nstats = netstats.lock().unwrap();
+
+    nstats.reach_nodes = reach_nodes.clone();
+
+    Ok(())
+}
+
+
+pub fn get_conn_nodes(netstats: Arc<Mutex<NetStats>>) -> Vec<ConnectedNode> {
+    let nstats = netstats.lock().unwrap();
+
+    nstats.conn_nodes.clone()
 }
 

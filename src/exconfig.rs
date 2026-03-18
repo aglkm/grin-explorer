@@ -43,15 +43,24 @@ lazy_static! {
             Err(_e) => {},
         }
        
-        match toml.get_array("external_nodes") {
+        match toml.get_array("stats_source") {
             Ok(nodes)   => {
                                for endpoint in nodes.clone() {
-                                   cfg.external_nodes.push(endpoint.into_string().unwrap());
+                                   cfg.stats_source.push(endpoint.into_string().unwrap());
                                }
                            },
             Err(_e) => {},
         }
-        
+       
+        match toml.get_array("public_nodes") {
+            Ok(nodes)   => {
+                               for endpoint in nodes.clone() {
+                                   cfg.public_nodes.push(endpoint.into_string().unwrap());
+                               }
+                           },
+            Err(_e) => {},
+        }
+
         match toml.get_string("database") {
             Ok(v)   => cfg.database = v,
             Err(_e) => {},

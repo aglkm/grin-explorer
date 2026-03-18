@@ -192,7 +192,8 @@ pub struct ExplorerConfig {
     pub foreign_api_secret:      String,
     pub coingecko_api:           String,
     pub public_api:              String,
-    pub external_nodes:          Vec<String>,
+    pub stats_source:            Vec<String>,
+    pub public_nodes:            Vec<String>,
     pub database:                String,
 }
 
@@ -210,7 +211,8 @@ impl ExplorerConfig {
             foreign_api_secret:      String::new(),
             coingecko_api:           String::new(),
             public_api:              String::new(),
-            external_nodes:          Vec::new(),
+            stats_source:            Vec::new(),
+            public_nodes:            Vec::new(),
             database:                String::new(),
         }
     }
@@ -271,6 +273,68 @@ impl Statistics {
             fees:       Vec::new(),
             utxos: Vec::new(),
             kernels:    Vec::new(),
+        }
+    }
+}
+
+// Public node data
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PublicNode {
+    pub name:    String,
+    pub version: String,
+    pub height:  String,
+    pub hash:    String,
+}
+
+impl PublicNode {
+    pub fn new() -> PublicNode {
+        PublicNode {
+            name:    String::new(),
+            version: String::new(),
+            height:  String::new(),
+            hash:    String::new(),
+        }
+    }
+}
+
+
+// Connected node data
+#[derive(PartialEq, Eq, Debug, Clone, Serialize, Deserialize)]
+pub struct ConnectedNode {
+    pub address:    String,
+    pub user_agent: String,
+    pub location:   String,
+    pub flag:       String,
+    pub isp:        String,
+}
+
+impl ConnectedNode {
+    pub fn new() -> ConnectedNode {
+        ConnectedNode {
+            address:    String::new(),
+            user_agent: String::new(),
+            location:   String::new(),
+            flag:       String::new(),
+            isp:        String::new(),
+        }
+    }
+}
+
+
+// Network data
+#[derive(Debug, Serialize)]
+pub struct NetStats {
+    pub pub_nodes:   Vec<PublicNode>,
+    pub reach_nodes: Vec<ConnectedNode>,
+    pub conn_nodes:  Vec<ConnectedNode>,
+}
+
+impl NetStats {
+    pub fn new() -> NetStats {
+        NetStats {
+            pub_nodes:   Vec::new(),
+            reach_nodes: Vec::new(),
+            conn_nodes:  Vec::new(),
         }
     }
 }

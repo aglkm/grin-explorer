@@ -1,0 +1,217 @@
+{% extends "base" %}
+
+{% block content %}
+
+<code>
+          
+<div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+  <div class="card-body" align="center">
+    <div class="value-text">
+      <div class="darkorange-text">PUBLIC NODES</div>
+    </div>
+  </div>
+</div>
+
+<div class="d-none d-md-block"> <!-- Show on >= md screens -->
+  <div class="card-group">
+      <div class="card border-start-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            NAME
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            VERSION
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            LATEST BLOCK
+          </div>
+	</div>
+      </div>
+      <div class="card border-end-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            BLOCK HASH
+          </div>
+	</div>
+      </div>
+  </div>
+
+
+    {% for node in pub_nodes %}
+    <div class="card-group rounded-0">
+        <div class="card border-top-0 border-start-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.name }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.version }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.height }}</div>
+          </div>
+	</div>
+        <div class="card border-top-0 border-end-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">
+                <a class="text-decoration-none" href="/hash/{{ node.hash }}">
+                  {{ node.hash | truncate(length=15) }}
+                </a>
+              </div>
+          </div>
+	</div>
+    </div>
+    {% endfor %}
+
+</div>
+
+
+<div class="d-md-none"> <!-- Show on < md screens-->
+    {% for node in pub_nodes %}
+        <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+          <div class="card-body" align="left">
+              <div class="d-flex justify-content-start">
+	        <i class="bi bi-pc-display-horizontal darkorange-text"></i>&nbsp;
+                  <div class="darkorange-text">{{ node.name }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Version</div>
+                  <div class="value-text">{{ node.version }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Latest Block</div>
+                  <div class="value-text">{{ node.height }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Block Hash</div>
+                  <div class="value-text">
+                    <a class="text-decoration-none" href="/hash/{{ node.hash }}">
+                      {{ node.hash | truncate(length=15) }}
+                    </a>
+                  </div>
+              </div>
+          </div>
+	</div>
+    {% endfor %}
+    <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+    </div>
+</div>
+
+
+<div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+  <div class="card-body" align="center">
+    <div class="value-text">
+      <div class="darkorange-text">REACHABLE NODES ({{ reach_len }})</div>
+    </div>
+  </div>
+</div>
+
+<div class="d-none d-md-block"> <!-- Show on >= md screens -->
+  <div class="card-group">
+      <div class="card border-start-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            ADDRESS
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            USER AGENT
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            ISP
+          </div>
+	</div>
+      </div>
+      <div class="card border-end-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            LOCATION
+          </div>
+	</div>
+      </div>
+  </div>
+
+
+    {% for node in reach_nodes %}
+    <div class="card-group rounded-0">
+        <div class="card border-top-0 border-start-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.address }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.user_agent }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.isp }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 border-end-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.location }} {{ node.flag }}</div>
+          </div>
+	</div>
+    </div>
+    {% endfor %}
+
+</div>
+
+
+<div class="d-md-none"> <!-- Show on < md screens-->
+    {% for node in reach_nodes %}
+        <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+          <div class="card-body" align="left">
+              <div class="d-flex justify-content-start">
+	        <i class="bi bi-pc-display-horizontal darkorange-text"></i>&nbsp;
+                  <div class="darkorange-text">{{ node.address }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">User Agent</div>
+                  <div class="value-text">{{ node.user_agent }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">ISP</div>
+                  <div class="value-text">{{ node.isp }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Location</div>
+                  <div class="value-text">{{ node.location }} {{ node.flag }}</div>
+              </div>
+          </div>
+	</div>
+    {% endfor %}
+    <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+    </div>
+</div>
+
+
+</code>
+
+{% endblock %}

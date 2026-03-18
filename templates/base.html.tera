@@ -50,6 +50,9 @@
               <li class="nav-item">
 	        <a class="nav-link" href="/emission"><i class="bi bi-graph-down-arrow"></i> Emission</a>
               </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/network"><i class="bi bi-hdd-network"></i> Network</a>
+              </li>
 	    {% elif route == "block_list" or route == "block_list_by_height" %}
               <li class="nav-item">
                 <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
@@ -62,6 +65,9 @@
               </li>
               <li class="nav-item">
 	        <a class="nav-link" href="/emission"><i class="bi bi-graph-down-arrow"></i> Emission</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/network"><i class="bi bi-hdd-network"></i> Network</a>
               </li>
 	    {% elif route == "stats" %}
               <li class="nav-item">
@@ -76,6 +82,9 @@
               <li class="nav-item">
 	        <a class="nav-link" href="/emission"><i class="bi bi-graph-down-arrow"></i> Emission</a>
               </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/network"><i class="bi bi-hdd-network"></i> Network</a>
+              </li>
 	    {% elif route == "emission" %}
               <li class="nav-item">
                 <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
@@ -89,6 +98,25 @@
               <li class="nav-item">
 	        <a class="nav-link" href="/emission"><div class="darkorange-text"><i class="bi bi-graph-down-arrow"></i> Emission</div></a>
               </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/network"><i class="bi bi-hdd-network"></i> Network</a>
+              </li>
+            {% elif route == "network" %}
+              <li class="nav-item">
+                <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/block_list"><i class="bi bi-box"></i> Blocks</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/stats"><i class="bi bi-calculator"></i> Statistics</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/emission"><i class="bi bi-graph-down-arrow"></i> Emission</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/network"><div class="darkorange-text"><i class="bi bi-hdd-network"></i> Network</div></a>
+              </li>
 	    {% else %}
               <li class="nav-item">
                 <a class="nav-link" href="/"><i class="bi bi-speedometer"></i> Dashboard</a>
@@ -101,6 +129,9 @@
               </li>
               <li class="nav-item">
 	        <a class="nav-link" href="/emission"><i class="bi bi-graph-down-arrow"></i> Emission</a>
+              </li>
+              <li class="nav-item">
+	        <a class="nav-link" href="/network"><i class="bi bi-hdd-network"></i> Network</a>
               </li>
 	    {% endif %}
           </ul>
