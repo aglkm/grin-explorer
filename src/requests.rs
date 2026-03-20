@@ -862,7 +862,7 @@ pub async fn get_reachable_nodes(netstats: Arc<Mutex<NetStats>>) -> Result<(), a
         match TcpStream::connect_timeout(&socket_addr, Duration::from_millis(3000)) {
             Ok(_) => {
                          let client = reqwest::Client::new();
-                         if let Some((addr, _port)) = node.address.split_once(':') {
+                         if let Some((addr, _port)) = node.address.rsplit_once(':') {
                              let ip = addr.trim_matches(|c| c == '[' || c == ']');
                              //let url = format!("https://api.country.is/{}", ip);
                              let url = format!("http://ip-api.com/json/{}", ip);
