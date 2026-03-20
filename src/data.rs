@@ -301,21 +301,25 @@ impl PublicNode {
 // Connected node data
 #[derive(PartialEq, Eq, Debug, Clone, Serialize, Deserialize)]
 pub struct ConnectedNode {
-    pub address:    String,
-    pub user_agent: String,
-    pub location:   String,
-    pub flag:       String,
-    pub isp:        String,
+    pub address:     String,
+    pub user_agent:  String,
+    pub bits:        u32,
+    pub is_archival: bool,
+    pub location:    String,
+    pub flag:        String,
+    pub isp:         String,
 }
 
 impl ConnectedNode {
     pub fn new() -> ConnectedNode {
         ConnectedNode {
-            address:    String::new(),
-            user_agent: String::new(),
-            location:   String::new(),
-            flag:       String::new(),
-            isp:        String::new(),
+            address:     String::new(),
+            user_agent:  String::new(),
+            bits:        0,
+            is_archival: false,
+            location:    String::new(),
+            flag:        String::new(),
+            isp:         String::new(),
         }
     }
 }

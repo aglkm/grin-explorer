@@ -82,8 +82,7 @@
         <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
           <div class="card-body" align="left">
               <div class="d-flex justify-content-start">
-	        <i class="bi bi-pc-display-horizontal darkorange-text"></i>&nbsp;
-                  <div class="darkorange-text">{{ node.name }}</div>
+                <div class="darkorange-text">{{ node.name }}</div>
               </div>
 	      <br>
               <div class="d-flex justify-content-between">
@@ -157,7 +156,11 @@
     <div class="card-group rounded-0">
         <div class="card border-top-0 border-start-0 rounded-0">
           <div class="card-body">
-              <div class="value-text">{{ node.address }}</div>
+              {% if node.is_archival == true %}
+                <div class="value-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
+              {% else %}
+                <div class="value-text">{{ node.address }}</div>
+              {% endif %}
 	  </div>
 	</div>
         <div class="card border-top-0 rounded-0">
@@ -186,8 +189,11 @@
         <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
           <div class="card-body" align="left">
               <div class="d-flex justify-content-start">
-	        <i class="bi bi-pc-display-horizontal darkorange-text"></i>&nbsp;
+                {% if node.is_archival == true %}
+                  <div class="darkorange-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
+                {% else %}
                   <div class="darkorange-text">{{ node.address }}</div>
+                {% endif %}
               </div>
 	      <br>
               <div class="d-flex justify-content-between">
@@ -197,7 +203,7 @@
 	      <br>
               <div class="d-flex justify-content-between">
 	        <div class="value-text">ISP</div>
-                  <div class="value-text">{{ node.isp }}</div>
+                  <div class="value-text text-end">{{ node.isp }}</div>
               </div>
 	      <br>
               <div class="d-flex justify-content-between">

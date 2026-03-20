@@ -141,22 +141,30 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
     let resp = call("get_connected_peers", "[]", "1", "owner").await?;
     
     if resp != Value::Null {
-        let mut node = ConnectedNode::new();
-
         // Collecting peers from local node
         for peer in resp["result"]["Ok"].as_array().unwrap() {
+            let mut node = ConnectedNode::new();
+
             if peer["direction"] == "Inbound" {
                 inbound += 1;
             }
             if peer["direction"] == "Outbound" {
                 outbound += 1;
             }
-            // Collecting user_agent nodes stats
+
+            // Collecting peers
             if !addrs.contains(&peer["addr"].to_string()) {
                 *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
                 addrs.push(peer["addr"].to_string());
                 node.address = peer["addr"].as_str().unwrap().to_string();
                 node.user_agent = peer["user_agent"].as_str().unwrap().to_string();
+                node.bits = peer["capabilities"]["bits"].to_string().parse::<u32>().unwrap();
+                // Check for BLOCK_HIST bit (archival mode)
+                // https://github.com/mimblewimble/grin/blob/2ec7b4d5cdba44db20d0007a71396e4bfd381cc5/p2p/src/types.rs#L393
+                if node.bits & (1 << 5) != 0 {
+                    node.is_archival = true;
+                }
+
                 connected_nodes.push(node.clone());
             }
         }
@@ -168,15 +176,21 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
         match call_external("get_connected_peers", "[]", "1", "owner", endpoint).await {
             Ok(resp) => {
                             if resp != Value::Null {
-                                let mut node = ConnectedNode::new();
                                 if resp["result"]["Ok"].is_null() == false { 
                                     for peer in resp["result"]["Ok"].as_array().unwrap() {
+                                        let mut node = ConnectedNode::new();
+
                                         // Collecting user_agent nodes stats
                                         if !addrs.contains(&peer["addr"].to_string()) {
                                             *peers.entry(peer["user_agent"].to_string()).or_insert(0) += 1;
                                             addrs.push(peer["addr"].to_string());
                                             node.address = peer["addr"].as_str().unwrap().to_string();
                                             node.user_agent = peer["user_agent"].as_str().unwrap().to_string();
+                                            node.bits = peer["capabilities"]["bits"].to_string().parse::<u32>().unwrap();
+                                            if node.bits & (1 << 5) != 0 {
+                                                node.is_archival = true;
+                                            }
+
                                             connected_nodes.push(node.clone());
                                         }
                                     }
