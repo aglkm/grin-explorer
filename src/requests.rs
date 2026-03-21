@@ -14,6 +14,7 @@ use std::collections::HashMap;
 use crate::data::{Block, ConnectedNode, Dashboard, Kernel, NetStats, Output, PublicNode, Statistics, Transactions};
 use crate::data::{KERNEL_WEIGHT, INPUT_WEIGHT, OUTPUT_WEIGHT, KERNEL_SIZE, INPUT_SIZE, OUTPUT_SIZE};
 use crate::exconfig::CONFIG;
+use crate::tokio::time;
 
 
 // RPC requests to grin node.
@@ -223,6 +224,7 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
 
     let mut nstats = netstats.lock().unwrap();
 
+    nstats.conn_nodes.clear();
     nstats.conn_nodes = connected_nodes.clone();
 
     Ok(())
@@ -890,20 +892,42 @@ pub async fn get_reachable_nodes(netstats: Arc<Mutex<NetStats>>) -> Result<(), a
                                  }
                              }
                          }
-                         
+
                          if !reach_nodes.contains(&node) {
                              reach_nodes.push(node.clone());
                          }
                      },
-            Err(_) => {
-                          reach_nodes.retain(|value| value.address != node.address);
-                      },
+            Err(_) => continue,
         }
+    }
+
+    let mut curr_reach_nodes = get_reach_nodes(netstats.clone());
+    
+    // Update current list of reachable nodes
+    for node in curr_reach_nodes.clone() {
+        let socket_addr: SocketAddr = match node.address.parse() {
+            Ok(addr) => addr,
+            Err(_)   => continue,
+        };
+
+        // Attempt to connect with a timeout
+        match TcpStream::connect_timeout(&socket_addr, Duration::from_millis(3000)) {
+            Ok(_) => continue,
+            Err(_) => curr_reach_nodes.retain(|value| value.address != node.address),
+        }
+        // no throttle
+        time::sleep(Duration::from_secs(1)).await;
     }
 
     let mut nstats = netstats.lock().unwrap();
 
-    nstats.reach_nodes = reach_nodes.clone();
+    nstats.reach_nodes.clear();
+    
+    // Copying updated list of reachable nodes
+    nstats.reach_nodes = curr_reach_nodes.clone();
+
+    // Appending newly found reachable nodes
+    nstats.reach_nodes.append(&mut reach_nodes);
 
     Ok(())
 }
@@ -914,4 +938,12 @@ pub fn get_conn_nodes(netstats: Arc<Mutex<NetStats>>) -> Vec<ConnectedNode> {
 
     nstats.conn_nodes.clone()
 }
+
+
+pub fn get_reach_nodes(netstats: Arc<Mutex<NetStats>>) -> Vec<ConnectedNode> {
+    let nstats = netstats.lock().unwrap();
+
+    nstats.reach_nodes.clone()
+}
+
 
