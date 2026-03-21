@@ -14,7 +14,6 @@ use std::collections::HashMap;
 use crate::data::{Block, ConnectedNode, Dashboard, Kernel, NetStats, Output, PublicNode, Statistics, Transactions};
 use crate::data::{KERNEL_WEIGHT, INPUT_WEIGHT, OUTPUT_WEIGHT, KERNEL_SIZE, INPUT_SIZE, OUTPUT_SIZE};
 use crate::exconfig::CONFIG;
-use crate::tokio::time;
 
 
 // RPC requests to grin node.
@@ -866,8 +865,23 @@ pub async fn get_pubnodes_stats(netstats: Arc<Mutex<NetStats>>) -> Result<(), an
 
 pub async fn get_reachable_nodes(netstats: Arc<Mutex<NetStats>>) -> Result<(), anyhow::Error> {
     let conn_nodes      = get_conn_nodes(netstats.clone());
-    let mut reach_nodes = Vec::<ConnectedNode>::new();
+    let mut reach_nodes = get_reach_nodes(netstats.clone());
 
+    // Update current list of reachable nodes
+    for node in reach_nodes.clone() {
+        let socket_addr: SocketAddr = match node.address.parse() {
+            Ok(addr) => addr,
+            Err(_)   => continue,
+        };
+
+        // Attempt to connect with a timeout
+        match TcpStream::connect_timeout(&socket_addr, Duration::from_millis(3000)) {
+            Ok(_) => continue,
+            Err(_) => reach_nodes.retain(|value| value.address != node.address),
+        }
+    }
+
+    // Loop over connected nodes and add to reachable nodes list if applicable
     for mut node in conn_nodes.clone() {
         let socket_addr: SocketAddr = match node.address.parse() {
             Ok(addr) => addr,
@@ -901,33 +915,12 @@ pub async fn get_reachable_nodes(netstats: Arc<Mutex<NetStats>>) -> Result<(), a
         }
     }
 
-    let mut curr_reach_nodes = get_reach_nodes(netstats.clone());
-    
-    // Update current list of reachable nodes
-    for node in curr_reach_nodes.clone() {
-        let socket_addr: SocketAddr = match node.address.parse() {
-            Ok(addr) => addr,
-            Err(_)   => continue,
-        };
-
-        // Attempt to connect with a timeout
-        match TcpStream::connect_timeout(&socket_addr, Duration::from_millis(3000)) {
-            Ok(_) => continue,
-            Err(_) => curr_reach_nodes.retain(|value| value.address != node.address),
-        }
-        // no throttle
-        time::sleep(Duration::from_secs(1)).await;
-    }
-
     let mut nstats = netstats.lock().unwrap();
 
     nstats.reach_nodes.clear();
     
     // Copying updated list of reachable nodes
-    nstats.reach_nodes = curr_reach_nodes.clone();
-
-    // Appending newly found reachable nodes
-    nstats.reach_nodes.append(&mut reach_nodes);
+    nstats.reach_nodes = reach_nodes.clone();
 
     Ok(())
 }
