@@ -907,7 +907,11 @@ pub async fn get_reachable_nodes(netstats: Arc<Mutex<NetStats>>) -> Result<(), a
                              }
                          }
 
-                         if !reach_nodes.contains(&node) {
+                         if let Some(item) = reach_nodes.iter_mut().find(|x| x.address == node.address) {
+                             // If address exists, then update with new data
+                             *item = node.clone();
+                         } else {
+                             // If it doesn't exist, add it
                              reach_nodes.push(node.clone());
                          }
                      },
