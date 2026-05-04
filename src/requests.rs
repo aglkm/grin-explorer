@@ -830,7 +830,7 @@ pub async fn get_pubnodes_stats(netstats: Arc<Mutex<NetStats>>) -> Result<(), an
 
         match call_external("get_version", "[]", "1", "foreign", endpoint.clone()).await {
             Ok(resp) => {
-                            if resp != Value::Null {
+                            if resp != Value::Null && resp["result"]["Ok"].is_null() == false {
                                 node.version = resp["result"]["Ok"]["node_version"].as_str().unwrap().to_string();
                             }
                         },
@@ -842,7 +842,7 @@ pub async fn get_pubnodes_stats(netstats: Arc<Mutex<NetStats>>) -> Result<(), an
 
         match call_external("get_tip", "[]", "1", "foreign", endpoint).await {
             Ok(resp) => {
-                            if resp != Value::Null {
+                            if resp != Value::Null && resp["result"]["Ok"].is_null() == false {
                                 node.height = resp["result"]["Ok"]["height"].to_string();
                                 node.hash = resp["result"]["Ok"]["last_block_pushed"].as_str().unwrap().to_string();
                             }
