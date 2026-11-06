@@ -108,30 +108,21 @@
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
-              <div class="value-text">Estimated Mining Cost
-                <!-- Button trigger mining cost explanation modal -->
-                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#mining_cost">
-                  <i class="bi bi-question-circle"></i>
-                </button>
-                </div><div class="value-text text-end" hx-get="/rpc/mining/production_cost" hx-trigger="load, every 10s"></div>
-            </div>
-	    <br>
-            <div class="d-flex justify-content-between">
-              <div class="value-text">Reward/Cost Ratio
-                <!-- Button trigger ratio explanation modal -->
-                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#ratio">
-                  <i class="bi bi-question-circle"></i>
-                </button>
-                </div><div class="value-text text-end" hx-get="/rpc/mining/reward_ratio" hx-trigger="load, every 10s"></div>
-            </div>
-	    <br>
-            <div class="d-flex justify-content-between">
-              <div class="value-text">Breakeven Electricity Cost
+              <div class="value-text">iPollo G1
                 <!-- Button trigger breakeven explanation modal -->
-                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#breakeven">
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#breakeven_g1">
                   <i class="bi bi-question-circle"></i>
                 </button>
-                </div><div class="value-text text-end" hx-get="/rpc/mining/breakeven_cost" hx-trigger="load, every 10s"></div>
+                </div><div class="value-text text-end" hx-get="/rpc/mining/breakeven_g1" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+              <div class="value-text">iPollo G1 mini
+                <!-- Button trigger breakeven explanation modal -->
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#breakeven_g1mini">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+                </div><div class="value-text text-end" hx-get="/rpc/mining/breakeven_g1mini" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
@@ -303,30 +294,21 @@
             </div>
 	    <br>
             <div class="d-flex justify-content-between">
-              <div class="value-text">Estimated Mining Cost
-                <!-- Button trigger mining cost explanation modal -->
-                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#mining_cost">
-                  <i class="bi bi-question-circle"></i>
-                </button>
-                </div><div class="value-text text-end" hx-get="/rpc/mining/production_cost" hx-trigger="load, every 10s"></div>
-            </div>
-	    <br>
-            <div class="d-flex justify-content-between">
-              <div class="value-text">Reward/Cost Ratio
-                <!-- Button trigger ratio explanation modal -->
-                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#ratio">
-                  <i class="bi bi-question-circle"></i>
-                </button>
-                </div><div class="value-text text-end" hx-get="/rpc/mining/reward_ratio" hx-trigger="load, every 10s"></div>
-            </div>
-	    <br>
-            <div class="d-flex justify-content-between">
-	      <div class="value-text">Breakeven Elec. Cost
+	      <div class="value-text">iPollo G1
                 <!-- Button trigger breakeven explanation modal -->
-                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#breakeven">
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#breakeven_g1">
                   <i class="bi bi-question-circle"></i>
                 </button>
-              </div><div class="value-text text-end" hx-get="/rpc/mining/breakeven_cost" hx-trigger="load, every 10s"></div>
+              </div><div class="value-text text-end" hx-get="/rpc/mining/breakeven_g1" hx-trigger="load, every 10s"></div>
+            </div>
+	    <br>
+            <div class="d-flex justify-content-between">
+	      <div class="value-text">iPollo G1 mini
+                <!-- Button trigger breakeven explanation modal -->
+                <button type="button" class="btn-sm" data-bs-toggle="modal" data-bs-target="#breakeven_g1mini">
+                  <i class="bi bi-question-circle"></i>
+                </button>
+              </div><div class="value-text text-end" hx-get="/rpc/mining/breakeven_g1mini" hx-trigger="load, every 10s"></div>
             </div>
           </div>
         </div>
@@ -696,61 +678,41 @@
   </div>
 </div>
 
-<div class="modal fade" id="mining_cost" tabindex="-1" aria-labelledby="mining_cost_label" aria-hidden="true">
+<div class="modal fade" id="breakeven_g1" tabindex="-1" aria-labelledby="breakeven_label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="mining_cost_label">Estimated Mining Cost</h1>
+        <h1 class="modal-title fs-5" id="breakeven_label">iPollo G1</h1>
         <div data-bs-theme="light">
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
       </div>
       <div class="modal-body">
-        Mining cost to produce 1 grin coin.<br>
-        Assuming that:<br>
-        Miner is G1-mini ASIC.<br>
-        Electricity cost is $0.07 per kW/h.<br>
+        <b>Breakeven electricity cost</b> is the maximum price a miner can pay for electricity while still covering the cost of mining Grin.<br>
+        Below <span class="value-text text-end" hx-get="/rpc/mining/breakeven_g1" hx-trigger="load"></span> - profitable.<br>
+        Above <span class="value-text text-end" hx-get="/rpc/mining/breakeven_g1" hx-trigger="load"></span> - unprofitable.<br>
         <br>
-        <a class="text-decoration-none" href="https://ipollo.com/products/ipollo-g1-mini">https://ipollo.com/products/ipollo-g1-mini</a>
+        Daily production: <span class="value-text text-end" hx-get="/rpc/mining/prod_g1" hx-trigger="load"></span>
       </div>
     </div>
   </div>
 </div>
 
-<div class="modal fade" id="ratio" tabindex="-1" aria-labelledby="ratio_label" aria-hidden="true">
+<div class="modal fade" id="breakeven_g1mini" tabindex="-1" aria-labelledby="breakeven_label" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="ratio_label">Reward/Cost Ratio</h1>
+        <h1 class="modal-title fs-5" id="breakeven_label">iPollo G1 mini</h1>
         <div data-bs-theme="light">
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
       </div>
       <div class="modal-body">
-        Shows the result of the following formula:<br>
-        Price of 1 Grin (USD) / Mining Cost of 1 Grin (USD).<br>
+        <b>Breakeven electricity cost</b> is the maximum price a miner can pay for electricity while still covering the cost of mining Grin.<br>
+        Below <span class="value-text text-end" hx-get="/rpc/mining/breakeven_g1mini" hx-trigger="load"></span> - profitable.<br>
+        Above <span class="value-text text-end" hx-get="/rpc/mining/breakeven_g1mini" hx-trigger="load"></span> - unprofitable.<br>
         <br>
-        <i class="bi bi-hand-thumbs-down"></i> - <= 1<br>
-        <i class="bi bi-hand-thumbs-up"></i> - from 1 to 2<br>
-        <i class="bi bi-emoji-sunglasses"></i> - from 2 to 3<br>
-        <i class='bi bi-rocket-takeoff'></i> - >= 3
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="breakeven" tabindex="-1" aria-labelledby="breakeven_label" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="breakeven_label">Breakeven Electricity Cost</h1>
-        <div data-bs-theme="light">
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-      </div>
-      <div class="modal-body">
-        Electricity threshold cost below which mining is profitable.<br>
-        Assuming G1-mini ASIC as a miner device.
+        Daily production: <span class="value-text text-end" hx-get="/rpc/mining/prod_g1mini" hx-trigger="load"></span>
       </div>
     </div>
   </div>

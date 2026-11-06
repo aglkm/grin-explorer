@@ -642,41 +642,34 @@ fn network_hashrate(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 }
 
 
-#[get("/rpc/mining/production_cost")]
-fn production_cost(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
+#[get("/rpc/mining/breakeven_g1")]
+fn breakeven_g1(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    format!("$ {}", data.production_cost)
+    format!("$ {} (kW/h)", data.breakeven_g1)
 }
 
 
-#[get("/rpc/mining/reward_ratio")]
-fn reward_ratio(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
+#[get("/rpc/mining/breakeven_g1mini")]
+fn breakeven_g1mini(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    if data.reward_ratio.is_empty() == false {
-        let ratio = data.reward_ratio.parse::<f64>().unwrap();
+    format!("$ {} (kW/h)", data.breakeven_g1mini)
+}
 
-        if ratio <= 1.0 {
-            return format!("x{} <i class='bi bi-hand-thumbs-down'></i>", data.reward_ratio);
-        } else if ratio < 2.0 {
-            return format!("x{} <i class='bi bi-hand-thumbs-up'></i>", data.reward_ratio);
-        } else if ratio < 3.0 {
-            return format!("x{} <i class='bi bi-emoji-sunglasses'></i>", data.reward_ratio);
-        } else if ratio >= 3.0 {
-            return format!("x{} <i class='bi bi-rocket-takeoff'></i>", data.reward_ratio);
-        }
-    }
+#[get("/rpc/mining/prod_g1")]
+fn prod_g1(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
+    let data = dashboard.lock().unwrap();
 
-    data.reward_ratio.clone()
+    format!(" {:.0} GRIN.", data.prod_g1 * 24.0)
 }
 
 
-#[get("/rpc/mining/breakeven_cost")]
-fn breakeven_cost(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
+#[get("/rpc/mining/prod_g1mini")]
+fn prod_g1mini(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
     let data = dashboard.lock().unwrap();
 
-    format!("$ {} (kW/h)", data.breakeven_cost)
+    format!(" {:.0} GRIN.", data.prod_g1mini * 24.0)
 }
 
 
@@ -1003,7 +996,7 @@ async fn main() {
                                 txns_count_24h, block_list, block_link, block_link_color,
                                 block_time, block_txns, block_inputs, block_outputs, block_fees,
                                 block_size, block_weight, block_details_by_height, block_header_by_hash,
-                                soft_supply, production_cost, reward_ratio, breakeven_cost,
+                                soft_supply, breakeven_g1, breakeven_g1mini, prod_g1, prod_g1mini,
                                 last_block_age, block_list_by_height, block_list_index, search, kernel,
                                 output, api_owner, api_foreign, stats, unspent_outputs, kernels,
                                 emission, api_overview, donate, supply_raw, network])

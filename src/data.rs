@@ -42,10 +42,12 @@ pub struct Dashboard {
     pub hashrate:        String,
     pub hashrate_kgs:    String,
     pub difficulty:      String,
-    // mining
-    pub production_cost: String,
-    pub reward_ratio:    String,
-    pub breakeven_cost:  String,
+    // Breakeven electricity cost
+    pub breakeven_g1:    String,
+    pub breakeven_g1mini: String,
+    // Hourly production
+    pub prod_g1:         f64,
+    pub prod_g1mini:     f64,
     // mempool
     pub txns:            String,
     pub stem:            String,
@@ -79,9 +81,10 @@ impl Dashboard {
             hashrate:        String::new(),
             hashrate_kgs:    String::new(),
             difficulty:      String::new(),
-            production_cost: String::new(),
-            reward_ratio:    String::new(),
-            breakeven_cost:  String::new(),
+            breakeven_g1:    String::new(),
+            breakeven_g1mini: String::new(),
+            prod_g1:         0.0,
+            prod_g1mini:     0.0,
             txns:            String::new(),
             stem:            String::new(),
             utxo_count:      String::new(),

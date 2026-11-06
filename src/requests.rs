@@ -359,18 +359,20 @@ pub async fn get_mining_stats(dashboard: Arc<Mutex<Dashboard>>) -> Result<(), an
             data.difficulty = net_diff.to_string();
 
             if CONFIG.coingecko_api == "enabled" {
-                // Calculating G1-mini production per hour
-                let coins_per_hour = 1.2 / hashrate * 60.0 * 60.0;
-
-                // Calculating production cost of 1 grin
-                // Assuming $0.07 per kW/h
-                data.production_cost = format!("{:.3}", 120.0 / 1000.0 * 0.07 * (1.0 / coins_per_hour));
+                // G1 (36 G/s) production per hour
+                data.prod_g1 = 36.0 / hashrate * 60.0 * 60.0;
+                // G1 mini (1.2 G/s) production per hour
+                data.prod_g1mini = 1.2 / hashrate * 60.0 * 60.0;
 
                 if data.price_usd.is_empty() == false {
-                    data.reward_ratio   = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
-                                                        / data.production_cost.parse::<f64>().unwrap());
-                    data.breakeven_cost = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
-                                                        / (120.0 / 1000.0 * (1.0 / coins_per_hour)));
+                    // Calculating breakeven electricity cost for the ASICs
+
+                    // iPollo G1 (2800W)
+                    data.breakeven_g1 = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                                                  / (2800.0 / 1000.0 * (1.0 / data.prod_g1)));
+                    // iPollo G1 mini (120W)
+                    data.breakeven_g1mini = format!("{:.2}", data.price_usd.parse::<f64>().unwrap()
+                                                     / (120.0 / 1000.0 * (1.0 / data.prod_g1mini)));
                 }
             }
         } else {
