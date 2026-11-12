@@ -14,7 +14,7 @@ pub const OUTPUT_SIZE: u64 = 674 + 33 + 1;
 
 
 // Dashboard data 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Dashboard {
     // status
     pub chain:           String,
@@ -57,45 +57,9 @@ pub struct Dashboard {
     pub kernel_mmr_size: String,
 }
 
-impl Dashboard {
-    pub fn new() -> Dashboard {
-        Dashboard {
-            chain:           String::new(),
-            height:          String::new(),
-            sync:            String::new(),
-            node_ver:        String::new(),
-            proto_ver:       String::new(),
-            inbound:         0,
-            outbound:        0,
-            supply:          String::new(),
-            supply_raw:      String::new(),
-            soft_supply:     String::new(),
-            inflation:       String::new(),
-            price_usd:       String::new(),
-            price_btc:       String::new(),
-            volume_usd:      String::new(),
-            volume_btc:      String::new(),
-            cap_usd:         String::new(),
-            cap_btc:         String::new(),
-            disk_usage:      String::new(),
-            hashrate:        String::new(),
-            hashrate_kgs:    String::new(),
-            difficulty:      String::new(),
-            breakeven_g1:    String::new(),
-            breakeven_g1mini: String::new(),
-            prod_g1:         0.0,
-            prod_g1mini:     0.0,
-            txns:            String::new(),
-            stem:            String::new(),
-            utxo_count:      String::new(),
-            kernel_mmr_size: String::new(),
-        }
-    }
-}
-
 
 // Block data
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Block {
     pub hash:     String,
     pub height:   String,
@@ -113,30 +77,9 @@ pub struct Block {
     pub raw_data: String,
 }
 
-impl Block {
-    pub fn new() -> Block {
-        Block {
-            hash:     String::new(),
-            height:   String::new(),
-            time:     String::new(),
-            version:  String::new(),
-            weight:   0.0,
-            size:     String::new(),
-            fees:     0.0,
-            kernels:  Vec::new(),
-            inputs:   Vec::new(),
-            outputs:  Vec::new(),
-            ker_len:  0,
-            in_len:   0,
-            out_len:  0,
-            raw_data: String::new(),
-        }
-    }
-}
-
 
 // Kernel data
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Kernel {
     pub height:   String,
     pub excess:   String,
@@ -146,22 +89,9 @@ pub struct Kernel {
     pub raw_data: String,
 }
 
-impl Kernel {
-    pub fn new() -> Kernel {
-        Kernel {
-            height:   String::new(),
-            excess:   String::new(),
-            ker_type: String::new(),
-            fee:      String::new(),
-            status:   String::new(),
-            raw_data: String::new(),
-        }
-    }
-}
-
 
 // Transactions data
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Transactions {
     pub period_1h:  String,
     pub period_24h: String,
@@ -169,20 +99,9 @@ pub struct Transactions {
     pub fees_24h:   String,
 }
 
-impl Transactions {
-    pub fn new() -> Transactions {
-        Transactions {
-            period_1h:  String::new(),
-            period_24h: String::new(),
-            fees_1h:    String::new(),
-            fees_24h:   String::new(),
-        }
-    }
-}
-
 
 // Explorer configuration
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ExplorerConfig {
     pub host:                    String,
     pub port:                    String,
@@ -200,30 +119,9 @@ pub struct ExplorerConfig {
     pub database:                String,
 }
 
-impl ExplorerConfig {
-    pub fn new() -> ExplorerConfig {
-        ExplorerConfig {
-            host:                    String::new(),
-            port:                    String::new(),
-            proto:                   String::new(),
-            user:                    String::new(),
-            api_secret_path:         String::new(),
-            foreign_api_secret_path: String::new(),
-            grin_dir:                String::new(),
-            api_secret:              String::new(),
-            foreign_api_secret:      String::new(),
-            coingecko_api:           String::new(),
-            public_api:              String::new(),
-            stats_source:            Vec::new(),
-            public_nodes:            Vec::new(),
-            database:                String::new(),
-        }
-    }
-}
-
 
 // Output data
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Output {
     pub height:   String,
     pub commit:   String,
@@ -232,21 +130,9 @@ pub struct Output {
     pub raw_data: String,
 }
 
-impl Output {
-    pub fn new() -> Output {
-        Output {
-            height:   String::new(),
-            commit:   String::new(),
-            out_type: String::new(),
-            status:   String::new(),
-            raw_data: String::new(),
-        }
-    }
-}
-
 
 // Statistics data
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct Statistics {
     pub date:       Vec<String>,
     // Node versions
@@ -264,24 +150,9 @@ pub struct Statistics {
     pub kernels:    Vec<String>,
 }
 
-impl Statistics {
-    pub fn new() -> Statistics {
-        Statistics {
-            date:       Vec::new(),
-            user_agent: Vec::new(),
-            count:      Vec::new(),
-            total:      0,
-            hashrate:   Vec::new(),
-            txns:       Vec::new(),
-            fees:       Vec::new(),
-            utxos: Vec::new(),
-            kernels:    Vec::new(),
-        }
-    }
-}
 
 // Public node data
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct PublicNode {
     pub name:    String,
     pub version: String,
@@ -289,20 +160,9 @@ pub struct PublicNode {
     pub hash:    String,
 }
 
-impl PublicNode {
-    pub fn new() -> PublicNode {
-        PublicNode {
-            name:    String::new(),
-            version: String::new(),
-            height:  String::new(),
-            hash:    String::new(),
-        }
-    }
-}
-
 
 // Connected node data
-#[derive(PartialEq, Eq, Debug, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Eq, Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ConnectedNode {
     pub address:     String,
     pub user_agent:  String,
@@ -313,36 +173,12 @@ pub struct ConnectedNode {
     pub isp:         String,
 }
 
-impl ConnectedNode {
-    pub fn new() -> ConnectedNode {
-        ConnectedNode {
-            address:     String::new(),
-            user_agent:  String::new(),
-            bits:        0,
-            is_archival: false,
-            location:    String::new(),
-            flag:        String::new(),
-            isp:         String::new(),
-        }
-    }
-}
-
 
 // Network data
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 pub struct NetStats {
     pub pub_nodes:   Vec<PublicNode>,
     pub reach_nodes: Vec<ConnectedNode>,
     pub conn_nodes:  Vec<ConnectedNode>,
-}
-
-impl NetStats {
-    pub fn new() -> NetStats {
-        NetStats {
-            pub_nodes:   Vec::new(),
-            reach_nodes: Vec::new(),
-            conn_nodes:  Vec::new(),
-        }
-    }
 }
 

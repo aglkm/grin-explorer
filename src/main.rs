@@ -50,7 +50,7 @@ fn block_list() -> Template {
 // [<--] and [-->] buttons at the bottom of the block list (Blocks) page.
 #[get("/block_list/<input_height>")]
 async fn block_list_by_height(input_height: &str) -> Template {
-    let mut blocks = Vec::<Block>::new();
+    let mut blocks = Vec::<Block>::default();
     // Store current latest height
     let mut height = 0;
 
@@ -86,7 +86,7 @@ async fn block_list_by_height(input_height: &str) -> Template {
 // Rendering page for a specified block (by height).
 #[get("/block/<height>")]
 async fn block_details_by_height(height: &str) -> Template {
-    let mut block = Block::new();
+    let mut block = Block::default();
 
     if height.is_empty() == false && height.chars().all(char::is_numeric) == true {
         let _ = requests::get_block_data(&height, &mut block).await;
@@ -130,7 +130,7 @@ async fn block_header_by_hash(hash: &str) -> Either<Template, Redirect> {
 // Rendering page for a specified kernel.
 #[get("/kernel/<excess>")]
 async fn kernel(excess: &str) -> Template {
-    let mut kernel = Kernel::new();
+    let mut kernel = Kernel::default();
 
     let _ = requests::get_kernel(&excess, &mut kernel).await;
 
@@ -152,7 +152,7 @@ async fn kernel(excess: &str) -> Template {
 // Rendering page for a specified output.
 #[get("/output/<commit>")]
 async fn output(commit: &str) -> Template {
-    let mut output = Output::new();
+    let mut output = Output::default();
 
     let _ = requests::get_output(&commit, &mut output).await;
 
@@ -206,8 +206,8 @@ pub async fn search(query: Option<&str>) -> Either<Template, Redirect> {
             // As we can't distinguish between Kernel and Output, this will produce redundant
             // get_kernel and get_output calls, but will allow for better UI (no need to ask user to
             // input the type of the search request).
-            let mut kernel = Kernel::new();
-            let mut output = Output::new();
+            let mut kernel = Kernel::default();
+            let mut output = Output::default();
 
             let _ = requests::get_kernel(&query, &mut kernel).await;
 
@@ -888,15 +888,15 @@ async fn main() {
 
     info!("starting up.");
     
-    let dash           = Arc::new(Mutex::new(Dashboard::new()));
+    let dash           = Arc::new(Mutex::new(Dashboard::default()));
     let dash_clone     = dash.clone();
-    let blocks         = Arc::new(Mutex::new(Vec::<Block>::new()));
+    let blocks         = Arc::new(Mutex::new(Vec::<Block>::default()));
     let blocks_clone   = blocks.clone();
-    let txns           = Arc::new(Mutex::new(Transactions::new()));
+    let txns           = Arc::new(Mutex::new(Transactions::default()));
     let txns_clone     = txns.clone();
-    let stats          = Arc::new(Mutex::new(Statistics::new()));
+    let stats          = Arc::new(Mutex::new(Statistics::default()));
     let stats_clone    = stats.clone();
-    let netstats       = Arc::new(Mutex::new(NetStats::new()));
+    let netstats       = Arc::new(Mutex::new(NetStats::default()));
     let netstats_clone = netstats.clone();
 
     let mut ready_data  = false;

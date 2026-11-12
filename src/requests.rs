@@ -134,7 +134,7 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
                                  netstats: Arc<Mutex<NetStats>>) -> Result<(), anyhow::Error> {
     let mut peers           = HashMap::new();
     let mut addrs           = Vec::new();
-    let mut connected_nodes = Vec::<ConnectedNode>::new();
+    let mut connected_nodes = Vec::<ConnectedNode>::default();
     let mut inbound         = 0;
     let mut outbound        = 0;
 
@@ -143,7 +143,7 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
     if resp != Value::Null {
         // Collecting peers from local node
         for peer in resp["result"]["Ok"].as_array().unwrap() {
-            let mut node = ConnectedNode::new();
+            let mut node = ConnectedNode::default();
 
             if peer["direction"] == "Inbound" {
                 inbound += 1;
@@ -178,7 +178,7 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
                             if resp != Value::Null {
                                 if resp["result"]["Ok"].is_null() == false { 
                                     for peer in resp["result"]["Ok"].as_array().unwrap() {
-                                        let mut node = ConnectedNode::new();
+                                        let mut node = ConnectedNode::default();
 
                                         // Collecting user_agent nodes stats
                                         if !addrs.contains(&peer["addr"].to_string()) {
@@ -632,7 +632,7 @@ pub async fn get_block_kernels(height: &String, blocks: &mut Vec<Block>)
         let resp   = call("get_blocks", params, "1", "foreign").await?;
 
         for resp_block in resp["result"]["Ok"]["blocks"].as_array().unwrap() {
-            let mut block = Block::new();
+            let mut block = Block::default();
             
             for kernel in resp_block["kernels"].as_array().unwrap() {
                 block.kernels.push((kernel["excess"].to_string(),
@@ -651,7 +651,7 @@ pub async fn get_block_kernels(height: &String, blocks: &mut Vec<Block>)
 // Collecting: period_1h, period_24h, fees_1h, fees_24h.
 pub async fn get_txn_stats(dashboard: Arc<Mutex<Dashboard>>,
                            transactions: Arc<Mutex<Transactions>>)-> Result<(), Error> {
-    let mut blocks = Vec::<Block>::new();
+    let mut blocks = Vec::<Block>::default();
     let height     = get_current_height(dashboard.clone());
 
     if height.is_empty() == false && height.parse::<u64>().unwrap() > 1440 {
@@ -719,10 +719,10 @@ pub async fn get_recent_blocks(dashboard: Arc<Mutex<Dashboard>>,
 
     if height_str.is_empty() == false && height_str.parse::<u64>().unwrap() > 0 {
         let height         = height_str.parse::<u64>().unwrap();
-        let mut blocks_vec = Vec::<Block>::new();
+        let mut blocks_vec = Vec::<Block>::default();
 
         while i < 10 {
-            let mut block = Block::new();
+            let mut block = Block::default();
             let height_index = height - i;
 
             let _ = get_block_list_data(&height_index.to_string(), &mut block).await;
@@ -760,7 +760,7 @@ pub async fn get_block_list_by_height(height: &str, blocks: &mut Vec<Block>,
             }
 
             while i < 10 {
-                let mut block = Block::new();
+                let mut block = Block::default();
 
                 let _ = get_block_list_data(&(height - i).to_string(), &mut block).await;
 
@@ -816,10 +816,10 @@ pub async fn get_unspent_outputs(dashboard: Arc<Mutex<Dashboard>>) -> Result<(),
 
 // Get public nodes data
 pub async fn get_pubnodes_stats(netstats: Arc<Mutex<NetStats>>) -> Result<(), anyhow::Error> {
-    let mut nodes = Vec::<PublicNode>::new();
+    let mut nodes = Vec::<PublicNode>::default();
 
     for endpoint in CONFIG.public_nodes.clone() {
-        let mut node = PublicNode::new();
+        let mut node = PublicNode::default();
 
         node.name = endpoint
             .strip_prefix("https://")

@@ -8,7 +8,7 @@ use crate::data::ExplorerConfig;
 // Static explorer config structure
 lazy_static! {
     pub static ref CONFIG: ExplorerConfig = {
-        let mut cfg = ExplorerConfig::new();
+        let mut cfg = ExplorerConfig::default();
         let toml    = Config::builder().add_source(config::File::with_name("Explorer")).build().unwrap();
 
         // Mandatory settings
