@@ -31,8 +31,19 @@ pub async fn data(dash: Arc<Mutex<Dashboard>>, blocks: Arc<Mutex<Vec<Block>>>,
 // Collecting statistics.
 pub async fn stats(dash: Arc<Mutex<Dashboard>>, txns: Arc<Mutex<Transactions>>, stats: Arc<Mutex<Statistics>>, netstats: Arc<Mutex<NetStats>>) -> Result<(), anyhow::Error> {
 
-    let _ = requests::get_unspent_outputs(dash.clone()).await?;
-    let _ = requests::get_reachable_nodes(netstats.clone()).await?;
+    match requests::get_unspent_outputs(dash.clone()).await {
+        Ok(_) => (),
+        Err(err) => {
+            warn!("{}", err);
+        }
+    }
+
+    match requests::get_reachable_nodes(netstats.clone()).await {
+        Ok(_) => (),
+        Err(err) => {
+            warn!("{}", err);
+        }
+    }
 
     let mut stats = stats.lock().unwrap();
     let dash      = dash.lock().unwrap();

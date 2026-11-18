@@ -43,7 +43,7 @@ pub async fn call(method: &str, params: &str, id: &str, rpc_type: &str) -> Resul
                        .await?;
 
     match result.error_for_status_ref() {
-        Ok(_res) => (),
+        Ok(_) => (),
         Err(err) => { error!("rpc failed, status code: {:?}", err.status().unwrap()); },
     }
 
@@ -69,7 +69,7 @@ pub async fn call_external(method: &str, params: &str, id: &str, rpc_type: &str,
                        .await?;
 
     match result.error_for_status_ref() {
-        Ok(_res) => (),
+        Ok(_) => (),
         Err(err) => { error!("rpc failed, status code: {:?}", err.status().unwrap()); },
     }
 

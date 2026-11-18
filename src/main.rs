@@ -7,6 +7,7 @@ use rocket::fs::FileServer;
 use rocket::{State, tokio};
 use rocket::response::Redirect;
 use rocket::serde::json::json;
+use std::io::Write;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use serde_json::Value;
@@ -884,7 +885,19 @@ fn kernels(dashboard: &State<Arc<Mutex<Dashboard>>>) -> String {
 // Main
 #[rocket::main]
 async fn main() {
-    env_logger::init();
+    env_logger::Builder::from_default_env()
+        .format(|buf, record| {
+            writeln!(
+                buf,
+                "{} [{}] {}:{} - {}",
+                buf.default_level_style(record.level()),
+                record.level(),
+                record.file().unwrap_or("unknown"),
+                record.line().unwrap_or(0),
+                record.args()
+            )
+        })
+        .init();
 
     info!("starting up.");
     
