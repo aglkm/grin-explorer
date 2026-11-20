@@ -173,6 +173,13 @@ pub struct ConnectedNode {
     pub isp:         String,
 }
 
+// Country data
+#[derive(Debug, Default, Clone, Serialize)]
+pub struct Country {
+    pub country: String,
+    pub flag: String,
+    pub count: i32,
+}
 
 // Network data
 #[derive(Debug, Default, Serialize)]
@@ -180,5 +187,9 @@ pub struct NetStats {
     pub pub_nodes:   Vec<PublicNode>,
     pub reach_nodes: Vec<ConnectedNode>,
     pub conn_nodes:  Vec<ConnectedNode>,
+    pub arch_nodes:  Vec<ConnectedNode>,
+    pub ipv4_nodes:  Vec<ConnectedNode>,
+    pub ipv6_nodes:  Vec<ConnectedNode>,
+    pub countries:   Vec<Country>,
 }
 

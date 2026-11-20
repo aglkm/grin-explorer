@@ -11,7 +11,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::Duration;
 use std::collections::HashMap;
 
-use crate::data::{Block, ConnectedNode, Dashboard, Kernel, NetStats, Output, PublicNode, Statistics, Transactions};
+use crate::data::{Block, ConnectedNode, Country, Dashboard, Kernel, NetStats, Output, PublicNode, Statistics, Transactions};
 use crate::data::{KERNEL_WEIGHT, INPUT_WEIGHT, OUTPUT_WEIGHT, KERNEL_SIZE, INPUT_SIZE, OUTPUT_SIZE};
 use crate::exconfig::CONFIG;
 
@@ -927,6 +927,49 @@ pub async fn get_reachable_nodes(netstats: Arc<Mutex<NetStats>>) -> Result<(), a
     
     // Copying updated list of reachable nodes
     nstats.reach_nodes = reach_nodes.clone();
+
+    // Copying archival nodes
+    nstats.arch_nodes = reach_nodes
+        .iter()
+        .filter(|node| node.is_archival == true)
+        .cloned()
+        .collect();
+    
+    // Copying ipv4 nodes
+    nstats.ipv4_nodes = reach_nodes
+        .iter()
+        .filter(|node| !node.address.starts_with('['))
+        .cloned()
+        .collect();
+    
+    // Copying ipv6 nodes
+    nstats.ipv6_nodes = reach_nodes
+        .iter()
+        .filter(|node| node.address.starts_with('['))
+        .cloned()
+        .collect();
+
+    // Copying countries
+    let mut countries: HashMap<String, (String, i32)> = HashMap::new();
+
+    for node in reach_nodes.clone() {
+        let entry = countries.entry(node.location).or_insert((node.flag, 0));
+        entry.1 += 1;
+    }
+    
+    // Sort countries HashMap into Vec
+    let mut countries_vec: Vec<Country> = countries
+        .into_iter()
+        .map(|(country, (flag, count))| Country {
+            country,
+            flag,
+            count,
+        })
+        .collect();
+
+    countries_vec.sort_by(|a, b| b.count.cmp(&a.count));
+
+    nstats.countries = countries_vec.clone();
 
     Ok(())
 }

@@ -62,6 +62,10 @@ div.card {
   border-style: none;
 }
 
+.nav-link.active {
+  color: #FF7518 !important;
+}
+
 footer {
   background-color: white;
 }
@@ -124,12 +128,8 @@ footer {
   color: silver !important;
 }
 
-.dark-mode span .badge {
-  badge-color: red;
-}
-
 .dark-mode {
-  background-color: #1f2029 !important;
+  background-color: #14151a !important;
   color: silver !important;
 }
 
@@ -177,7 +177,7 @@ footer {
 
 .dark-mode .nav-link.active {
   background-color: #14151a;
-  color: #636c72 !important;
+  color: #f2a900 !important;
   border-style: none;
 }
 

@@ -410,6 +410,14 @@ fn network(netstats: &State<Arc<Mutex<NetStats>>>) -> Template {
         pub_nodes: &data.pub_nodes,
         reach_nodes: &data.reach_nodes,
         reach_len: &data.reach_nodes.len(),
+        arch_nodes: &data.arch_nodes,
+        arch_len: &data.arch_nodes.len(),
+        ipv4_nodes: &data.ipv4_nodes,
+        ipv4_len: &data.ipv4_nodes.len(),
+        ipv6_nodes: &data.ipv6_nodes,
+        ipv6_len: &data.ipv6_nodes.len(),
+        countries: &data.countries,
+        countries_len: &data.countries.len(),
         cg_api: CONFIG.coingecko_api.clone(),
     })
 }

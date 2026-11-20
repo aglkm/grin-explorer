@@ -110,14 +110,38 @@
     </div>
 </div>
 
+<br>
 
 <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
   <div class="card-body" align="center">
     <div class="value-text">
-      <div class="darkorange-text">REACHABLE NODES ({{ reach_len }})</div>
+      <div class="darkorange-text">REACHABLE NODES</div>
     </div>
   </div>
 </div>
+
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-tab-pane" type="button" role="tab" aria-controls="all-tab-pane" aria-selected="true">ALL ({{ reach_len }})</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="archival-tab" data-bs-toggle="tab" data-bs-target="#archival-tab-pane" type="button" role="tab" aria-controls="archival-tab-pane" aria-selected="false">ARCHIVAL ({{ arch_len }})</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="ipv4-tab" data-bs-toggle="tab" data-bs-target="#ipv4-tab-pane" type="button" role="tab" aria-controls="ipv4-tab-pane" aria-selected="false">IPv4 ({{ ipv4_len }})</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="ipv6-tab" data-bs-toggle="tab" data-bs-target="#ipv6-tab-pane" type="button" role="tab" aria-controls="ipv6-tab-pane" aria-selected="false">IPv6 ({{ ipv6_len }})</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="countries-tab" data-bs-toggle="tab" data-bs-target="#countries-tab-pane" type="button" role="tab" aria-controls="countries-tab-pane" aria-selected="false">COUNTRIES ({{ countries_len }})</button>
+  </li>
+</ul>
+
+
+<div class="tab-content" id="myTabContent">
+
+<div class="tab-pane show active" id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab" tabindex="0">
 
 <div class="d-none d-md-block"> <!-- Show on >= md screens -->
   <div class="card-group">
@@ -150,7 +174,6 @@
 	</div>
       </div>
   </div>
-
 
     {% for node in reach_nodes %}
     <div class="card-group rounded-0">
@@ -217,6 +240,359 @@
     </div>
 </div>
 
+</div>
+
+<div class="tab-pane" id="archival-tab-pane" role="tabpanel" aria-labelledby="archival-tab" tabindex="0">
+
+<div class="d-none d-md-block"> <!-- Show on >= md screens -->
+  <div class="card-group">
+      <div class="card border-start-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            ADDRESS
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            USER AGENT
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            ISP
+          </div>
+	</div>
+      </div>
+      <div class="card border-end-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            LOCATION
+          </div>
+	</div>
+      </div>
+  </div>
+
+    {% for node in arch_nodes %}
+    <div class="card-group rounded-0">
+        <div class="card border-top-0 border-start-0 rounded-0">
+          <div class="card-body">
+            <div class="value-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.user_agent }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.isp }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 border-end-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.location }} {{ node.flag }}</div>
+          </div>
+	</div>
+    </div>
+    {% endfor %}
+
+</div>
+
+
+<div class="d-md-none"> <!-- Show on < md screens-->
+    {% for node in arch_nodes %}
+        <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+          <div class="card-body" align="left">
+              <div class="d-flex justify-content-start">
+                <div class="darkorange-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">User Agent</div>
+                  <div class="value-text">{{ node.user_agent }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">ISP</div>
+                  <div class="value-text text-end">{{ node.isp }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Location</div>
+                  <div class="value-text">{{ node.location }} {{ node.flag }}</div>
+              </div>
+          </div>
+	</div>
+    {% endfor %}
+    <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+    </div>
+</div>
+
+</div>
+
+<div class="tab-pane" id="ipv4-tab-pane" role="tabpanel" aria-labelledby="ipv4-tab" tabindex="0">
+
+<div class="d-none d-md-block"> <!-- Show on >= md screens -->
+  <div class="card-group">
+      <div class="card border-start-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            ADDRESS
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            USER AGENT
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            ISP
+          </div>
+	</div>
+      </div>
+      <div class="card border-end-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            LOCATION
+          </div>
+	</div>
+      </div>
+  </div>
+
+    {% for node in ipv4_nodes %}
+    <div class="card-group rounded-0">
+        <div class="card border-top-0 border-start-0 rounded-0">
+          <div class="card-body">
+              {% if node.is_archival == true %}
+                <div class="value-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
+              {% else %}
+                <div class="value-text">{{ node.address }}</div>
+              {% endif %}
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.user_agent }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.isp }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 border-end-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.location }} {{ node.flag }}</div>
+          </div>
+	</div>
+    </div>
+    {% endfor %}
+
+</div>
+
+
+<div class="d-md-none"> <!-- Show on < md screens-->
+    {% for node in ipv4_nodes %}
+        <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+          <div class="card-body" align="left">
+              <div class="d-flex justify-content-start">
+                {% if node.is_archival == true %}
+                  <div class="value-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
+                {% else %}
+                  <div class="value-text">{{ node.address }}</div>
+                {% endif %}
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">User Agent</div>
+                  <div class="value-text">{{ node.user_agent }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">ISP</div>
+                  <div class="value-text text-end">{{ node.isp }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Location</div>
+                  <div class="value-text">{{ node.location }} {{ node.flag }}</div>
+              </div>
+          </div>
+	</div>
+    {% endfor %}
+    <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+    </div>
+</div>
+
+</div>
+
+<div class="tab-pane" id="ipv6-tab-pane" role="tabpanel" aria-labelledby="ipv6-tab" tabindex="0">
+
+<div class="d-none d-md-block"> <!-- Show on >= md screens -->
+  <div class="card-group">
+      <div class="card border-start-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            ADDRESS
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            USER AGENT
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            ISP
+          </div>
+	</div>
+      </div>
+      <div class="card border-end-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            LOCATION
+          </div>
+	</div>
+      </div>
+  </div>
+
+    {% for node in ipv6_nodes %}
+    <div class="card-group rounded-0">
+        <div class="card border-top-0 border-start-0 rounded-0">
+          <div class="card-body">
+              {% if node.is_archival == true %}
+                <div class="value-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
+              {% else %}
+                <div class="value-text">{{ node.address }}</div>
+              {% endif %}
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.user_agent }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.isp }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 border-end-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ node.location }} {{ node.flag }}</div>
+          </div>
+	</div>
+    </div>
+    {% endfor %}
+
+</div>
+
+
+<div class="d-md-none"> <!-- Show on < md screens-->
+    {% for node in ipv6_nodes %}
+        <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+          <div class="card-body" align="left">
+              <div class="d-flex justify-content-start">
+                {% if node.is_archival == true %}
+                  <div class="value-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
+                {% else %}
+                  <div class="value-text">{{ node.address }}</div>
+                {% endif %}
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">User Agent</div>
+                  <div class="value-text">{{ node.user_agent }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">ISP</div>
+                  <div class="value-text text-end">{{ node.isp }}</div>
+              </div>
+	      <br>
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">Location</div>
+                  <div class="value-text">{{ node.location }} {{ node.flag }}</div>
+              </div>
+          </div>
+	</div>
+    {% endfor %}
+    <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+    </div>
+</div>
+
+</div>
+
+<div class="tab-pane" id="countries-tab-pane" role="tabpanel" aria-labelledby="countries-tab" tabindex="0">
+
+<div class="d-none d-md-block"> <!-- Show on >= md screens -->
+  <div class="card-group">
+      <div class="card border-start-0 rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            COUNTRY
+          </div>
+	</div>
+      </div>
+      <div class="card rounded-0">
+        <div class="card-body">
+          <div class="darkorange-text">
+            COUNT
+          </div>
+	</div>
+      </div>
+  </div>
+
+    {% for item in countries %}
+    <div class="card-group rounded-0">
+        <div class="card border-top-0 border-start-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ item.country }} {{ item.flag }}</div>
+	  </div>
+	</div>
+        <div class="card border-top-0 rounded-0">
+          <div class="card-body">
+              <div class="value-text">{{ item.count }}</div>
+	  </div>
+	</div>
+    </div>
+    {% endfor %}
+
+</div>
+
+
+<div class="d-md-none"> <!-- Show on < md screens-->
+    {% for item in countries %}
+        <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+          <div class="card-body" align="left">
+              <div class="d-flex justify-content-between">
+	        <div class="value-text">{{ item.country }} {{ item.flag }}</div>
+                  <div class="value-text">{{ item.count }}</div>
+              </div>
+          </div>
+	</div>
+    {% endfor %}
+    <div class="card border-bottom-0 border-start-0 border-end-0 rounded-0">
+    </div>
+</div>
+
+</div>
+
+</div>
 
 </code>
 
