@@ -407,9 +407,9 @@
           <div class="card-body" align="left">
               <div class="d-flex justify-content-start">
                 {% if node.is_archival == true %}
-                  <div class="value-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
+                  <div class="darkorange-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
                 {% else %}
-                  <div class="value-text">{{ node.address }}</div>
+                  <div class="darkorange-text">{{ node.address }}</div>
                 {% endif %}
               </div>
 	      <br>
@@ -508,9 +508,9 @@
           <div class="card-body" align="left">
               <div class="d-flex justify-content-start">
                 {% if node.is_archival == true %}
-                  <div class="value-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
+                  <div class="darkorange-text">{{ node.address }} <i class="bi bi-database" title="archival"></i></div>
                 {% else %}
-                  <div class="value-text">{{ node.address }}</div>
+                  <div class="darkorange-text">{{ node.address }}</div>
                 {% endif %}
               </div>
 	      <br>
