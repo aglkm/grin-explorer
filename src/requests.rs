@@ -4,6 +4,7 @@ use fs_extra::dir::get_size;
 use humantime::format_duration;
 use num_format::{Locale, ToFormattedString};
 use reqwest::Error;
+use rocket::tokio;
 use serde_json::Value;
 use std::net::{TcpStream, SocketAddr};
 use std::sync::{Arc, Mutex};
@@ -916,6 +917,8 @@ pub async fn get_reachable_nodes(netstats: Arc<Mutex<NetStats>>) -> Result<(), a
                              // If it doesn't exist, add it
                              reach_nodes.push(node.clone());
                          }
+                         // Sleep after every request to avoid throttling
+                         tokio::time::sleep(Duration::from_secs(3)).await;
                      },
             Err(_) => continue,
         }
