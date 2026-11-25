@@ -224,7 +224,6 @@ pub async fn get_connected_peers(dashboard: Arc<Mutex<Dashboard>>, statistics: A
 
     let mut nstats = netstats.lock().unwrap();
 
-    nstats.conn_nodes.clear();
     nstats.conn_nodes = connected_nodes.clone();
 
     Ok(())
@@ -733,7 +732,6 @@ pub async fn get_recent_blocks(dashboard: Arc<Mutex<Dashboard>>,
         }
 
         let mut blcks = blocks.lock().unwrap();
-        blcks.clear();
         *blcks = blocks_vec;
 
     }
@@ -926,8 +924,6 @@ pub async fn get_reachable_nodes(netstats: Arc<Mutex<NetStats>>) -> Result<(), a
 
     let mut nstats = netstats.lock().unwrap();
 
-    nstats.reach_nodes.clear();
-    
     // Copying updated list of reachable nodes
     nstats.reach_nodes = reach_nodes.clone();
 
