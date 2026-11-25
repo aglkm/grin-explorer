@@ -31,6 +31,8 @@ pub async fn data(dash: Arc<Mutex<Dashboard>>, blocks: Arc<Mutex<Vec<Block>>>,
 // Collecting statistics.
 pub async fn stats(dash: Arc<Mutex<Dashboard>>, txns: Arc<Mutex<Transactions>>, stats: Arc<Mutex<Statistics>>, netstats: Arc<Mutex<NetStats>>) -> Result<(), anyhow::Error> {
 
+    info!("worker::stats in progress...");
+
     match requests::get_unspent_outputs(dash.clone()).await {
         Ok(_) => (),
         Err(err) => {
