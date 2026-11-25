@@ -669,7 +669,7 @@
         </div>
       </div>
       <div class="modal-body">
-        Percentage of issued coins from the soft total supply (3150M) when inflation will reach <1%.
+        The percentage of coins issued from the soft total supply (3150M) when inflation drops below 1%.
         <br>
         <br>
         <a class="text-decoration-none" href="https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153">https://john-tromp.medium.com/a-case-for-using-soft-total-supply-1169a188d153</a>

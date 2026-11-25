@@ -30,8 +30,8 @@ public_api = "enabled"
 # Note that not all public nodes provide "get_connected_peers" owner API.
 # stats_source = ["https://grinnode.live:3413", "https://grincoin.org"]
  
-# List of piblic nodes
-# public_nodes = ["https://grincoin.org", "https://main.gri.mw", "https://mainnet.grinffindor.org", "https://grinnode.live:3413", "https://scan.grin.money"]
+# List of public nodes.
+# public_nodes = ["https://grincoin.org", "https://main.gri.mw", "https://mainnet.grinffindor.org", "https://grinnode.live:3413"]
 
 # Database path.
 # By default, it will be created in the current directory.
